@@ -1,0 +1,9 @@
+{
+  "purpose": "Manually authored functional queries after inspecting the two complete PDFs; no accuracy claim or benchmark label lookup.",
+  "questions": [
+    "Which page illustrates the serial temporal-unary matrix multiplication hardware?",
+    "Where can I compare the parallel tuGEMM design and its power, area, and latency plots?",
+    "How is Frechet Music Distance computed?",
+    "Which page shows how transposing pitch changes the music evaluation distance?"
+  ]
+}

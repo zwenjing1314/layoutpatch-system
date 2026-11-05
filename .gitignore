@@ -1,0 +1,18 @@
+# System project only; never alter source repositories to match this file.
+.env
+.env.*
+!.env.example
+.venv/
+.venv-parser/
+node_modules/
+.next/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+runtime/
+storage/
+models/
+checkpoints/
+*.sqlite*
+*.log

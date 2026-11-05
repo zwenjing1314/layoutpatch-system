@@ -1,0 +1,38 @@
+{
+  "schema": "colpali-local-profile-v1",
+  "name": "colpali_full_v1",
+  "model_id": "vidore/colpali",
+  "adapter_revision": "7754422bfa37f8e3cd771e13d4d7f07de3103c95",
+  "base_model_id": "vidore/colpaligemma-3b-mix-448-base",
+  "base_revision": "6ff0d944ea09c3ead97d2bc57427e3d4f01d192f",
+  "dimension": 128,
+  "page_tokens": 1031,
+  "image_tokens": 1024,
+  "dtype": "bfloat16",
+  "query_padding": "attention_mask_zero_only_preserve_augmentation",
+  "score": "sum_query_max_page_inner_product",
+  "model_files": {
+    "adapter": {
+      "adapter_config.json": "bfc17607903d920dda5303981e1e1866537f428c4199b73bde1d280609c51bd9",
+      "adapter_model.safetensors": "961b72c2b2a1bebc3e11e7d98cd173d263437aad5ef36e760e9265c184c88d64",
+      "added_tokens.json": "7d0bad90030d638a4bf89a82e91206e25f1fbe0012f14bca21666a64b643bc49",
+      "chat_template.jinja": "f1891fbe06e05a8f1222a91aa5541da1570eb6c5a6fcdb0681328e14b556a74c",
+      "preprocessor_config.json": "90299f8d8315526f40c6ea71373d64e56898115c7e7db641075eb23b34f7ceb9",
+      "special_tokens_map.json": "c87885c12d55c60133110a234291db5ac952e99e83d9735099d304cb4d45914d",
+      "tokenizer.json": "1df2ab04780faccf51a881d7c5a7026cc6f979083af2eebf709d051b8d47134b",
+      "tokenizer.model": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+      "tokenizer_config.json": "5a4d5042efb7f465976b1c7257dc3b080e8c1a5e5afabe43a0ff7d31e45025ad"
+    },
+    "base": {
+      "config.json": "15e6dda39456cbce4310e5c18f028f9eb7531b74d63786c2fde98c81c7d5ca6d",
+      "model-00001-of-00002.safetensors": "8b439a322fa98964517fca8fbf0a1d17e6e60e7e8812bc1c373ad87d654108d5",
+      "model-00002-of-00002.safetensors": "ad075b39b4a24b309028f3d003a0e7cad9e45fa2dbbd267867474e77e10df814",
+      "model.safetensors.index.json": "4e5df353aaefc5ed9b2f6407cea6d127dfad2b3b8f6fa0c8132f6bb8395dc966"
+    }
+  },
+  "historical_implementation_sha256": {
+    "ColPali": "4bb9be17b47dd6c4e6b409f561a550da8610a310ae4051ae1be55b3137f15f8a",
+    "ColPaliProcessor": "cc5fdc935d42ed45002d0362f64249e4d7a8873213de833a0e893c0b273fdab5"
+  },
+  "source_manifest_sha256": "87386a31e2300093d59f0f0c5bd81ecac7161292ab9df49736581ecf2217aa4f"
+}

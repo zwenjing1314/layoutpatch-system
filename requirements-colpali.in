@@ -1,0 +1,10 @@
+# Stage 1A direct dependencies; exact transitive versions in requirements-colpali.lock.txt.
+colpali-engine==0.3.18
+torch==2.13.0+cu130
+torchvision==0.28.0+cu130
+transformers==5.17.0
+peft==0.20.0
+accelerate==1.15.0
+pymupdf==1.28.2
+pillow==12.3.0
+pytest==9.1.1

@@ -1,0 +1,887 @@
+{
+  "schema": "stage1a-evidence-bundle-v1",
+  "date": "2026-11-05",
+  "round": "R03",
+  "status": "passed",
+  "raw_report": {
+    "path": "runtime/verification/20261105-gpu-first/report.json",
+    "sha256": "d1b025f09734c10c0c17083425b46f7040c33c3bd84e89c080b05dad78621920"
+  },
+  "environment_seed": {
+    "path": "runtime/checks/environment-seed.json",
+    "sha256": "f973999a7ed46130d41df29fd4eea0aa4520d3cc5b44606451468d1edbce5f51",
+    "method": "independent file copies; no source sys.path; no console launchers",
+    "packages": {
+      "accelerate": {
+        "version": "1.15.0",
+        "copied_files": 92
+      },
+      "annotated-doc": {
+        "version": "0.0.5",
+        "copied_files": 10
+      },
+      "anyio": {
+        "version": "4.15.1",
+        "copied_files": 55
+      },
+      "certifi": {
+        "version": "2026.7.22",
+        "copied_files": 14
+      },
+      "charset-normalizer": {
+        "version": "3.5.1",
+        "copied_files": 23
+      },
+      "click": {
+        "version": "8.5.0",
+        "copied_files": 24
+      },
+      "colorama": {
+        "version": "0.4.6",
+        "copied_files": 19
+      },
+      "colpali-engine": {
+        "version": "0.3.18",
+        "copied_files": 96
+      },
+      "filelock": {
+        "version": "3.32.6",
+        "copied_files": 28
+      },
+      "fsspec": {
+        "version": "2026.6.0",
+        "copied_files": 63
+      },
+      "h11": {
+        "version": "0.16.0",
+        "copied_files": 19
+      },
+      "hf-xet": {
+        "version": "1.6.0",
+        "copied_files": 9
+      },
+      "httpcore": {
+        "version": "1.0.9",
+        "copied_files": 38
+      },
+      "httpx": {
+        "version": "0.28.1",
+        "copied_files": 31
+      },
+      "huggingface-hub": {
+        "version": "1.31.0",
+        "copied_files": 194
+      },
+      "idna": {
+        "version": "3.19",
+        "copied_files": 18
+      },
+      "iniconfig": {
+        "version": "2.3.0",
+        "copied_files": 12
+      },
+      "jinja2": {
+        "version": "3.1.6",
+        "copied_files": 33
+      },
+      "markdown-it-py": {
+        "version": "4.2.0",
+        "copied_files": 76
+      },
+      "markupsafe": {
+        "version": "3.0.3",
+        "copied_files": 13
+      },
+      "mdurl": {
+        "version": "0.1.2",
+        "copied_files": 13
+      },
+      "mpmath": {
+        "version": "1.3.0",
+        "copied_files": 94
+      },
+      "networkx": {
+        "version": "3.6.1",
+        "copied_files": 603
+      },
+      "numpy": {
+        "version": "2.4.6",
+        "copied_files": 1063
+      },
+      "packaging": {
+        "version": "26.3",
+        "copied_files": 31
+      },
+      "peft": {
+        "version": "0.20.0",
+        "copied_files": 255
+      },
+      "pillow": {
+        "version": "12.3.0",
+        "copied_files": 123
+      },
+      "pluggy": {
+        "version": "1.6.0",
+        "copied_files": 16
+      },
+      "psutil": {
+        "version": "7.2.2",
+        "copied_files": 18
+      },
+      "pygments": {
+        "version": "2.21.0",
+        "copied_files": 351
+      },
+      "pymupdf": {
+        "version": "1.28.2",
+        "copied_files": 121
+      },
+      "pytest": {
+        "version": "9.1.1",
+        "copied_files": 91
+      },
+      "pyyaml": {
+        "version": "6.0.3",
+        "copied_files": 26
+      },
+      "regex": {
+        "version": "2026.9.10",
+        "copied_files": 12
+      },
+      "requests": {
+        "version": "2.34.2",
+        "copied_files": 28
+      },
+      "rich": {
+        "version": "15.0.0",
+        "copied_files": 107
+      },
+      "safetensors": {
+        "version": "0.8.0",
+        "copied_files": 17
+      },
+      "scipy": {
+        "version": "1.17.1",
+        "copied_files": 1534
+      },
+      "setuptools": {
+        "version": "84.0.0",
+        "copied_files": 345
+      },
+      "shellingham": {
+        "version": "1.5.4",
+        "copied_files": 15
+      },
+      "sympy": {
+        "version": "1.14.0",
+        "copied_files": 1571
+      },
+      "tokenizers": {
+        "version": "0.23.2",
+        "copied_files": 34
+      },
+      "torch": {
+        "version": "2.13.0+cu130",
+        "copied_files": 12100
+      },
+      "torchvision": {
+        "version": "0.28.0+cu130",
+        "copied_files": 201
+      },
+      "tqdm": {
+        "version": "4.70.1",
+        "copied_files": 41
+      },
+      "transformers": {
+        "version": "5.17.0",
+        "copied_files": 2690
+      },
+      "typer": {
+        "version": "0.27.2",
+        "copied_files": 43
+      },
+      "typing-extensions": {
+        "version": "4.16.0",
+        "copied_files": 7
+      },
+      "urllib3": {
+        "version": "2.7.0",
+        "copied_files": 44
+      }
+    },
+    "distribution_count": 49,
+    "file_count": 22461,
+    "excluded_entries": 25,
+    "downloaded": false
+  },
+  "validation": {
+    "contract_tests": {
+      "command": ".venv/Scripts/python.exe -B -m pytest tests/test_retrieval_contract.py -q -p no:cacheprovider",
+      "passed": 4,
+      "seconds": 3.33
+    },
+    "dependency_check": {
+      "command": "uv pip check --python .venv/Scripts/python.exe",
+      "result": "all 49 packages compatible"
+    },
+    "source_repositories_unchanged": true,
+    "old_environment_root_cause": "not established",
+    "scope": "CLI functional verification, not authenticated web, Qdrant, region ranking, or benchmark accuracy"
+  },
+  "manual_observations": [
+    {
+      "query": 1,
+      "target_page": 2,
+      "rank": 2
+    },
+    {
+      "query": 2,
+      "target_page": 3,
+      "rank": null,
+      "note": "parallel design figure not in Top-3"
+    },
+    {
+      "query": 3,
+      "target_page": 2,
+      "rank": 2
+    },
+    {
+      "query": 4,
+      "target_page": 6,
+      "rank": 2,
+      "note": "reference page 7 ranked first"
+    }
+  ],
+  "run": {
+    "schema": "colpali-live-verification-v1",
+    "status": "passed",
+    "started_utc": "2026-11-05T13:56:34.220412+00:00",
+    "stage": "complete",
+    "device": "cuda:0",
+    "network_attempts": [],
+    "page_cache_read": false,
+    "prediction_table_read": false,
+    "training": false,
+    "errors": [],
+    "queries": [
+      {
+        "question": "Which page illustrates the serial temporal-unary matrix multiplication hardware?",
+        "token_shape": [
+          23,
+          128
+        ],
+        "query_embedding_sha256": "952cf2b40512cd2d515ca0111bd8f844a2bae97879ddc3ec279991902f3704c9",
+        "search_seconds": 0.003242500009946525,
+        "reference_max_abs_diff": 1.9073486328125e-06,
+        "reference_top_k_matches": true,
+        "top_k": [
+          {
+            "page_id": "a9fff4245e2a6344:p0",
+            "rank": 1,
+            "score": 17.02510643005371,
+            "document_id": "a9fff4245e2a6344",
+            "page_number": 1
+          },
+          {
+            "page_id": "a9fff4245e2a6344:p1",
+            "rank": 2,
+            "score": 16.920705795288086,
+            "document_id": "a9fff4245e2a6344",
+            "page_number": 2
+          },
+          {
+            "page_id": "a9fff4245e2a6344:p2",
+            "rank": 3,
+            "score": 15.44685173034668,
+            "document_id": "a9fff4245e2a6344",
+            "page_number": 3
+          }
+        ]
+      },
+      {
+        "question": "Where can I compare the parallel tuGEMM design and its power, area, and latency plots?",
+        "token_shape": [
+          31,
+          128
+        ],
+        "query_embedding_sha256": "b5081cac433149d045311bbf0de9c9304a3ece661afaaedb07b64411cbae4d75",
+        "search_seconds": 0.004098700010217726,
+        "reference_max_abs_diff": 3.814697265625e-06,
+        "reference_top_k_matches": true,
+        "top_k": [
+          {
+            "page_id": "a9fff4245e2a6344:p0",
+            "rank": 1,
+            "score": 24.486122131347656,
+            "document_id": "a9fff4245e2a6344",
+            "page_number": 1
+          },
+          {
+            "page_id": "a9fff4245e2a6344:p1",
+            "rank": 2,
+            "score": 23.904783248901367,
+            "document_id": "a9fff4245e2a6344",
+            "page_number": 2
+          },
+          {
+            "page_id": "a9fff4245e2a6344:p3",
+            "rank": 3,
+            "score": 23.696836471557617,
+            "document_id": "a9fff4245e2a6344",
+            "page_number": 4
+          }
+        ]
+      },
+      {
+        "question": "How is Frechet Music Distance computed?",
+        "token_shape": [
+          19,
+          128
+        ],
+        "query_embedding_sha256": "238340f05ce975e2930fabf87b088e09a5bf8faa308302fe6fd416b0cc8ef709",
+        "search_seconds": 0.0035057999775744975,
+        "reference_max_abs_diff": 1.9073486328125e-06,
+        "reference_top_k_matches": true,
+        "top_k": [
+          {
+            "page_id": "77c1bf54c3da64f6:p0",
+            "rank": 1,
+            "score": 16.38571548461914,
+            "document_id": "77c1bf54c3da64f6",
+            "page_number": 1
+          },
+          {
+            "page_id": "77c1bf54c3da64f6:p1",
+            "rank": 2,
+            "score": 16.297382354736328,
+            "document_id": "77c1bf54c3da64f6",
+            "page_number": 2
+          },
+          {
+            "page_id": "77c1bf54c3da64f6:p5",
+            "rank": 3,
+            "score": 14.555559158325195,
+            "document_id": "77c1bf54c3da64f6",
+            "page_number": 6
+          }
+        ]
+      },
+      {
+        "question": "Which page shows how transposing pitch changes the music evaluation distance?",
+        "token_shape": [
+          24,
+          128
+        ],
+        "query_embedding_sha256": "782f47dec96c4ce0b841efe7802301c6cb194ce02c5f33558db0f0936465d91e",
+        "search_seconds": 0.0038093000184744596,
+        "reference_max_abs_diff": 9.5367431640625e-07,
+        "reference_top_k_matches": true,
+        "top_k": [
+          {
+            "page_id": "77c1bf54c3da64f6:p6",
+            "rank": 1,
+            "score": 17.633813858032227,
+            "document_id": "77c1bf54c3da64f6",
+            "page_number": 7
+          },
+          {
+            "page_id": "77c1bf54c3da64f6:p5",
+            "rank": 2,
+            "score": 17.330581665039062,
+            "document_id": "77c1bf54c3da64f6",
+            "page_number": 6
+          },
+          {
+            "page_id": "77c1bf54c3da64f6:p0",
+            "rank": 3,
+            "score": 17.1019229888916,
+            "document_id": "77c1bf54c3da64f6",
+            "page_number": 1
+          }
+        ]
+      }
+    ],
+    "page_encoding": [
+      {
+        "document_id": "a9fff4245e2a6344",
+        "page_id": "a9fff4245e2a6344:p0",
+        "page_index": 0,
+        "page_number": 1,
+        "image_path": "a9fff4245e2a6344\\page-001.png",
+        "image_sha256": "a86fe46e19c8379d73e655f1f3a68206c08024db37924964cffb0d18e9b38267",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 1.6132555999793112
+      },
+      {
+        "document_id": "a9fff4245e2a6344",
+        "page_id": "a9fff4245e2a6344:p1",
+        "page_index": 1,
+        "page_number": 2,
+        "image_path": "a9fff4245e2a6344\\page-002.png",
+        "image_sha256": "62592871b486df057fb91e058a20d5b375cfd05bc518746406c98e06984bc107",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.17704049998428673
+      },
+      {
+        "document_id": "a9fff4245e2a6344",
+        "page_id": "a9fff4245e2a6344:p2",
+        "page_index": 2,
+        "page_number": 3,
+        "image_path": "a9fff4245e2a6344\\page-003.png",
+        "image_sha256": "4aa8fcc9e227dcdf84b4092f66a1f352177855067e3657389ee955501e321191",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.17894109996268526
+      },
+      {
+        "document_id": "a9fff4245e2a6344",
+        "page_id": "a9fff4245e2a6344:p3",
+        "page_index": 3,
+        "page_number": 4,
+        "image_path": "a9fff4245e2a6344\\page-004.png",
+        "image_sha256": "c6930f1e9e9da75d78217d44064aeb9e1a3901ee56e03dc48cc606c514d5d048",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.1916619999683462
+      },
+      {
+        "document_id": "a9fff4245e2a6344",
+        "page_id": "a9fff4245e2a6344:p4",
+        "page_index": 4,
+        "page_number": 5,
+        "image_path": "a9fff4245e2a6344\\page-005.png",
+        "image_sha256": "e4f398c9124322bca8fe4742867cd00270b93fc1180bb66410f82db48ccb57de",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.18172660004347563
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "page_id": "77c1bf54c3da64f6:p0",
+        "page_index": 0,
+        "page_number": 1,
+        "image_path": "77c1bf54c3da64f6\\page-001.png",
+        "image_sha256": "bd28cfc72833bf37980e4fad52fa003a4934d399bc4beee6fb9573acf739036d",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.18029789999127388
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "page_id": "77c1bf54c3da64f6:p1",
+        "page_index": 1,
+        "page_number": 2,
+        "image_path": "77c1bf54c3da64f6\\page-002.png",
+        "image_sha256": "ae59b93b981bd0262468233801bb88c8c3ada9406fdcbd5452843a2fb13eb950",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.17362939997110516
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "page_id": "77c1bf54c3da64f6:p2",
+        "page_index": 2,
+        "page_number": 3,
+        "image_path": "77c1bf54c3da64f6\\page-003.png",
+        "image_sha256": "4f8211ed5c263caf3441c3a3ce53780f2dd4602302539123ad9e1a3be8e0d23d",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.17336719995364547
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "page_id": "77c1bf54c3da64f6:p3",
+        "page_index": 3,
+        "page_number": 4,
+        "image_path": "77c1bf54c3da64f6\\page-004.png",
+        "image_sha256": "fe925eb611c1272e73d0496efe2b40112cfa9571d12ba738e151c046c3a06e5a",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.1710915999719873
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "page_id": "77c1bf54c3da64f6:p4",
+        "page_index": 4,
+        "page_number": 5,
+        "image_path": "77c1bf54c3da64f6\\page-005.png",
+        "image_sha256": "fc8480fba3164d6b5cc40276a7f1e0035bcd03bc3650be978c2242970a7ba75b",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.1751915000495501
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "page_id": "77c1bf54c3da64f6:p5",
+        "page_index": 5,
+        "page_number": 6,
+        "image_path": "77c1bf54c3da64f6\\page-006.png",
+        "image_sha256": "ad1fb2430c8a197b9b1cf7f670e1e781bc08f4b72b73fda08582e16995081fb3",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.17661109997425228
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "page_id": "77c1bf54c3da64f6:p6",
+        "page_index": 6,
+        "page_number": 7,
+        "image_path": "77c1bf54c3da64f6\\page-007.png",
+        "image_sha256": "036a5a3cfdded0ce1c8caee6031b90e3821a2e2c4baf310f265823ba0b6b8c16",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.18515939998906106
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "page_id": "77c1bf54c3da64f6:p7",
+        "page_index": 7,
+        "page_number": 8,
+        "image_path": "77c1bf54c3da64f6\\page-008.png",
+        "image_sha256": "545c4439fc4a70d6757e4cbc4674ea7602464c1994840a2b33c03fdb9b59f1f7",
+        "width": 1224,
+        "height": 1584,
+        "shape": [
+          1031,
+          128
+        ],
+        "seconds": 0.17560790001880378
+      }
+    ],
+    "corpus_sha256": "741f9b955474f8536319637d1aa77fd96fd5647ab1df019a0b80bde090e87a9a",
+    "page_count": 13,
+    "document_count": 2,
+    "documents": [
+      {
+        "document_id": "a9fff4245e2a6344",
+        "archive_member": "PDF/cs/2412.17966_tuGEMM_Area-Power-Efficient_Temporal_Unary_GEMM_Architecture_for_Low-Precision_Edge_AI.pdf",
+        "pdf_path": "a9fff4245e2a6344\\source.pdf",
+        "sha256": "a9fff4245e2a63445d6f0a086c8b8a32ea32cb6945b32d72a4faeee309288aaa",
+        "page_count": 5
+      },
+      {
+        "document_id": "77c1bf54c3da64f6",
+        "archive_member": "PDF/eess/2412.07948_Frechet_Music_Distance_A_Metric_For_Generative_Symbolic_Music_Evaluation.pdf",
+        "pdf_path": "77c1bf54c3da64f6\\source.pdf",
+        "sha256": "77c1bf54c3da64f61628f866071027550f81772fb057ca5c54dbdd70264e1410",
+        "page_count": 8
+      }
+    ],
+    "python": "3.11.16 (main, Aug 14 2026, 15:34:35) [MSC v.1944 64 bit (AMD64)]",
+    "executable": "C:\\Users\\WenJing\\Documents\\WorkTransfer\\layoutpatch-system\\.venv\\Scripts\\python.exe",
+    "packages": {
+      "accelerate": "1.15.0",
+      "annotated-doc": "0.0.5",
+      "anyio": "4.15.1",
+      "certifi": "2026.7.22",
+      "charset-normalizer": "3.5.1",
+      "click": "8.5.0",
+      "colorama": "0.4.6",
+      "colpali_engine": "0.3.18",
+      "filelock": "3.32.6",
+      "fsspec": "2026.6.0",
+      "h11": "0.16.0",
+      "hf-xet": "1.6.0",
+      "httpcore": "1.0.9",
+      "httpx": "0.28.1",
+      "huggingface_hub": "1.31.0",
+      "idna": "3.19",
+      "iniconfig": "2.3.0",
+      "Jinja2": "3.1.6",
+      "markdown-it-py": "4.2.0",
+      "MarkupSafe": "3.0.3",
+      "mdurl": "0.1.2",
+      "mpmath": "1.3.0",
+      "networkx": "3.6.1",
+      "numpy": "2.4.6",
+      "packaging": "26.3",
+      "peft": "0.20.0",
+      "pillow": "12.3.0",
+      "pluggy": "1.6.0",
+      "psutil": "7.2.2",
+      "Pygments": "2.21.0",
+      "pymupdf": "1.28.2",
+      "pytest": "9.1.1",
+      "PyYAML": "6.0.3",
+      "regex": "2026.9.10",
+      "requests": "2.34.2",
+      "rich": "15.0.0",
+      "safetensors": "0.8.0",
+      "scipy": "1.17.1",
+      "setuptools": "84.0.0",
+      "shellingham": "1.5.4",
+      "sympy": "1.14.0",
+      "tokenizers": "0.23.2",
+      "torch": "2.13.0+cu130",
+      "torchvision": "0.28.0+cu130",
+      "tqdm": "4.70.1",
+      "transformers": "5.17.0",
+      "typer": "0.27.2",
+      "typing_extensions": "4.16.0",
+      "urllib3": "2.7.0"
+    },
+    "old_research_import": false,
+    "gpu": {
+      "name": "NVIDIA GeForce RTX 3080 Ti",
+      "initial_free_bytes": 11639193600,
+      "total_bytes": 12884377600,
+      "cuda_build": "13.0",
+      "peak_allocated_bytes": 8696922624,
+      "peak_reserved_bytes": 8935964672
+    },
+    "profile_id": "da132ccca44fd3964eea940881be0f30663f7b48957f09925cce19c5df9b0f99",
+    "profile": {
+      "schema": "colpali-local-profile-v1",
+      "name": "colpali_full_v1",
+      "model_id": "vidore/colpali",
+      "adapter_revision": "7754422bfa37f8e3cd771e13d4d7f07de3103c95",
+      "base_model_id": "vidore/colpaligemma-3b-mix-448-base",
+      "base_revision": "6ff0d944ea09c3ead97d2bc57427e3d4f01d192f",
+      "dimension": 128,
+      "page_tokens": 1031,
+      "image_tokens": 1024,
+      "dtype": "bfloat16",
+      "query_padding": "attention_mask_zero_only_preserve_augmentation",
+      "score": "sum_query_max_page_inner_product",
+      "model_files": {
+        "adapter": {
+          "adapter_config.json": "bfc17607903d920dda5303981e1e1866537f428c4199b73bde1d280609c51bd9",
+          "adapter_model.safetensors": "961b72c2b2a1bebc3e11e7d98cd173d263437aad5ef36e760e9265c184c88d64",
+          "added_tokens.json": "7d0bad90030d638a4bf89a82e91206e25f1fbe0012f14bca21666a64b643bc49",
+          "chat_template.jinja": "f1891fbe06e05a8f1222a91aa5541da1570eb6c5a6fcdb0681328e14b556a74c",
+          "preprocessor_config.json": "90299f8d8315526f40c6ea71373d64e56898115c7e7db641075eb23b34f7ceb9",
+          "special_tokens_map.json": "c87885c12d55c60133110a234291db5ac952e99e83d9735099d304cb4d45914d",
+          "tokenizer.json": "1df2ab04780faccf51a881d7c5a7026cc6f979083af2eebf709d051b8d47134b",
+          "tokenizer.model": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+          "tokenizer_config.json": "5a4d5042efb7f465976b1c7257dc3b080e8c1a5e5afabe43a0ff7d31e45025ad"
+        },
+        "base": {
+          "config.json": "15e6dda39456cbce4310e5c18f028f9eb7531b74d63786c2fde98c81c7d5ca6d",
+          "model-00001-of-00002.safetensors": "8b439a322fa98964517fca8fbf0a1d17e6e60e7e8812bc1c373ad87d654108d5",
+          "model-00002-of-00002.safetensors": "ad075b39b4a24b309028f3d003a0e7cad9e45fa2dbbd267867474e77e10df814",
+          "model.safetensors.index.json": "4e5df353aaefc5ed9b2f6407cea6d127dfad2b3b8f6fa0c8132f6bb8395dc966"
+        }
+      },
+      "historical_implementation_sha256": {
+        "ColPali": "4bb9be17b47dd6c4e6b409f561a550da8610a310ae4051ae1be55b3137f15f8a",
+        "ColPaliProcessor": "cc5fdc935d42ed45002d0362f64249e4d7a8873213de833a0e893c0b273fdab5"
+      },
+      "source_manifest_sha256": "87386a31e2300093d59f0f0c5bd81ecac7161292ab9df49736581ecf2217aa4f"
+    },
+    "model_files_verified": [
+      "adapter/adapter_config.json",
+      "adapter/adapter_model.safetensors",
+      "adapter/added_tokens.json",
+      "adapter/chat_template.jinja",
+      "adapter/preprocessor_config.json",
+      "adapter/special_tokens_map.json",
+      "adapter/tokenizer.json",
+      "adapter/tokenizer.model",
+      "adapter/tokenizer_config.json",
+      "base/config.json",
+      "base/model-00001-of-00002.safetensors",
+      "base/model-00002-of-00002.safetensors",
+      "base/model.safetensors.index.json"
+    ],
+    "loading_info": {
+      "missing_keys": [],
+      "unexpected_keys": [],
+      "mismatched_keys": [],
+      "error_msgs": []
+    },
+    "load_seconds": 8.336320500005968,
+    "model_parameters": 3490684784,
+    "trainable_parameters": 0,
+    "query_batch_seconds": [
+      0.03983900003368035,
+      0.027025400020647794
+    ],
+    "query_token_audit": [
+      {
+        "question": "Which page illustrates the serial temporal-unary matrix multiplication hardware?",
+        "valid_tokens": 23,
+        "padding_tokens": 8,
+        "valid_pad_id_tokens": 10,
+        "input_ids": [
+          2,
+          13033,
+          2602,
+          41950,
+          573,
+          12345,
+          30577,
+          235290,
+          148176,
+          9077,
+          46824,
+          16417,
+          235336,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "question": "Where can I compare the parallel tuGEMM design and its power, area, and latency plots?",
+        "valid_tokens": 31,
+        "padding_tokens": 0,
+        "valid_pad_id_tokens": 10,
+        "input_ids": [
+          2,
+          6006,
+          798,
+          590,
+          12711,
+          573,
+          14255,
+          2575,
+          78077,
+          235296,
+          2480,
+          578,
+          1277,
+          2384,
+          235269,
+          2713,
+          235269,
+          578,
+          65325,
+          28921,
+          235336,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "question": "How is Frechet Music Distance computed?",
+        "valid_tokens": 19,
+        "padding_tokens": 5,
+        "valid_pad_id_tokens": 10,
+        "input_ids": [
+          2,
+          2299,
+          603,
+          6539,
+          13654,
+          8554,
+          35004,
+          28326,
+          235336,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "question": "Which page shows how transposing pitch changes the music evaluation distance?",
+        "valid_tokens": 24,
+        "padding_tokens": 0,
+        "valid_pad_id_tokens": 10,
+        "input_ids": [
+          2,
+          13033,
+          2602,
+          4918,
+          1368,
+          1505,
+          13212,
+          16786,
+          4559,
+          573,
+          4296,
+          13167,
+          6075,
+          235336,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "page_forward_calls": 13,
+    "query_forward_calls": 2,
+    "feature_bytes": 3436308,
+    "query_feature_bytes": 27703,
+    "total_seconds": 24.179318999988027,
+    "completed_utc": "2026-11-05T13:56:58.400067+00:00"
+  }
+}
