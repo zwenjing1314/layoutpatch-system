@@ -4,6 +4,8 @@
 !.env.example
 .venv/
 .venv-parser/
+.venv-web/
+*.tsbuildinfo
 node_modules/
 .next/
 __pycache__/

@@ -1,0 +1,16 @@
+name: layoutpatch-system
+services:
+  qdrant:
+    # Qdrant v1.16.2; immutable pulled image identity.
+    image: qdrant/qdrant:v1.16.2@sha256:dab6de32f7b2cc599985a7c764db3e8b062f70508fb85ca074aa856f829bf335
+    ports:
+      - "127.0.0.1:6333:6333"
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:?Run scripts/init-local.ps1 first}
+      QDRANT__TELEMETRY_DISABLED: "true"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: "no"
+volumes:
+  qdrant_data:
+    name: layoutpatch-system-qdrant-data

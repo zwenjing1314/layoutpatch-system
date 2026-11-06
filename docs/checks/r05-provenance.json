@@ -1,0 +1,35 @@
+{
+  "date": "2026-11-06",
+  "round": "R05",
+  "source": "C:\\Users\\WenJing\\Documents\\WorkTransfer\\Snappy",
+  "commit": "acde4a1fdfd75f31d4ff13a04c03b1f06706b6f1",
+  "files": [
+    {
+      "path": "frontend/package.json",
+      "sha256": "ab48a4b9904eccf1105b7768000933ff591ad3168fd1e0c6022417b8e21975c3"
+    },
+    {
+      "path": "frontend/yarn.lock",
+      "sha256": "952c1f1ee3555d65641923aaed8313d016e1f670d303731b8fd94bbf7ac8349c"
+    },
+    {
+      "path": "frontend/lib/api/client.ts",
+      "sha256": "fb893c4cdf49de78d95ff16d7b7b9da1fcf2e94d5f3220d557b8840fa38f5753"
+    },
+    {
+      "path": "frontend/next.config.ts",
+      "sha256": "0c1b10e2a88a2102d5b6cdcf88a803a21d4b77b30df4d44ba426320f22eed6b7"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "e082679229190829a417c50d174e065e26352de20960aae78f17c71518669ae4"
+    }
+  ],
+  "reuse": {
+    "frontend/yarn.lock": "Copied then pruned/resolved by Yarn Classic for minimal dependencies; frozen install verified",
+    "frontend/package.json": "Selected Next16.0.7 React19.2.0 and SDK generator mechanism; no UI/business modules copied",
+    "frontend/lib/api/client.ts": "Reimplemented same-origin SDK configuration; no Docker internal URL fallback",
+    "frontend/next.config.ts": "New minimal rewrite config; no public files image patterns copied",
+    "third_party/Snappy/LICENSE": "Unmodified MIT notice"
+  }
+}

@@ -1,5 +1,9 @@
 # 架构、数据实体与部署设计
 
+**2026-11-06 / R06当前状态：1B-1已通过。** Docker29.8.0正常；独立Qdrant就绪、密钥保护、停止/重启与镜像摘要已验，浏览器按钮显示连接正常。前后端和本项目Qdrant保留运行；命令及限制见[运行手册](stage1b-1-runbook.md)，[补验收证据](checks/r06-stage1b-1-completion.json)。下一批1B-2等待用户继续；下文R05阻塞陈述保留为历史。
+
+**2026-11-06 / R05历史更新：** 1B-1已实现并验证最小前后端、生成SDK与同源代理，Web包隔离在`.venv-web`；Qdrant仅配置完成，Docker引擎故障阻塞实际就绪。见[运行手册](stage1b-1-runbook.md)。下文完整业务架构仍为设计；模型Web集成、会话与权限尚未实现。
+
 日期：2026-11-05。本文的Web架构是 **[设计]**。阶段1A已实现独立Python环境中的ColPali本地adapter、完整页面/问题编码与CPU MaxSim CLI，见 [本轮验收](stage1a-verification.md)。尚未启动Web、SQLite、Qdrant或认证流程；下图不是现有运行拓扑。阶段0源码事实保留在 [核查记录](source-audit.md)。
 
 ## 1. 复用决策
@@ -108,7 +112,7 @@ D 使用的完整 `[1024,128]` patch 与压缩检索向量分开。默认保留�
 推荐首版：Windows 原生 Next.js + 独立 Python 3.11 后端/模型环境；Docker 只运行独立 Qdrant；MinerU CPU 使用独立解析环境。理由：本机已有原研究 CUDA 依赖和模型，避免上游两套 GPU 服务、Python 3.10 镜像与默认底座同时介入。
 
 - 前端 `127.0.0.1:3000`，同源 `/api/:path*` 转发到 `127.0.0.1:8000/:path*`；代理须保留 Cookie/Set-Cookie、CSRF header、二进制/Range 语义。阶段 1B 做实测。
-- 后端 `127.0.0.1:8000`，一个进程；未来命令模式为 `python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8000`，现在尚无这些文件，不能运行。
+- 后端 `127.0.0.1:8000`，一个进程；未来命令模式为 `python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8000`，R05实际入口已建立：`python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --workers 1`（项目根目录，使用`.venv-web`）。
 - Qdrant 新容器、独立 volume/collection 前缀，6333 只绑 loopback，配置服务端 API key；浏览器不持有 key。不要复用旧 Snappy 空库卷来承载本项目文档。
 - 不对浏览器提供模型端口；本机操作系统账户的直接磁盘访问不属于此 Web 用户隔离边界。
 - 后端、前端、解析器依赖分别锁定。沿用 Snappy yarn.lock；宿主未找到 yarn，阶段 1 需核实 Corepack/锁文件对应版本。不要把旧 .venv 变成本项目可写环境。
