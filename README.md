@@ -1,5 +1,7 @@
 # 视觉文档检索与证据定位系统
 
+**2026-11-06 / R08当前状态：1B-2数据库与归属已验收。** SQLAlchemy/Alembic六表、admin/A/B、A-tuGEMM5页与B-Music8页、重复初始化保护和9项数据测试通过。profile/index仍pending；未增加登录/检索路由。见[本批手册](docs/stage1b-2-runbook.md)、[数据证据](docs/checks/stage1b-2-verification.json)。下一批1B-3等待用户继续；下文旧轮次结论保留为历史。
+
 **阶段1B学习专册：**[03技术详解与跟做步骤](docs/过程记录/03_1b技术操作详解.md)、[04口述与学习复述](docs/过程记录/04_1b逐步口述稿.md)。后续1B记录统一在03/04维护。
 
 **2026-11-06 / R06当前状态：1B-1已通过。** Docker29.8.0正常；独立Qdrant就绪、密钥保护、停止/重启与镜像摘要已验，浏览器按钮显示连接正常。前后端和本项目Qdrant保留运行；命令及限制见[运行手册](docs/stage1b-1-runbook.md)，[补验收证据](docs/checks/r06-stage1b-1-completion.json)。下一批1B-2等待用户继续；下文R05阻塞陈述保留为历史。

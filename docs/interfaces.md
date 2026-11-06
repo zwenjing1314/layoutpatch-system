@@ -1,5 +1,7 @@
 # 模块与接口契约
 
+**2026-11-06 / R08当前状态：1B-2数据库与归属已验收。** SQLAlchemy/Alembic六表、admin/A/B、A-tuGEMM5页与B-Music8页、重复初始化保护和9项数据测试通过。profile/index仍pending；未增加登录/检索路由。见[本批手册](stage1b-2-runbook.md)、[数据证据](checks/stage1b-2-verification.json)。下一批1B-3等待用户继续；下文旧轮次结论保留为历史。
+
 **2026-11-06 / R06当前状态：1B-1已通过。** Docker29.8.0正常；独立Qdrant就绪、密钥保护、停止/重启与镜像摘要已验，浏览器按钮显示连接正常。前后端和本项目Qdrant保留运行；命令及限制见[运行手册](stage1b-1-runbook.md)，[补验收证据](checks/r06-stage1b-1-completion.json)。下一批1B-2等待用户继续；下文R05阻塞陈述保留为历史。
 
 **2026-11-06 / R05历史更新：** 已实现`GET /health`（200、`{"status":"ok"}`、no-store）并由生成SDK经同源`/api/health`访问；OpenAPI仅含此路由。其余HTTP业务接口仍为设计，未开发认证/检索/高亮。见[1B-1实际验证](stage1b-1-runbook.md)。

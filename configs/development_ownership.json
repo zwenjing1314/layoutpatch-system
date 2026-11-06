@@ -1,0 +1,14 @@
+{
+  "schema": "development-ownership-v1",
+  "users": {"admin": "admin", "A": "user", "B": "user"},
+  "documents": {
+    "a9fff4245e2a6344": {
+      "owner": "A", "display_name": "tuGEMM", "page_count": 5,
+      "sha256": "a9fff4245e2a63445d6f0a086c8b8a32ea32cb6945b32d72a4faeee309288aaa"
+    },
+    "77c1bf54c3da64f6": {
+      "owner": "B", "display_name": "Music", "page_count": 8,
+      "sha256": "77c1bf54c3da64f61628f866071027550f81772fb057ca5c54dbdd70264e1410"
+    }
+  }
+}

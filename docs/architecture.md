@@ -1,5 +1,7 @@
 # 架构、数据实体与部署设计
 
+**2026-11-06 / R08当前状态：1B-2数据库与归属已验收。** SQLAlchemy/Alembic六表、admin/A/B、A-tuGEMM5页与B-Music8页、重复初始化保护和9项数据测试通过。profile/index仍pending；未增加登录/检索路由。见[本批手册](stage1b-2-runbook.md)、[数据证据](checks/stage1b-2-verification.json)。下一批1B-3等待用户继续；下文旧轮次结论保留为历史。
+
 **2026-11-06 / R06当前状态：1B-1已通过。** Docker29.8.0正常；独立Qdrant就绪、密钥保护、停止/重启与镜像摘要已验，浏览器按钮显示连接正常。前后端和本项目Qdrant保留运行；命令及限制见[运行手册](stage1b-1-runbook.md)，[补验收证据](checks/r06-stage1b-1-completion.json)。下一批1B-2等待用户继续；下文R05阻塞陈述保留为历史。
 
 **2026-11-06 / R05历史更新：** 1B-1已实现并验证最小前后端、生成SDK与同源代理，Web包隔离在`.venv-web`；Qdrant仅配置完成，Docker引擎故障阻塞实际就绪。见[运行手册](stage1b-1-runbook.md)。下文完整业务架构仍为设计；模型Web集成、会话与权限尚未实现。
@@ -36,7 +38,7 @@ flowchart TD
 
 ## 3. 登录和会话
 
-建议密码采用 `pwdlib[argon2]`；服务端会话使用 `starsessions` 中间件并薄适配 SQLite `SessionStore`。这两个库在新环境尚未安装/验证，需阶段 1B 锁定兼容版本及会话存储接口；不得宣称 Snappy 已提供认证。会话采用随机不可预测 ID，数据库仅存 ID 的哈希及会话状态，Cookie 仅携带原始 ID；不自创密码或签名算法。
+建议密码采用 `pwdlib[argon2]`；服务端会话使用 `starsessions` 中间件并薄适配 SQLite `SessionStore`。R08已安装pwdlib0.3.0并验证Argon2id密码哈希；starsessions及会话存储接口留1B-3，尚未安装/实现；不得宣称 Snappy 已提供认证。会话采用随机不可预测 ID，数据库仅存 ID 的哈希及会话状态，Cookie 仅携带原始 ID；不自创密码或签名算法。
 
 Cookie：HttpOnly、SameSite=Lax、Path=/，不设跨域 Domain；HTTPS 开启 Secure，本机 HTTP 开发显式关闭。建议空闲过期 30 分钟、绝对过期 8 小时。登录/提权时轮换会话；退出、改密、重置密码、停用均撤销对应会话。每次请求核验账号启用状态和 `auth_version`，不能仅在登录时检查。
 
