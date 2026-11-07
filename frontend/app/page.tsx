@@ -4,6 +4,8 @@ import { setCsrfToken } from "@/lib/api/client";
 import { ApiError, AuthService, SearchService } from "@/lib/api/generated";
 import type { MeResponse, SearchHit, SearchResponse } from "@/lib/api/generated";
 import { RequestGeneration, privatePreviewPath } from "@/lib/workspace-lifecycle";
+import { WorkspaceShell } from "@/components/workspace/workspace";
+import "./workspace.css";
 
 type Mode = "checking" | "login" | "password" | "workspace" | "unavailable";
 type Cancelable<T> = PromiseLike<T> & { cancel(): void };
@@ -14,6 +16,7 @@ export default function Home() {
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
   const [question, setQuestion] = useState("");
+  const [submittedQuestion, setSubmittedQuestion] = useState("");
   const [result, setResult] = useState<SearchResponse | null>(null);
   const [selected, setSelected] = useState<SearchHit | null>(null);
   const [image, setImage] = useState<string | null>(null);
@@ -33,7 +36,7 @@ export default function Home() {
     imageObject.current = null; setImage(null); setImageBusy(false); setImageError("");
   }, []);
   const clearResults = useCallback(() => {
-    generation.current.reset(); clearImage(); setResult(null); setSelected(null); setBusy(false);
+    generation.current.reset(); clearImage(); setResult(null); setSelected(null); setSubmittedQuestion(""); setBusy(false);
   }, [clearImage]);
   const lock = useCallback((next: Mode = "login", message = "") => {
     clearResults(); setCsrfToken(); identity.current = null;
@@ -173,7 +176,7 @@ export default function Home() {
   async function search(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const data = new FormData(event.currentTarget);
     const q = question.trim(), k = Number(data.get("k"));
-    clearResults(); setNotice(""); setBusy(true); const stamp = generation.current.current();
+    clearResults(); setSubmittedQuestion(q); setNotice(""); setBusy(true); const stamp = generation.current.current();
     try {
       const response = await tracked(SearchService.searchPages(q, k));
       if (!generation.current.accepts(stamp)) return;
@@ -181,6 +184,15 @@ export default function Home() {
     } catch (error) { if (generation.current.accepts(stamp)) businessError(error); }
     finally { if (generation.current.accepts(stamp)) setBusy(false); }
   }
+
+  if (mode === "workspace" && me) return <WorkspaceShell
+    username={me.username} role={me.role} question={question} submittedQuestion={submittedQuestion}
+    busy={busy} notice={notice} result={result} selected={selected}
+    image={image} imageBusy={imageBusy} imageError={imageError}
+    onQuestionChange={setQuestion} onSearch={search} onSelect={hit => void preview(hit)}
+    onNewSearch={() => { clearResults(); setQuestion(""); setNotice(""); }}
+    onLogout={() => void logout()}
+  />;
 
   return <div className="app-shell">
     <header className="topbar"><a className="brand" href="/" aria-label="LayoutPatch 首页"><span className="brand-mark" aria-hidden="true">L<span>·</span></span>LayoutPatch<span className="brand-caption">视觉文档检索</span></a>
@@ -200,16 +212,7 @@ export default function Home() {
         <label htmlFor="confirm_password">再次输入新密码</label><input id="confirm_password" name="confirm_password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} disabled={busy}/>
         {notice && <p className="notice" role="alert">{notice}</p>}<button className="full" disabled={busy}>{busy ? "更新中…" : "更新密码并重新登录"}</button>
       </form></section>}
-      {mode === "workspace" && <div className="workspace"><section className="search-intro"><p className="eyebrow">文档工作空间</p><h1>你想在文档中找到什么？</h1><p className="muted">描述你的问题，检索个人文档与管理员共享的内容。</p>
-        <form className="search-form" onSubmit={search}><label className="sr-only" htmlFor="question">检索问题</label><textarea id="question" name="q" value={question} onChange={(e) => setQuestion(e.target.value)} required maxLength={2000} placeholder="例如：文中如何比较硬件面积与能耗？" rows={2}/><div className="search-controls"><span className="scope-label">◈ 个人与共享文档</span><label htmlFor="k">返回页数</label><select id="k" name="k" defaultValue="3"><option value="3">3 页</option><option value="5">5 页</option><option value="10">10 页</option></select><button disabled={busy || !question.trim()}>{busy ? "检索中…" : "检索文档"}<span aria-hidden="true"> ↗</span></button></div></form>
-        {notice && <p className="notice" role="alert">{notice}</p>}</section>
-        {busy && <div className="center-state" role="status"><span className="spinner"/>正在查找相关页面，首次检索可能需要更久…</div>}
-        {!result && !busy && <section className="empty-state"><span className="empty-icon" aria-hidden="true">⌕</span><h2>从一个问题开始</h2><p>相关页面会显示在这里。选择结果，即可查看页面原文。</p></section>}
-        {result && result.items.length === 0 && <section className="empty-state" role="status"><span className="empty-icon" aria-hidden="true">▤</span><h2>当前没有可检索的文档</h2><p>你的空间中还没有可用页面，也暂无共享文档。请联系管理员。</p></section>}
-        {result && result.items.length > 0 && <section className="result-area" aria-label="检索结果"><div className="result-heading"><h2>相关页面 <span>{result.items.length}</span></h2><p>按相关分数排序 · 请结合原文核对</p></div><div className="result-grid"><div className="result-list">{result.items.map((hit) => <button key={hit.page_id} className={`result-card ${selected?.page_id === hit.page_id ? "is-selected" : ""}`} aria-pressed={selected?.page_id === hit.page_id} onClick={() => void preview(hit)}><span className="rank">{String(hit.page_rank).padStart(2, "0")}</span><span className="result-copy"><strong>{hit.document_name}</strong><span>第 {hit.page_number} 页 <span className="dot">·</span> 相关分数 {hit.page_score.toFixed(2)}</span><small>查看页面原文 <span aria-hidden="true">→</span></small></span></button>)}</div>
-          <div className="preview-panel"><div className="preview-toolbar"><div><span className="eyebrow">页面预览</span><h3>{selected?.document_name}</h3></div><span className="page-badge">第 {selected?.page_number} 页</span></div><div className="preview-canvas" aria-busy={imageBusy}>{imageBusy && <p role="status"><span className="spinner"/>正在加载页面…</p>}{imageError && <div role="alert"><p>{imageError}</p><button className="button-quiet" onClick={() => selected && void preview(selected)}>重试预览</button></div>}{image && selected && <img src={image} alt={`${selected.document_name}，第 ${selected.page_number} 页原文`} width={selected.width_px} height={selected.height_px}/>}</div></div>
-        </div></section>}
-      </div>}
+
     </main><footer className="site-footer"><span>LayoutPatch</span><span>让问题与文档相遇</span></footer>
   </div>;
 }

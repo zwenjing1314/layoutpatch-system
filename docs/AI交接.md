@@ -1,6 +1,27 @@
 # AI交接文档
 
-## 当前交接：R16 / 2-3A已完成（2026-11-07，北京时间）
+
+## 当前交接：R17 / 2-3B-1已完成（2026-11-07，北京时间）
+
+本轮只做工作台外壳与展示组件拆分。见[交付手册](stage2-3b1-runbook.md)、[汇总/修改文件](checks/stage2-3b1-verification.json)、[30项浏览器检查](checks/stage2-3b1-browser.json)、[14项正式恢复](checks/stage2-3b1-formal.json)和[文档保护](checks/r17-document-checks.json)。没有提前接双模式/文档列表、名称筛选网页、上传/任务恢复、历史、MinerU、D或高亮。
+
+重新核实现有0006、原13页、Git干净和端口后，保存[R17基线](checks/stage2-3b1-preflight.json)、runtime/verification/r17/metadata-before.sqlite3及source-state-r17-before。历史报告没有冒充新证据。仅前端app改动；正式表/后端/SDK/迁移/算法/代理配置/依赖锁未变。
+
+frontend/components/workspace/workspace.tsx导出Shell、Sidebar、QueryComposer、RetrievalResults、EvidencePanel；workspace.css只作用于工作台，登录/首改/断连沿用原样式。身份五态、CSRF、SDK代号/取消、图片Abort/PNG检查/Blob释放、visibility/pagehide/BFCache和广播仍集中Home。新检索清理旧结果/图/问题并聚焦；结果态中央滚动、输入置底；窄屏独立问题/预览视图、收起导航、键盘开关与焦点恢复。仍真实调用searchPages(q,k)，不传document_id、不写历史或假数据。
+
+最终9前端测试269.0387毫秒、tsc与Next生产build通过；75后端28.629秒、4原模型CPU契约2.28秒通过。隔离克隆R15已完成21页库，A/B真实查询和授权原图；最终UI名称/页码/分数顺序对应实际HTTP。1920×1080、1366×768、390×844及320×700检查无横向溢出/输入覆盖，长文件名换行、切页、折叠、键盘、新检索、退出/换号、跨标签、首改门禁、撤销后的401及断连恢复通过。7次真实query前6次共用worker PID50060，追加修正复核重启后共涉及PID50060、58436、network0、page encoding0；包括取消/故障查询，不把7次都说成成功展示。算法没改，未重跑官方参考评分，不把R16评分当本轮。
+
+故障边界：6秒延迟和实际query后、返回前改名是显式隔离注入；Qdrant适配器只在隔离服务指向本机拒绝连接端口得到503，未停止容器；空态使用非ready元数据fixture。首次改密只观察门禁，未输入/提交新密码。最终复核补修窄屏预览时错误提示可能被隐藏的问题；notice使视图返回检索，提交也回到检索，并实测真实PNG404后提示可见/焦点恢复。隐藏/BFCache逻辑和既有单测保留，没有新做完整BFCache或GPU中断/容量实验；追加撤销隔离文档ready资格后的真实PNG404，窄屏自动返回结果区、清图并聚焦输入；未验网络断流/损坏图重试。
+
+正式恢复14项通过：全部表/schema逻辑内容、原13及复用21页完整float32/payload/config、8份BF16完整特征、R15源库不变；匿名代理401/no-store、首页/health200、上传Origin403。正式凭据未用未改。当前8000监听PID59524（venv启动器39432）、3000 PID31164、6333 Docker PID49880；8001无监听，隔离模型树已停，正式按需加载。PID仅快照，启停前重新核对CIM命令和创建时间。
+
+[失败修正](checks/stage2-3b1-failures.json)保留cwd/守卫拒绝、亚像素精确断言及过早notice观察；最终通过，未放松授权/评分。文档检查首轮因先校验自身链接、后创建报告而失败，原失败及building摘要保留为attempt1，调整生成顺序后复查；首轮及最终构建/测试日志分开保留；只有既有baseline-browser-mapping提示，未升级依赖。截图是隔离真实查询，长文件名是fixture，非正式改名。无本批未解决阻塞。
+
+已同步progress/testing/需求架构接口入口、改版方案/路线图/指南与[07技术](过程记录/07_2技术操作详解.md)/[08口述](过程记录/08_2逐步口述稿.md) R17-S01—S05；01—06、旧证据/.gitignore保留。新增docs受原忽略规则影响，显式检查本地文件，跨机器另带。旧库保护是Git/选定配置/模型依赖指纹，不是ignored全盘审计。无下载、训练、换底座、暂存/提交/推送。
+
+**下一唯一任务：2-3B-2，接授权列表、文件名筛选/分页/状态/单选及文档库/单文档双模式。等待用户指定；本轮停止。** C仍为上传任务恢复，历史到3-4。
+
+## 以下为R16历史交接（不能替代顶部R17当前状态）
 
 用户明确授权本批，只实现授权文档列表、文件名筛选、单文档检索后端/SDK。见[手册](stage2-3a-runbook.md)、[本轮汇总/增量文件清单](checks/stage2-3a-verification.json)、[文档保护检查](checks/r16-document-checks.json)。没有提前实现2-3B工作台/选择网页、2-3C上传恢复、MinerU、D或高亮。
 

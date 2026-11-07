@@ -1,5 +1,18 @@
 # 分阶段验收与检查记录
 
+## 2026-11-07｜R17 / 2-3B-1实际验收
+
+[手册](stage2-3b1-runbook.md)、[汇总/文件清单](checks/stage2-3b1-verification.json)、[浏览器30项](checks/stage2-3b1-browser.json)、[正式14项](checks/stage2-3b1-formal.json)和[文档保护](checks/r17-document-checks.json)为本轮入口。最终9前端269.0387毫秒、tsc/Next生产build、75后端28.629秒、4算法CPU契约2.28秒通过；原始日志runtime/verification/r17。构建仅既有baseline-browser-mapping提示，未升级依赖。
+
+| 适用子项 | 本轮实际证据 | 未覆盖/不能扩大声明 |
+|---|---|---|
+| T01/T05前端子集 | 真实登录、退出/换号、跨标签退出、首改门禁、撤销后的auth/me401及断连恢复；正式匿名401/no-store、上传Origin403；已有CSRF回归 | 不自动输入/提交改密；本批没有上传UI |
+| T03/T04/T06/T11前端子集 | 隔离21页库A/B真实query与PNG，最终UI文件名/页码/分数对应HTTP；7次query前6次同PID50060、追加复核后共两棵先后启动的模型树（50060、58436）/network0、0page encoding | 两种范围UI仍到B-2；算法/SDK未变，未重跑官方评分/准确率 |
+| 生命周期 | 新检索取消和6秒迟到不复活；409返回前改名注入、503隔离Qdrant端口拒连、空授权范围；图片切页与Blob展示；退出卸载工作台 | 不称GPU被取消、真实并发撤权/断电/容量；PNG404已有追加真实浏览器检查；断流/损坏图重试未验；未新做BFCache实验 |
+| 布局/键盘 | 1920×1080、1366×768、390×844及320×700；无横向溢出/输入覆盖，长名换行，导航展开/收起焦点、Enter选页阅读；[截图](checks/stage2-3b1-laptop-final.jpg) | 人工结构/阅读宽度检查，不是完整视觉精度或无障碍审计 |
+
+正式schema/全部表、原13及复用21页完整向量/payload/config、8份BF16全特征及R15源库不变；后端/SDK/迁移/依赖锁未改。隔离测试助手不进入正式启动。服务已恢复、测试模型树已停，正式凭据未用未改。[失败记录](checks/stage2-3b1-failures.json)保留命令cwd、守卫、亚像素精确比较和异步观察过早；文档检查首轮的自身报告生成顺序失败另存attempt1，修正后复查。无本批阻塞。仅B-1完成，不宣布T01—T15整表或整个B阶段通过；下一唯一B-2。
+
 ## 2026-11-07｜R16 / 2-3A实际验收
 
 [手册](stage2-3a-runbook.md)、[汇总/增量文件](checks/stage2-3a-verification.json)、[文档保护](checks/r16-document-checks.json)为入口。75后端（旧63＋新12）30.352秒、4算法CPU契约2.26秒、前端5项、tsc、SDK生成和Next生产build通过。新增测试明确使用模型/向量替身；推理中撤回/版本改变、列表返回前撤回为精确单元注入，不当作真实GPU竞态。

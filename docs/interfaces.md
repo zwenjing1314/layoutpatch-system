@@ -1,5 +1,9 @@
 # 模块与接口契约
 
+## R17 / 2-3B-1前端对接状态（2026-11-07）
+
+本批公开HTTP/OpenAPI/生成SDK无变化；新工作台继续SearchService.searchPages(q,k)两参文档库查询，未调用授权列表或传document_id。结果组件收到完整SearchResponse/SearchHit，选页回调原preview，授权签名PNG、no-store、同源路径限制和Blob释放不变。组件无独立网络/持久缓存；B-2才接双模式及文档选择。实际UI/HTTP对应及边界见[手册](stage2-3b1-runbook.md)。
+
 ## R16 / 2-3A已实现公开契约（2026-11-07）
 
 GET /documents?name=&limit=20&cursor=：name原长度≤255、NFKC＋casefold普通子串，空白等于不筛选；limit1—100；cursor非空≤2048。未知/重复参数422。返回items、next_cursor、scope_version；每项含document_id/display_name、当前或待处理版本ID/号/页数、visibility/access、status、本人job_status/error_code、created_at、searchable/unsearchable_reason，无总数/内部路径。本人未ready可见但不能搜索，共享只列启用管理员ready且不返回任务细节。searchable为DB资格，不保证依赖在线。

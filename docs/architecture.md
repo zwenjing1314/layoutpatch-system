@@ -1,5 +1,11 @@
 # 架构、数据实体与部署设计
 
+## R17 / 2-3B-1实际实现（2026-11-07）
+
+前端Home保留认证/CSRF、请求代号/取消、图片Abort/Blob及广播/可见性控制，工作台JSX抽到frontend/components/workspace/workspace.tsx的Shell、Sidebar、QueryComposer、RetrievalResults、EvidencePanel。子组件只管理折叠、视图及焦点，完整response/hit仍传回Home，输入与已提交问题仅存内存。workspace.css按.ws-*作用域实现桌面三栏及窄屏独立阅读视图，不覆盖登录/首改/断连。
+
+本批没有改表、后端、SDK、代理或模型。仍调用searchPages(q,k)文档库接口，无列表/单文档UI；正式数据及完整特征指纹保留。验收助手只在R17隔离服务运行，正式仍backend.main:app，见[实际手册](stage2-3b1-runbook.md)。B-2再接选择范围，C再接上传恢复；以下R16及更早段落为历史实施记录。
+
 ## R16 / 2-3A实际实现（2026-11-07）
 
 0006在documents末尾追加display_name_key和索引，以NFKC＋casefold回填；原展示名和原列不变，无表重建。新建/ORM改名通过同一名称函数同步键，直接SQL维护须同时改键；名称筛选用参数化instr普通包含，不编码文件名、不触发模型。
