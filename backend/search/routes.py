@@ -1,6 +1,7 @@
 import math
 import time
 from typing import Annotated, Literal
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, ConfigDict, Field
@@ -19,6 +20,7 @@ class SearchInput(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     q: str = Field(min_length=1, max_length=2000)
     k: int = Field(default=3, ge=1, le=50)
+    document_id: UUID | None = None
 
 
 class SearchHit(BaseModel):
@@ -39,6 +41,8 @@ class SearchHit(BaseModel):
 
 class SearchResponse(BaseModel):
     status: Literal["ok", "empty"]
+    search_mode: Literal["library", "document"]
+    document_id: str | None
     profile_id: str
     index_generation: str
     scope_version: str
@@ -50,16 +54,18 @@ class SearchResponse(BaseModel):
             dependencies=[Depends(load_cookie)])
 def search(request: Request, params: Annotated[SearchInput, Query()]):
     start = time.perf_counter()
+    document_id = str(params.document_id) if params.document_id is not None else None
+    mode = "document" if document_id is not None else "library"
     if any(len(request.query_params.getlist(key)) != 1 for key in request.query_params):
         raise HTTPException(422, "INVALID_REQUEST")
     try:
         with Session(request.app.state.engine) as db:
             _, user = principal(request, db, require_changed=True)
             identity = (user.id, user.role, user.auth_version)
-            scope = allowed_scope(db, user)
+            scope = allowed_scope(db, user, document_id)
         if not scope.pages:
             # No model startup and no Qdrant call for empty authorized scope.
-            return SearchResponse(status="empty", profile_id=scope.profile_id, index_generation=scope.index_id,
+            return SearchResponse(status="empty", search_mode=mode, document_id=document_id, profile_id=scope.profile_id, index_generation=scope.index_id,
                                   scope_version=scope.fingerprint, timings_ms={"total": (time.perf_counter()-start)*1000}, items=[])
         tick = time.perf_counter()
         vector = request.app.state.model_worker.encode(params.q, scope.encoder_sha256)
@@ -89,7 +95,12 @@ def search(request: Request, params: Annotated[SearchInput, Query()]):
         # authority, including scope changes that could have affected Top-k.
         with Session(request.app.state.engine) as db:
             row, user = principal(request, db, require_changed=True)
-            current = allowed_scope(db, user)
+            try:
+                current = allowed_scope(db, user, document_id)
+            except HTTPException as exc:
+                if exc.status_code in (404, 409):
+                    raise HTTPException(409, "SEARCH_SCOPE_CHANGED") from None
+                raise
             if identity != (user.id, user.role, user.auth_version) or current != scope:
                 raise HTTPException(409, "SEARCH_SCOPE_CHANGED")
         result.sort(key=lambda item: (-item[1], item[0].id))
@@ -98,7 +109,7 @@ def search(request: Request, params: Annotated[SearchInput, Query()]):
                            page_rank=rank+1, page_score=score, width_px=p.width_px, height_px=p.height_px,
                            render_sha256=p.render_sha256, preview_url=preview_url(row, p.id, p.render_sha256))
                  for rank, (p, score) in enumerate(result)]
-        return SearchResponse(status="ok", profile_id=scope.profile_id, index_generation=scope.index_id,
+        return SearchResponse(status="ok", search_mode=mode, document_id=document_id, profile_id=scope.profile_id, index_generation=scope.index_id,
                               scope_version=scope.fingerprint, timings_ms={"query_encode_including_queue": encode_ms,
                               "page_search": search_ms, "total": (time.perf_counter()-start)*1000}, items=items)
     except SearchBusy:

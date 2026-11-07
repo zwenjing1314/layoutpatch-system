@@ -1,5 +1,20 @@
 # 分阶段验收与检查记录
 
+## 2026-11-07｜R16 / 2-3A实际验收
+
+[手册](stage2-3a-runbook.md)、[汇总/增量文件](checks/stage2-3a-verification.json)、[文档保护](checks/r16-document-checks.json)为入口。75后端（旧63＋新12）30.352秒、4算法CPU契约2.26秒、前端5项、tsc、SDK生成和Next生产build通过。新增测试明确使用模型/向量替身；推理中撤回/版本改变、列表返回前撤回为精确单元注入，不当作真实GPU竞态。
+
+| 适用子项 | 实际本轮证据 | 不包括 |
+|---|---|---|
+| T01/T05 | 新路由401/首改403、参数422/no-store；游标绑定会话/筛选/limit/快照，跨会话/篡改拒绝；上传Origin/CSRF旧回归保留，正式Origin403 | 工作台/浏览器选择尚未实现 |
+| T03/T04 | 同名A/B及admin无私有旁路；本人非ready显示原因不可搜，启用管理员ready共享/撤回/停用；Top-k前实际版本/页过滤、PNG独立授权；库9页与目标5/4页区分 | UI切换与处理中真实GPU撤权竞态；单元已注入 |
+| T06/T11 | 复用R15完整21页/8份BF16特征，真实6次新query（含重复）、同PID/network0，page forward0；官方6组精确范围排名一致、最大差6.072998047557121e-6，原容差不变 | 本批不重编码页面，不计准确率或预算/区域成绩 |
+| T09子集 | 真实重启会话、分页游标和选中文档PNG保留；正式0006重复迁移无变动、integrity ok/FK0 | retry/cancel/运行中断电和容量未验 |
+
+[隔离HTTP第二轮94项](checks/stage2-3a-http-attempt2.json)、[6组官方参考](checks/stage2-3a-reference.json)、[正式27项](checks/stage2-3a-formal.json)通过。正式只增加documents归一化列及索引，原列和另11张业务/认证表逐行等于R16备份；正式仍原13页，原13/复用21集合全向量/payload/config及R15源库和8份完整特征不变。正式HTTP只匿名，不使用正式凭据。名称/未ready元数据fixture不能冒充新PDF入库。
+
+[首轮真实失败](checks/stage2-3a-http-attempt1.json)：历史指纹助手固定13页拒绝21页，GPU前终止，新增动态助手后另轮通过，旧助手未改。[正式首轮断言失败](checks/r16-formal-first-failure.json)：Vary实际Cookie, Accept-Encoding，改按token列表验证，不改保护。编译时缺括号已修；构建只有既有baseline-browser-mapping陈旧提示，不升级依赖。没有2-3A阻塞；服务器全快照分页成本、UI/容量/完整T矩阵未验边界保留，下一唯一2-3B-1。
+
 ## 2026-11-07｜R15 / 阶段2-2实际验收
 
 本轮仅验完整页面入库与安全激活，不宣布T01—T15整表通过。入口：[手册](stage2-2-runbook.md)、[增量修改清单/汇总](checks/stage2-2-verification.json)、[收尾保护](checks/r15-document-checks.json)，学习记录[07](过程记录/07_2技术操作详解.md)/[08](过程记录/08_2逐步口述稿.md) R15-S01—S05。

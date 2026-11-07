@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { DocumentListResponse } from '../models/DocumentListResponse';
 import type { DocumentResponse } from '../models/DocumentResponse';
 import type { JobResponse } from '../models/JobResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -72,6 +73,32 @@ export class DocumentsService {
             },
             formData: formData,
             mediaType: 'multipart/form-data',
+        });
+    }
+    /**
+     * List Documents
+     * @param name
+     * @param limit
+     * @param cursor
+     * @returns DocumentListResponse Successful Response
+     * @throws ApiError
+     */
+    public static listDocuments(
+        name: string = '',
+        limit: number = 20,
+        cursor?: (string | null),
+    ): CancelablePromise<DocumentListResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/documents',
+            query: {
+                'name': name,
+                'limit': limit,
+                'cursor': cursor,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
         });
     }
 }

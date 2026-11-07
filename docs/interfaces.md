@@ -1,5 +1,15 @@
 # 模块与接口契约
 
+## R16 / 2-3A已实现公开契约（2026-11-07）
+
+GET /documents?name=&limit=20&cursor=：name原长度≤255、NFKC＋casefold普通子串，空白等于不筛选；limit1—100；cursor非空≤2048。未知/重复参数422。返回items、next_cursor、scope_version；每项含document_id/display_name、当前或待处理版本ID/号/页数、visibility/access、status、本人job_status/error_code、created_at、searchable/unsearchable_reason，无总数/内部路径。本人未ready可见但不能搜索，共享只列启用管理员ready且不返回任务细节。searchable为DB资格，不保证依赖在线。
+
+游标HMAC绑定当前会话、名称、limit及可见快照；非法/跨会话/参数不符422 INVALID_CURSOR，列表或权限变化409 DOCUMENT_LIST_CHANGED，须从第一页刷新。列表返回前新事务复核会话/权限。所有保护响应private,no-store/Vary Cookie；未认证401、首改403。当前服务器快照线性计算，仅返回单页，不称大库游标优化。
+
+GET /search保留q/k，新增可选UUID document_id；响应新增search_mode=library/document、document_id（库模式null），其余profile/index/scope/timings/items保持。目标无权/未知404 DOCUMENT_NOT_FOUND、本人未ready409 DOCUMENT_NOT_READY、非法/空/重复422；实际查询前后都用相同目标，Top-k前过滤所选当前版本页，整代计数保持全局；返回时目标已撤回或版本/权限改变409 SEARCH_SCOPE_CHANGED。绝不回退全库，原401/503与PNG独立授权仍有效。
+
+已导出OpenAPI并生成DocumentsService.listDocuments(name,limit,cursor)、SearchService.searchPages(q,k,documentId?)，原两参调用兼容，无手工改生成代码。前端选择UI尚未实现。详情及实测见[2-3A手册](stage2-3a-runbook.md)。下方R14“尚未实现”为历史设计状态，当前以上述契约为准。
+
 ## R15 / 2-2实际任务语义（2026-11-07）
 
 本批无新增公开路由/字段，实际OpenAPI与已生成SDK完全相同。POST /index仍以同源/CSRF/已改密会话上传且202，服务端owner/private；响应后后台自动处理，GET /jobs/{id}可见status=running及stage=rendering/encoding/indexing/activating，成功status/stage=completed、progress=100，GET /documents/{id}变ready。失败以固定error_code和最后stage表达，页面不激活；attempt仍1，无retry/cancel接口。重复upload key语义沿用2-1，不能将已完成任务重跑。

@@ -3,11 +3,12 @@ import hashlib
 import json
 
 from sqlalchemy import and_, select
+from fastapi import HTTPException
 
 from backend.db.connection import ROOT
 from backend.db.models import Document, DocumentVersion, IndexGeneration, IndexPage, Page, PipelineProfile, SystemState, User
 from backend.db.seed import canonical, sha
-from backend.documents.access import readable_document
+from backend.documents.access import readable_document, visible_document
 from .qdrant import SearchUnavailable
 
 
@@ -36,6 +37,7 @@ class AllowedScope:
     feature_file_sha256: str
     source_manifest_sha256: str
     pages: tuple[ScopedPage, ...]
+    target_document_id: str | None = None
 
     @property
     def fingerprint(self):
@@ -54,7 +56,14 @@ def active_index(db):
     return rows[0]
 
 
-def allowed_scope(db, user):
+def allowed_scope(db, user, document_id=None):
+    if document_id is not None:
+        doc = db.scalar(select(Document).join(User, User.id == Document.owner_id)
+                        .where(Document.id == document_id, visible_document(user)))
+        if doc is None:
+            raise HTTPException(404, "DOCUMENT_NOT_FOUND")
+        if doc.status != "ready" or doc.active_version_id is None:
+            raise HTTPException(409, "DOCUMENT_NOT_READY")
     index, profile = active_index(db)
     try:
         config = json.loads(profile.config_json)
@@ -67,11 +76,15 @@ def allowed_scope(db, user):
         raise SearchUnavailable("Profile provenance mismatch") from None
     # The owner must be an active administrator for shared documents. Admin's
     # ordinary search gets the same own+shared rule, never a global bypass.
-    docs = db.execute(select(Document, DocumentVersion).join(User, User.id == Document.owner_id)
+    statement = (select(Document, DocumentVersion).join(User, User.id == Document.owner_id)
                       .join(DocumentVersion, and_(DocumentVersion.id == Document.active_version_id,
                                                   DocumentVersion.document_id == Document.id))
-                      .where(readable_document(user))
-                      .order_by(Document.id)).all()
+                      .where(readable_document(user)))
+    if document_id is not None:
+        statement = statement.where(Document.id == document_id)
+    docs = db.execute(statement.order_by(Document.id)).all()
+    if document_id is not None and not docs:
+        raise SearchUnavailable("Selected document has no valid active version")
     pages = []
     for doc, version in docs:
         entries = db.execute(select(Page, IndexPage).join(IndexPage, IndexPage.page_id == Page.id)
@@ -83,4 +96,4 @@ def allowed_scope(db, user):
                                 p.page_index, p.width_px, p.height_px, p.render_sha256, ip.embedding_sha256)
                      for p, ip in entries)
     return AllowedScope(profile.id, hashlib.sha256(encoder_bytes).hexdigest(), index.id, index.collection_name,
-                        index.page_count, index.feature_file_sha256, index.source_manifest_sha256, tuple(pages))
+                        index.page_count, index.feature_file_sha256, index.source_manifest_sha256, tuple(pages), document_id)

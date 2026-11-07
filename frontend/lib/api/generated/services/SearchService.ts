@@ -11,12 +11,14 @@ export class SearchService {
      * Search
      * @param q
      * @param k
+     * @param documentId
      * @returns SearchResponse Successful Response
      * @throws ApiError
      */
     public static searchPages(
         q: string,
         k: number = 3,
+        documentId?: (string | null),
     ): CancelablePromise<SearchResponse> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -24,6 +26,7 @@ export class SearchService {
             query: {
                 'q': q,
                 'k': k,
+                'document_id': documentId,
             },
             errors: {
                 422: `Validation Error`,

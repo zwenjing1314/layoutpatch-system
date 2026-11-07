@@ -272,7 +272,7 @@ class AuthTests(unittest.TestCase):
                 self.assertIn("secure", result.headers["set-cookie"].lower())
         finally:
             secure_app.state.engine.dispose()
-        self.assertEqual(set(self.app.openapi()["paths"]), {"/health", "/auth/login", "/auth/me", "/auth/password", "/auth/logout", "/admin/profiles", "/search", "/pages/{page_id}/image", "/index", "/jobs/{job_id}", "/documents/{document_id}"})
+        self.assertEqual(set(self.app.openapi()["paths"]), {"/health", "/auth/login", "/auth/me", "/auth/password", "/auth/logout", "/admin/profiles", "/search", "/pages/{page_id}/image", "/index", "/jobs/{job_id}", "/documents/{document_id}", "/documents"})
         with self.assertRaises(ValueError):
             AuthSettings(database=self.path, origin="http://example.com")
 

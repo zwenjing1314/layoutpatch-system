@@ -3,7 +3,9 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from sqlalchemy import Boolean, CheckConstraint, Float, ForeignKey, ForeignKeyConstraint, Integer, String, Text, UniqueConstraint
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
+
+from backend.documents.names import normalize_name
 
 
 def new_id() -> str:
@@ -48,6 +50,12 @@ class Document(Base):
     source_key: Mapped[str] = mapped_column(String, unique=True)
     owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     display_name: Mapped[str] = mapped_column(String)
+    display_name_key: Mapped[str] = mapped_column(String, server_default="", index=True)
+
+    @validates("display_name")
+    def set_display_name(self, key, value):
+        self.display_name_key = normalize_name(value)
+        return value
     visibility: Mapped[str] = mapped_column(String, default="private")
     status: Mapped[str] = mapped_column(String, default="registered")
     active_version_id: Mapped[str | None] = mapped_column(String(36))

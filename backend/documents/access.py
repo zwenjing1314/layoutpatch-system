@@ -7,3 +7,9 @@ def readable_document(user):
     return and_(Document.status == "ready", Document.deleted_at.is_(None),
                 or_(Document.owner_id == user.id,
                     and_(Document.visibility == "shared", User.role == "admin", User.active.is_(True))))
+
+
+def visible_document(user):
+    """Own non-deleted metadata, plus only readable ready admin shares."""
+    return and_(Document.deleted_at.is_(None), Document.status != "deleted",
+                or_(Document.owner_id == user.id, readable_document(user)))

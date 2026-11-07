@@ -22,6 +22,7 @@ from backend.documents.routes import router as pages_router
 from backend.documents.ingest import router as ingest_router, recover_uploads
 from backend.documents.uploads import UploadSettings
 from backend.documents.pipeline import IngestionRunner
+from backend.documents.listing import router as listing_router
 
 
 class HealthResponse(BaseModel):
@@ -77,6 +78,7 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
     app.include_router(search_router)
     app.include_router(pages_router)
     app.include_router(ingest_router)
+    app.include_router(listing_router)
     return app
 
 

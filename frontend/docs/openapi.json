@@ -191,6 +191,23 @@
               "default": 3,
               "title": "K"
             }
+          },
+          {
+            "name": "document_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Document Id"
+            }
           }
         ],
         "responses": {
@@ -419,10 +436,246 @@
           }
         ]
       }
+    },
+    "/documents": {
+      "get": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "List Documents",
+        "operationId": "list_documents",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 255,
+              "default": "",
+              "title": "Name"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "DocumentListItem": {
+        "properties": {
+          "document_id": {
+            "type": "string",
+            "title": "Document Id"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "document_version_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Version Id"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "page_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Count"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "private",
+              "shared"
+            ],
+            "title": "Visibility"
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "own",
+              "shared"
+            ],
+            "title": "Access"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "job_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Status"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "searchable": {
+            "type": "boolean",
+            "title": "Searchable"
+          },
+          "unsearchable_reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "DOCUMENT_NOT_READY",
+                  "METADATA_INCOMPLETE",
+                  "INDEX_UNAVAILABLE",
+                  "INDEX_INCOMPLETE"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unsearchable Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document_id",
+          "display_name",
+          "document_version_id",
+          "version",
+          "page_count",
+          "visibility",
+          "access",
+          "status",
+          "job_status",
+          "error_code",
+          "created_at",
+          "searchable",
+          "unsearchable_reason"
+        ],
+        "title": "DocumentListItem"
+      },
+      "DocumentListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "scope_version": {
+            "type": "string",
+            "title": "Scope Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor",
+          "scope_version"
+        ],
+        "title": "DocumentListResponse"
+      },
       "DocumentResponse": {
         "properties": {
           "document_id": {
@@ -764,6 +1017,25 @@
             ],
             "title": "Status"
           },
+          "search_mode": {
+            "type": "string",
+            "enum": [
+              "library",
+              "document"
+            ],
+            "title": "Search Mode"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
           "profile_id": {
             "type": "string",
             "title": "Profile Id"
@@ -794,6 +1066,8 @@
         "type": "object",
         "required": [
           "status",
+          "search_mode",
+          "document_id",
           "profile_id",
           "index_generation",
           "scope_version",

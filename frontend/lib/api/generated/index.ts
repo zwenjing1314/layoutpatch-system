@@ -7,6 +7,8 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { DocumentListItem } from './models/DocumentListItem';
+export type { DocumentListResponse } from './models/DocumentListResponse';
 export type { DocumentResponse } from './models/DocumentResponse';
 export type { HealthResponse } from './models/HealthResponse';
 export type { HTTPValidationError } from './models/HTTPValidationError';

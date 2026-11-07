@@ -1,5 +1,13 @@
 # 架构、数据实体与部署设计
 
+## R16 / 2-3A实际实现（2026-11-07）
+
+0006在documents末尾追加display_name_key和索引，以NFKC＋casefold回填；原展示名和原列不变，无表重建。新建/ORM改名通过同一名称函数同步键，直接SQL维护须同时改键；名称筛选用参数化instr普通包含，不编码文件名、不触发模型。
+
+GET /documents单独使用visible_document：本人非删除元数据包含未ready，其他只含启用管理员ready/shared；不改既有readable_document对search/PNG的ready要求。列表先授权/名称过滤，再按时间/ID倒序从服务器可见快照取单页，HMAC游标绑定会话、名称、limit和权限/元数据快照，返回前新事务复核。searchable仅表示DB当前版本与活动索引页面完整。完整服务器快照有线性成本，未承诺大库性能。
+
+allowed_scope增加可选目标，先核对对象可见/ready，再限定document_id当前版本页，index_page_count仍是全代点数；两次scope使用相同目标，Qdrant页/版本过滤先于Top-k，任何失败不扩大范围。响应补充search_mode/document_id，SDK重新生成；现有PNG独立授权/会话清理不变。复用R15的21页和全特征只执行新query，未写向量/编码页面。实际范围/故障与后续边界见[本批手册](stage2-3a-runbook.md)。
+
 ## R15 / 阶段2-2实际实现（2026-11-07）
 
 0005_ingestion仅增system_state单例活动索引指针、page_features全页特征来源表，不重建旧表。PageFeature按page_id保存encoder配置SHA、完整BF16 tensor/float32导出路径及哈希。已有ready索引仍保留；是否活动由指针决定，空指针只允许唯一validated/ready索引引导，多代无指针拒绝。正式迁移保留原10表数据，仍原13页。

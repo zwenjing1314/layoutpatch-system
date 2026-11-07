@@ -1,5 +1,13 @@
 # 进度、阻塞与下一批
 
+更新：**2026-11-07，北京时间，R16 / 2-3A通过适用验收**。0006归一化名称键、授权分页列表/字面名称筛选、GET /search可选document_id与同目标前后复核、生成SDK已完成。正式仍原13页，原列/另11表及全部原集合指纹不变。
+
+实际：75后端、4算法CPU契约、前端5项＋tsc＋生产build通过；[真实HTTP94项](checks/stage2-3a-http-attempt2.json)，6次新query、0页重编码，复用21页；A库9页与选旧5/新4页差异、实际Top-k前过滤、同名/Unicode/分页/共享/原图/重启通过。[6组官方参考](checks/stage2-3a-reference.json)最大差6.07e-6、排名一致；[正式27项](checks/stage2-3a-formal.json)通过。新证据与[修改清单](checks/stage2-3a-verification.json)、[保护](checks/r16-document-checks.json)、[手册](stage2-3a-runbook.md)为入口。
+
+首轮固定13页助手和正式Vary单值断言失败均保留并修正，无本批阻塞。服务器分页快照有随可见对象数增长成本；无UI/容量/准确率/推理中真实撤权竞态声明。当前后端27136、前端16000、Qdrant49880，8001/测试模型已停。07/08续写R16五步；01—06、忽略规则和旧结果保留，无下载训练或提交推送。**下一唯一批：2-3B-1工作台外壳与组件拆分；完成检查后停，B-2与C不提前。**
+
+## 以下为R15历史进度（以顶部R16现状为准）
+
 更新：**2026-11-07，北京时间，R15 / 阶段2-2通过适用范围**。自动领取持久上传任务，完整渲染、原ColPali页面编码、BF16全特征保存与新索引代原子激活已实现。0005新增system_state/page_features；正式仍原13页，原10表逻辑数据、原Qdrant全指纹不变。最终补丁已加载，3000/8000/6333监听，隔离8001/模型已停。
 
 实际验收：最终63后端、4原模型CPU契约、4前端测试与tsc通过；[隔离HTTP48项](checks/stage2-2-http-attempt2.json)实际8新页＋4query同模型、network0，13→17→21；[官方4组对照](checks/stage2-2-reference.json)排名一致、最大差2.63e-6；[最终正式20项](checks/stage2-2-formal-final.json)通过。见[2-2手册](stage2-2-runbook.md)、[增量修改清单/汇总](checks/stage2-2-verification.json)、[文档保护](checks/r15-document-checks.json)及[07](过程记录/07_2技术操作详解.md)/[08](过程记录/08_2逐步口述稿.md) R15-S01—S05。

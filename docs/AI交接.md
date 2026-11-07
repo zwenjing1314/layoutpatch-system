@@ -1,6 +1,28 @@
 # AI交接文档
 
-## 当前交接：R15 / 2-2已完成（2026-11-07，北京时间）
+## 当前交接：R16 / 2-3A已完成（2026-11-07，北京时间）
+
+用户明确授权本批，只实现授权文档列表、文件名筛选、单文档检索后端/SDK。见[手册](stage2-3a-runbook.md)、[本轮汇总/增量文件清单](checks/stage2-3a-verification.json)、[文档保护检查](checks/r16-document-checks.json)。没有提前实现2-3B工作台/选择网页、2-3C上传恢复、MinerU、D或高亮。
+
+开工重新核实正式0005、原13页、3000/8000/6333监听、8001空闲、无已加载模型，其他可见同项目窗口idle；实际状态/文件哈希及在线备份见[预检](checks/stage2-3a-preflight.json)、runtime/verification/r16/metadata-before.sqlite3。只在独立系统修改，既有状态按本轮基线保护，旧报告不覆盖。
+
+0006只给documents追加NFKC＋casefold名称键和索引，回填旧键，不改展示名/原列、不重建表、不编码页面。ORM名称赋值同步键，直接SQL维护须同步键；当前无重命名API。GET /documents先授权本人非删除元数据＋启用管理员ready/shared，再字面instr包含筛选和created_at/id倒序单页；%/_不作通配符。本人非ready可见不可搜，共享不暴露任务错误。searchable是DB当前版本/活动索引完整资格，不保证运行依赖在线。游标HMAC绑定当前会话、规范名称、limit和可见快照，跨会话/篡改/参数不符422，列表/权限变化409；返回前新事务复核。服务器完整快照计算有O(可见元数据/页)成本，不称大库分页方案。
+
+GET /search可选UUID document_id；未提供保持library，提供则先授权/ready检查，限定当前版本页面白名单，整索引计数仍全局。Qdrant在Top-k前过滤，返回前同一目标复核；未知/越权404，未ready409，非法/空/重复422，变化409/身份撤销401/依赖503，绝不扩大到全库。SearchResponse增加search_mode和document_id；OpenAPI已导出、SDK生成，原两参调用兼容。PNG继续同会话签名及当前对象授权，未挂裸目录。
+
+实际验收：75后端（旧63＋新增12）30.352秒、4原模型CPU契约2.26秒、前端5项＋tsc＋Next生产build通过；前端app展示不改，build仅既有baseline-browser-mapping提示，未升级包。[真实HTTP第二轮94项](checks/stage2-3a-http-attempt2.json)：只读克隆R15的21页与完整特征，6次query同一模型PID46980/network0、page forward0；A库9页/所选旧5页/新4页，实际Qdrant过滤参数、另一文档更高分不能挤占目标、新图、同名/Unicode/分页、共享撤回/停用及重启会话游标通过。[6组官方参考](checks/stage2-3a-reference.json)：同次query精确范围，对官方processor＋CPU float32 MaxSim，非并列排名一致，最大差6.072998047557121e-6，原atol1e-4/rtol1e-5不变。元数据名称/未ready对象为明确fixture，不冒充新上传入库；推理中撤回精确竞态是单元测试，真实HTTP撤回发生在请求之间。
+
+正式迁移/恢复[27项](checks/stage2-3a-formal.json)：0006仅加名称键/索引，documents原列及另11业务/认证表逐行等于R16备份；仍2文档/原13页/原活动代，jobs/features空、integrity ok/FK0/重复迁移不变。原13页/复用21页集合全向量/payload/config和8份BF16文件哈希、R15源库逻辑内容不变。正式只匿名检查Next代理401/no-store/Origin403及首页/health，不使用/改变正式凭据。
+
+运行快照：后端8000 PID27136（工具会话41706）、前端3000 PID16000（会话82573）、Qdrant6333 PID49880。8001与隔离模型树已停止，正式模型按需加载。PID仅快照，启停前核对CIM命令/创建时间，不杀Docker Desktop或删卷。
+
+失败保留：scope链式调用括号在静态编译时修复；[真实首轮](checks/stage2-3a-http-attempt1.json)因旧助手固定13页校验21页失败，GPU前终止，新增动态指纹助手后另轮成功。正式首轮误将Vary当单值，实际Cookie, Accept-Encoding合法；[失败记录](checks/r16-formal-first-failure.json)保留，改按token检查含Cookie后通过，应用保护未变。所有日志runtime/verification/r16。无本批阻塞。
+
+已同步progress/testing/接口架构/需求/路线图/新窗口指南；[07](过程记录/07_2技术操作详解.md)/[08](过程记录/08_2逐步口述稿.md)续写R16-S01—S05，01—06和旧证据保留。.gitignore仍忽略新docs，显式检查本地文件，跨机器需另带。旧库可检查Git状态/选定算法配置/模型依赖不变，不是ignored全盘审计；无模型下载、训练、换底座、暂存/提交/推送。
+
+**下一唯一任务：2-3B-1，工作台外壳与展示组件拆分，接回真实文档库检索及身份/图片生命周期，完成布局检查即停。** B-2再接双模式与列表选择，C再做上传恢复。本轮停止，等待用户指定。
+
+## 以下为R15历史交接（不能替代顶部R16当前状态）
 
 用户明确启动2-2，已按最新[工作台改版方案](前端工作台改版方案与复用评估.md)保留后续A/B-1/B-2/C拆分。本批只完成完整页面渲染、原ColPali编码及索引安全激活；没有提前做文档列表、单文档范围、前端改版、MinerU、D或高亮。详见[2-2手册](stage2-2-runbook.md)、[汇总/增量文件清单](checks/stage2-2-verification.json)及[文档保护检查](checks/r15-document-checks.json)。
 
