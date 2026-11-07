@@ -4,6 +4,8 @@
 /* eslint-disable */
 import type { DocumentListResponse } from '../models/DocumentListResponse';
 import type { DocumentResponse } from '../models/DocumentResponse';
+import type { JobActionInput } from '../models/JobActionInput';
+import type { JobListResponse } from '../models/JobListResponse';
 import type { JobResponse } from '../models/JobResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -96,6 +98,77 @@ export class DocumentsService {
                 'limit': limit,
                 'cursor': cursor,
             },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * List Jobs
+     * @param limit
+     * @param cursor
+     * @returns JobListResponse Successful Response
+     * @throws ApiError
+     */
+    public static listJobs(
+        limit: number = 10,
+        cursor?: (string | null),
+    ): CancelablePromise<JobListResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/jobs',
+            query: {
+                'limit': limit,
+                'cursor': cursor,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Retry Job
+     * @param jobId
+     * @param requestBody
+     * @returns JobResponse Successful Response
+     * @throws ApiError
+     */
+    public static retryJob(
+        jobId: string,
+        requestBody: JobActionInput,
+    ): CancelablePromise<JobResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/jobs/{job_id}/retry',
+            path: {
+                'job_id': jobId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Cancel Job
+     * @param jobId
+     * @param requestBody
+     * @returns JobResponse Successful Response
+     * @throws ApiError
+     */
+    public static cancelJob(
+        jobId: string,
+        requestBody: JobActionInput,
+    ): CancelablePromise<JobResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/jobs/{job_id}/cancel',
+            path: {
+                'job_id': jobId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 422: `Validation Error`,
             },

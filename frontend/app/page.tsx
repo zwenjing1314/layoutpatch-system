@@ -8,6 +8,7 @@ import { matchesSearchTarget, searchDocumentId } from "@/lib/document-selection"
 import type { SearchMode } from "@/lib/document-selection";
 import { WorkspaceShell } from "@/components/workspace/workspace";
 import "./workspace.css";
+import { useUploadTasks } from "@/lib/use-upload-tasks";
 
 type Mode = "checking" | "login" | "password" | "workspace" | "unavailable";
 type Cancelable<T> = PromiseLike<T> & { cancel(): void };
@@ -42,6 +43,18 @@ export default function Home() {
   const identity = useRef<string | null>(null);
   const channel = useRef<BroadcastChannel | null>(null);
   const form = useRef<HTMLFormElement | null>(null);
+  const [workspaceView, setWorkspaceView] = useState<"search" | "tasks">("search");
+  const [leavingWorkspace, setLeavingWorkspace] = useState(false);
+  const taskWorkspace = useUploadTasks({
+    enabled: mode === "workspace" && !leavingWorkspace, userId: me?.user_id ?? null, csrfToken: me?.csrf_token,
+    onSessionError: error => businessError(error),
+    onChanged: () => invalidateDocumentScope("入库任务已更新，请刷新范围或重新选择就绪文档。"),
+    onBrowse: job => {
+      clearResults(); clearDocuments(); setSearchMode("document"); setDocumentName(job.display_name);
+      setWorkspaceView("search"); setNotice("请选择已完成文档，再提交内容问题。");
+    },
+  });
+  const resetTasks = taskWorkspace.reset;
 
   const clearImage = useCallback(() => {
     imageSequence.current += 1; imageRequest.current?.abort(); imageRequest.current = null;
@@ -57,9 +70,9 @@ export default function Home() {
     setListBusy(false); setListError(""); setListCursors([null]);
   }, []);
   const lock = useCallback((next: Mode = "login", message = "") => {
-    clearResults(); clearDocuments(); setCsrfToken(); identity.current = null;
+    clearResults(); clearDocuments(); resetTasks(); setWorkspaceView("search"); setLeavingWorkspace(false); setCsrfToken(); identity.current = null;
     setMe(null); setQuestion(""); setMode(next); setNotice(message); form.current?.reset();
-  }, [clearResults, clearDocuments]);
+  }, [clearResults, clearDocuments, resetTasks]);
   const announce = useCallback(() => { channel.current?.postMessage("session-changed"); }, []);
   async function tracked<T>(request: Cancelable<T>) {
     const release = generation.current.track(() => request.cancel());
@@ -118,7 +131,7 @@ export default function Home() {
       const detail = (error.body as { detail?: string } | undefined)?.detail;
       if (error.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
       if (error.status === 403 && detail === "PASSWORD_CHANGE_REQUIRED") {
-        clearResults(); clearDocuments(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
+        clearResults(); clearDocuments(); resetTasks(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
       }
       if (error.status === 404 || error.status === 409) { invalidateDocumentScope(); return; }
       if (error.status === 503) { setNotice(detail === "MODEL_BUSY" ? "检索服务繁忙，请稍后重试。" : "检索服务暂时不可用，请稍后重试。"); return; }
@@ -214,7 +227,7 @@ export default function Home() {
   }
   async function logout() {
     const csrf = me?.csrf_token;
-    clearResults(); clearDocuments(); setQuestion(""); setNotice(""); setBusy(true);
+    setLeavingWorkspace(true); clearResults(); clearDocuments(); resetTasks(); setQuestion(""); setNotice(""); setBusy(true);
     const stamp = generation.current.current();
     try {
       setCsrfToken(csrf); await tracked(AuthService.logout());
@@ -234,7 +247,7 @@ export default function Home() {
       });
       if (!generation.current.accepts(stamp) || sequence !== imageSequence.current) return;
       if (response.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
-      if (response.status === 403) { clearResults(); clearDocuments(); setMode("password"); setNotice("请先设置新密码。"); return; }
+      if (response.status === 403) { clearResults(); clearDocuments(); resetTasks(); setMode("password"); setNotice("请先设置新密码。"); return; }
       if (response.status === 404) { invalidateDocumentScope("页面访问权限已变化，请重新检索。"); return; }
       if (!response.ok || response.headers.get("content-type")?.split(";", 1)[0] !== "image/png") throw new Error("Preview unavailable");
       const blob = await response.blob();
@@ -263,6 +276,7 @@ export default function Home() {
   }
 
   if (mode === "workspace" && me) return <WorkspaceShell
+    view={workspaceView} onViewChange={setWorkspaceView} taskPanel={taskWorkspace.panel}
     username={me.username} role={me.role} question={question} submittedQuestion={submittedQuestion}
     busy={busy} notice={notice} result={result} selected={selected}
     image={image} imageBusy={imageBusy} imageError={imageError}
@@ -274,7 +288,7 @@ export default function Home() {
       onRefresh: () => { listGeneration.current.reset(); setNotice(current => current === listError ? "" : current); setListCursors([null]); setListRefresh(value => value + 1); },
     }}
     onQuestionChange={setQuestion} onSearch={search} onSelect={hit => void preview(hit)}
-    onNewSearch={() => { clearResults(); setQuestion(""); setNotice(""); }}
+    onNewSearch={() => { clearResults(); setWorkspaceView("search"); setQuestion(""); setNotice(""); }}
     onLogout={() => void logout()}
   />;
 

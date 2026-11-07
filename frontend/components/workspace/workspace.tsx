@@ -6,8 +6,13 @@ import type { DocumentListItem, SearchHit, SearchResponse } from "@/lib/api/gene
 import type { SearchMode } from "@/lib/document-selection";
 import { DocumentPicker, ScopeSwitch } from "./document-picker";
 import type { DocumentPickerProps } from "./document-picker";
+import { UploadTasksPanel } from "./upload-tasks";
+import type { UploadTasksProps } from "./upload-tasks";
 
 type WorkspaceProps = {
+  view: "search" | "tasks";
+  onViewChange: (view: "search" | "tasks") => void;
+  taskPanel: UploadTasksProps;
   username: string;
   role: string;
   question: string;
@@ -30,16 +35,18 @@ type WorkspaceProps = {
   onLogout: () => void;
 };
 
-export function WorkspaceSidebar({ username, role, collapsed, newSearchRef, onToggle, onNewSearch, onLogout }: {
+export function WorkspaceSidebar({ username, role, collapsed, newSearchRef, onToggle, onNewSearch, onLogout, view, onViewChange }: {
   username: string; role: WorkspaceProps["role"]; collapsed: boolean;
   newSearchRef: RefObject<HTMLButtonElement | null>;
   onToggle: () => void; onNewSearch: () => void; onLogout: () => void;
+  view: WorkspaceProps["view"]; onViewChange: WorkspaceProps["onViewChange"];
 }) {
   return <aside className="ws-sidebar" id="workspace-navigation" aria-label="工作台导航">
     <div className="ws-brand-row"><a href="/" className="ws-brand" aria-label="LayoutPatch 首页"><span className="ws-mark" aria-hidden="true">L<span>·</span></span><span className="ws-sidebar-text">LayoutPatch</span></a>
       <button type="button" className="ws-icon-button ws-collapse" onClick={onToggle} aria-label={collapsed ? "展开侧栏" : "折叠侧栏"} aria-expanded={!collapsed} title={collapsed ? "展开侧栏" : "折叠侧栏"}>{collapsed ? "›" : "‹"}</button></div>
     <button type="button" ref={newSearchRef} className="ws-new-search" onClick={onNewSearch} title="新检索"><span aria-hidden="true">＋</span><span className="ws-sidebar-text">新检索</span><span className="sr-only ws-collapsed-label">新检索</span></button>
-    <nav aria-label="当前功能"><span className="ws-current" aria-current="page" title="文档检索"><span aria-hidden="true">▤</span><span className="ws-sidebar-text">文档检索</span><span className="sr-only ws-collapsed-label">文档检索</span></span></nav>
+    <nav aria-label="当前功能"><button type="button" className="ws-current" aria-current={view !== "tasks" ? "page" : undefined} onClick={() => onViewChange("search")} title="文档检索"><span aria-hidden="true">▤</span><span className="ws-sidebar-text">文档检索</span><span className="sr-only ws-collapsed-label">文档检索</span></button>
+      <button type="button" className="ws-current" aria-current={view === "tasks" ? "page" : undefined} onClick={() => onViewChange("tasks")} title="上传与任务"><span aria-hidden="true">⇧</span><span className="ws-sidebar-text">上传与任务</span><span className="sr-only ws-collapsed-label">上传与任务</span></button></nav>
     <p className="ws-sidebar-note ws-sidebar-text">从问题找到页面，<br/>再回到原文核对。</p>
     <div className="ws-account"><span className="ws-avatar" aria-hidden="true">{username.slice(0, 1).toUpperCase()}</span><div className="ws-sidebar-text"><strong>{username}</strong><small>{role === "admin" ? "管理员" : "个人空间"}</small></div>
       <button type="button" className="ws-logout" onClick={onLogout} title="退出 / 换号"><span aria-hidden="true">↪</span><span className="ws-sidebar-text">退出 / 换号</span><span className="sr-only ws-collapsed-label">退出 / 换号</span></button></div>
@@ -92,6 +99,14 @@ export function WorkspaceShell(props: WorkspaceProps) {
   const menuRef = useRef<HTMLButtonElement | null>(null);
   const newSearchRef = useRef<HTMLButtonElement | null>(null);
   const pickerRef = useRef<HTMLDivElement | null>(null);
+  const tasksHeadingRef = useRef<HTMLDivElement | null>(null);
+  function changeView(view: "search" | "tasks") {
+    props.onViewChange(view); setNavigationOpen(false); setPanel("search");
+    requestAnimationFrame(() => {
+      if (view === "tasks") tasksHeadingRef.current?.querySelector<HTMLInputElement>('input[type="file"]')?.focus();
+      else inputRef.current?.focus();
+    });
+  }
   useEffect(() => {
     // A permission/scope error may arrive while the narrow-screen preview is open.
     if (!props.notice) return;
@@ -123,11 +138,12 @@ export function WorkspaceShell(props: WorkspaceProps) {
   return <div className={`ws-shell ${collapsed ? "ws-is-collapsed" : ""} ${navigationOpen ? "ws-nav-open" : ""} ws-panel-${panel}`} onKeyDown={event => {
     if (event.key === "Escape" && navigationOpen) { setNavigationOpen(false); menuRef.current?.focus(); }
   }}>
-    <WorkspaceSidebar username={props.username} role={props.role} collapsed={collapsed} newSearchRef={newSearchRef} onToggle={() => setCollapsed(value => !value)} onNewSearch={newSearch} onLogout={props.onLogout}/>
+    <WorkspaceSidebar username={props.username} role={props.role} collapsed={collapsed} newSearchRef={newSearchRef} onToggle={() => setCollapsed(value => !value)} onNewSearch={newSearch} onLogout={props.onLogout} view={props.view} onViewChange={changeView}/>
     <header className="ws-topbar"><div><button type="button" ref={menuRef} className="ws-icon-button ws-mobile-menu" aria-label={navigationOpen ? "收起导航" : "展开导航"} aria-expanded={navigationOpen} aria-controls="workspace-navigation" onClick={() => {
       setNavigationOpen(value => !value);
       if (!navigationOpen) requestAnimationFrame(() => newSearchRef.current?.focus());
-    }}>☰</button><span>{props.searchMode === "document" ? "单文档检索" : "文档库检索"}</span><span className="ws-topbar-detail">VISUAL DOCUMENT SEARCH</span></div><span className="ws-private-indicator"><i aria-hidden="true"/>授权范围内检索</span></header>
+    }}>☰</button><span>{props.view === "tasks" ? "上传与任务" : props.searchMode === "document" ? "单文档检索" : "文档库检索"}</span><span className="ws-topbar-detail">VISUAL DOCUMENT SEARCH</span></div><span className="ws-private-indicator"><i aria-hidden="true"/>授权范围内检索</span></header>
+    {props.view === "tasks" ? <div className="ws-tasks-slot" ref={tasksHeadingRef}><UploadTasksPanel {...props.taskPanel}/></div> : <>
     <div className="ws-view-switch" aria-label="工作区视图"><button type="button" aria-pressed={panel === "search"} aria-controls="workspace-search" onClick={() => setPanel("search")}>问题与结果</button><button type="button" aria-pressed={panel === "preview"} aria-controls="workspace-preview" onClick={() => setPanel("preview")}>页面预览{props.selected ? ` · 第 ${props.selected.page_number} 页` : ""}</button></div>
     <main id="workspace-search" className={`ws-main ${props.result || props.submittedQuestion || props.searchMode === "document" ? "ws-has-activity" : "ws-is-empty"}`} aria-label="文档检索工作区">
       <div className="ws-scope-area"><ScopeSwitch mode={props.searchMode} onChange={changeScope}/>
@@ -143,5 +159,6 @@ export function WorkspaceShell(props: WorkspaceProps) {
       <div className="ws-composer-area">{props.busy && !props.submittedQuestion && <p className="ws-search-status" role="status">正在退出登录…</p>}{props.notice && <p className="ws-notice" role="alert">{props.notice}</p>}<QueryComposer question={props.question} busy={props.busy} searchMode={props.searchMode} targetDocument={props.targetDocument} inputRef={inputRef} onQuestionChange={props.onQuestionChange} onSearch={event => { setPanel("search"); props.onSearch(event); }}/><p className="ws-composer-note">每次独立检索 · 相关分数用于排序，请结合原文核对</p></div>
     </main>
     <div className="ws-preview-slot" id="workspace-preview"><EvidencePanel selected={props.selected} image={props.image} imageBusy={props.imageBusy} imageError={props.imageError} headingRef={headingRef} onRetry={() => props.selected && props.onSelect(props.selected)}/></div>
+    </>}
   </div>;
 }

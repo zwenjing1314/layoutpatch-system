@@ -158,8 +158,28 @@ class Job(Base):
     progress: Mapped[int] = mapped_column(Integer, default=0)
     attempt: Mapped[int] = mapped_column(Integer, default=1)
     error_code: Mapped[str | None] = mapped_column(String(64))
+    cancel_requested_at: Mapped[str | None] = mapped_column(String)
     created_at: Mapped[str] = mapped_column(String, default=now)
     updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class JobAttempt(Base):
+    __tablename__ = "job_attempts"
+    __table_args__ = (
+        CheckConstraint("attempt >= 1 AND progress >= 0 AND progress <= 100", name="ck_attempt_counts"),
+        CheckConstraint("status IN ('receiving','queued','failed','interrupted','running','completed','cancelled')", name="ck_attempt_status"),
+    )
+    job_id: Mapped[str] = mapped_column(ForeignKey("jobs.id"), primary_key=True)
+    attempt: Mapped[int] = mapped_column(Integer, primary_key=True)
+    status: Mapped[str] = mapped_column(String(16))
+    stage: Mapped[str] = mapped_column(String(32))
+    progress: Mapped[int] = mapped_column(Integer)
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    cancel_requested_at: Mapped[str | None] = mapped_column(String)
+    created_at: Mapped[str] = mapped_column(String)
+    updated_at: Mapped[str] = mapped_column(String)
+    started_at: Mapped[str | None] = mapped_column(String)
+    ended_at: Mapped[str | None] = mapped_column(String)
 
 
 class SystemState(Base):

@@ -1,5 +1,13 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R19 / 2-3C真实实现
+
+0007在jobs追加cancel_requested_at，新增(job_id,attempt)主键的job_attempts保存每次阶段/进度/错误与时间。重试在BEGIN IMMEDIATE下复核本人、当前attempt、源PDF大小/SHA、文档registered且未激活；旧尝试保留、新尝试独立产物目录，仍单持久调度线程、原ColPali ModelWorker及完整特征。
+
+running取消仅记请求；渲染后、页间、索引写入间和最终激活事务复核，已提交completed不可撤销。默认900秒总时限按检查点执行，既有操作各自有限超时；重启receiving/running转interrupted，已保存取消则cancelled，building索引转failed保留。非空旧任务只回填当前已知attempt，不生成未知过去记录。
+
+useUploadTasks持有文件/随机上传ID、三个独立请求代号、本人分页及轮询；无私有localStorage。Home统一身份/隐藏/退出门禁并防退出等待期间poll回填，任务变化清结果/PNG并刷新范围；UploadTasksPanel只展示/回调。停止发送等待不等于取消任务，completed不自动选中文档。测试gate仅隔离adapter导入，正式仍backend.main:app。见[手册](stage2-3c-runbook.md)。
+
 **2026-11-08｜R18 / 2-3B-2实际补充：**Home集中两种范围与目标、列表/检索两套RequestGeneration、游标与私有状态；ScopeSwitch/DocumentPicker只负责展示/回调。列表仅document模式加载，筛选不暗换目标；同筛选快照变化保守清选择，切换范围清结果/PNG，锁定清列表。服务端继续决定可读/ready/Top-k前白名单，前端不替代授权。无表/公开API/算法/SDK变更，见[手册](stage2-3b2-runbook.md)。
 
 ## R17 / 2-3B-1实际实现（2026-11-07）

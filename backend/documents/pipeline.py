@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import subprocess
 import threading
+import os
+import time
 
 from PIL import Image
 from sqlalchemy import select, update
@@ -18,6 +20,7 @@ from backend.search.indexing import feature_digest
 from backend.search.qdrant import SearchUnavailable, validate_vector
 from backend.search.scope import active_index
 from backend.search.worker import SearchBusy
+from backend.documents.task_state import sync_attempt
 
 
 class IngestError(Exception):
@@ -58,10 +61,13 @@ def render_pdf(worker, version, output):
 
 
 class IngestionRunner:
-    def __init__(self, engine, worker, qdrant, renderer=render_pdf):
+    def __init__(self, engine, worker, qdrant, renderer=render_pdf, max_seconds=None):
         self.engine, self.worker, self.qdrant, self.renderer = engine, worker, qdrant, renderer
         self.stop_event = threading.Event()
         self.thread = None
+        self.max_seconds = float(max_seconds if max_seconds is not None else os.getenv("LAYOUTPATCH_INGEST_MAX_SECONDS", "900"))
+        if not 1 <= self.max_seconds <= 7200:
+            raise ValueError("Ingestion deadline must be between1 and7200 seconds")
 
     def start(self):
         self.thread = threading.Thread(target=self.loop, name="private-pdf-ingestion", daemon=True)
@@ -85,15 +91,19 @@ class IngestionRunner:
                 pass
             self.stop_event.wait(1)
 
-    def checkpoint(self, job_id, stage=None, progress=None):
-        if self.stop_event.is_set():
-            raise IngestError("INGEST_INTERRUPTED")
+    def checkpoint(self, job_id, stage=None, progress=None, *, attempt=None, deadline=None):
         with write_transaction(self.engine) as db:
             job = db.get(Job, job_id)
+            if job and job.cancel_requested_at and (attempt is None or job.attempt == attempt):
+                raise IngestError("CANCELLED_BY_OWNER")
+            if self.stop_event.is_set():
+                raise IngestError("INGEST_INTERRUPTED")
+            if deadline is not None and time.monotonic() >= deadline:
+                raise IngestError("INGEST_DEADLINE_EXCEEDED")
             user = db.get(User, job.owner_id) if job else None
             version = db.get(DocumentVersion, job.document_version_id) if job else None
             doc = db.get(Document, version.document_id) if version else None
-            if (not job or job.status != "running" or not user or not user.active or not doc
+            if (not job or job.status != "running" or attempt is not None and job.attempt != attempt or not user or not user.active or not doc
                     or doc.owner_id != job.owner_id or doc.deleted_at or doc.status != "registered"
                     or doc.active_version_id is not None):
                 raise IngestError("INGEST_AUTHORITY_CHANGED")
@@ -102,6 +112,7 @@ class IngestionRunner:
             if progress is not None:
                 job.progress = progress
             job.updated_at = now()
+            sync_attempt(db, job)
 
     def run_one(self):
         with write_transaction(self.engine) as db:
@@ -109,11 +120,15 @@ class IngestionRunner:
             if job is None:
                 return False
             job.status, job.stage, job.updated_at = "running", "rendering", now()
-            job_id = job.id
+            job_id, attempt = job.id, job.attempt
+            sync_attempt(db, job)
+        deadline = time.monotonic() + self.max_seconds
+        def checkpoint(stage=None, progress=None):
+            self.checkpoint(job_id, stage, progress, attempt=attempt, deadline=deadline)
         candidate_id = None
         phase = "preparing"
         try:
-            self.checkpoint(job_id)
+            checkpoint()
             with Session(self.engine, expire_on_commit=False) as db:
                 job = db.get(Job, job_id)
                 version = db.get(DocumentVersion, job.document_version_id)
@@ -137,6 +152,7 @@ class IngestionRunner:
             output = ROOT / "runtime/corpus/ingest" / job_id / f"attempt-{job.attempt}"
             phase = "rendering"
             manifest = self.renderer(self.worker, version, output)
+            checkpoint()
             entries = manifest["pages"]
             if (manifest["pdf_sha256"] != version.pdf_sha256 or len(entries) != version.page_count
                     or [p["page_index"] for p in entries] != list(range(version.page_count))):
@@ -148,7 +164,7 @@ class IngestionRunner:
             candidate_id = new_id()
             phase = "encoding"
             for number, entry in enumerate(entries):
-                self.checkpoint(job_id, "encoding", 5 + int(70 * number / len(entries)))
+                checkpoint("encoding", 5 + int(70 * number / len(entries)))
                 image_path = private_file(entry["image_path"], ROOT / "runtime/corpus/ingest")
                 if sha(image_path.read_bytes()) != entry["render_sha256"] or image_path.stat().st_size > 20 * 1024 * 1024:
                     raise IngestError("RENDER_IDENTITY_MISMATCH")
@@ -173,7 +189,7 @@ class IngestionRunner:
                     "page_id": page_id, "document_id": doc.id, "document_version_id": version.id,
                     "profile_id": profile_id, "index_generation": candidate_id, "owner_id": doc.owner_id,
                     "visibility": doc.visibility, "render_sha256": entry["render_sha256"], "embedding_sha256": encoded["embedding_sha256"]}})
-            self.checkpoint(job_id, "indexing", 80)
+            checkpoint("indexing", 80)
             phase = "indexing"
             self.qdrant.check_info(self.qdrant.info(old.collection_name), old.page_count)
             previous = self.qdrant.all_points(old.collection_name)
@@ -201,7 +217,7 @@ class IngestionRunner:
                 raise IngestError("CANDIDATE_COLLECTION_EXISTS")
             self.qdrant.create(collection)
             for point in all_points:
-                self.checkpoint(job_id)
+                checkpoint()
                 self.qdrant.upsert(collection, [point])
             self.qdrant.check_info(self.qdrant.info(collection), len(all_points))
             actual = self.qdrant.all_points(collection)
@@ -213,7 +229,7 @@ class IngestionRunner:
                 if (received is None or received["payload"] != expected["payload"] or set(received["vector"]) != {"original"}
                         or feature_digest(validate_vector(received["vector"]["original"], rows=1031)) != expected["payload"]["embedding_sha256"]):
                     raise IngestError("CANDIDATE_INDEX_IDENTITY_MISMATCH")
-            self.checkpoint(job_id, "activating", 95)
+            checkpoint("activating", 95)
             phase = "activating"
             (output / "index-provenance.json").write_text(provenance + "\n", encoding="utf-8")
             with write_transaction(self.engine) as db:
@@ -222,7 +238,14 @@ class IngestionRunner:
                 current_doc = db.get(Document, doc.id)
                 current_user = db.get(User, job.owner_id)
                 current_version = db.get(DocumentVersion, version.id)
+                if current_job.cancel_requested_at:
+                    raise IngestError("CANCELLED_BY_OWNER")
+                if self.stop_event.is_set():
+                    raise IngestError("INGEST_INTERRUPTED")
+                if time.monotonic() >= deadline:
+                    raise IngestError("INGEST_DEADLINE_EXCEEDED")
                 if (current.id != old_id or not current_user.active or current_job.status != "running"
+                        or current_job.attempt != attempt
                         or current_doc.owner_id != job.owner_id or current_doc.status != "registered" or current_doc.deleted_at
                         or current_doc.active_version_id is not None or current_version.pdf_sha256 != version.pdf_sha256):
                     raise IngestError("INGEST_AUTHORITY_CHANGED")
@@ -242,6 +265,7 @@ class IngestionRunner:
                 current_version.render_profile_json, current_version.render_profile_sha256 = render_json, sha(render_json.encode())
                 current_doc.status, current_doc.active_version_id = "ready", version.id
                 current_job.status, current_job.stage, current_job.progress, current_job.updated_at = "completed", "completed", 100, now()
+                sync_attempt(db, current_job)
                 state = db.get(SystemState, 1)
                 if state is None:
                     db.add(SystemState(id=1, active_index_id=candidate_id))
@@ -265,9 +289,12 @@ class IngestionRunner:
             with write_transaction(self.engine) as db:
                 failed = db.get(Job, job_id)
                 # Never undo a committed activation due to post-commit filesystem failure.
-                if failed and failed.status == "running":
-                    failed.status = "interrupted" if code == "INGEST_INTERRUPTED" else "failed"
+                if failed and failed.status == "running" and failed.attempt == attempt:
+                    if failed.cancel_requested_at:
+                        code = "CANCELLED_BY_OWNER"
+                    failed.status = "cancelled" if code == "CANCELLED_BY_OWNER" else "interrupted" if code == "INGEST_INTERRUPTED" else "failed"
                     failed.error_code, failed.updated_at = code, now()
+                    sync_attempt(db, failed)
                 if candidate_id:
                     candidate = db.get(IndexGeneration, candidate_id)
                     if candidate and candidate.status == "building":

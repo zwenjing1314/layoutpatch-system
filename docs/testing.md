@@ -1,5 +1,20 @@
 # 分阶段验收与检查记录
 
+## 2026-11-08｜R19 / 2-3C实际验收
+
+[手册](stage2-3c-runbook.md)、[汇总](checks/stage2-3c-verification.json)、[HTTP39](checks/stage2-3c-http.json)、[网页36](checks/stage2-3c-browser.json)、[运行30](checks/stage2-3c-runtime.json)、[正式29](checks/stage2-3c-formal.json)、[非空旧任务迁移](checks/stage2-3c-migration.json)、[完整特征](checks/stage2-3c-features.json)与[文档保护](checks/r19-document-checks.json)。最终87后端38.671秒、25前端377.422毫秒、4原模型CPU契约2.35秒、tsc和Next生产build通过，原始日志runtime/verification/r19。
+
+| 适用子项 | 新运行证据 | 限制 |
+|---|---|---|
+| T01/T03归属与上传 | 真网页5/6页完整PDF、private/版本1、本人列表/明细/控制；A/B越权404、首改403、Origin/CSRF403、未知/重复参数422；正式匿名401/no-store | 正式身份未使用，admin首改只观察；普通admin无旁路有单元回归 |
+| T06新PDF闭环 | A/B两种模式四次实际query与四份PNG；Top-k前Qdrant白名单5/10/6/14；24活动页、11新完整特征、每版本一套Page | 16次页面forward含取消5次，两棵顺序worker，network0；未重跑官方参考评分或研究准确率 |
+| T09/T14持久与竞态 | A最后checkpoint之后/激活事务之前取消，候选failed且原13页不变；B显式渲染失败、真实CPU渲染后硬停、重启interrupted与第三次重试完成；attempt保留 | gate/渲染失败/8秒延迟为隔离注入，不是自然故障；未强杀当前GPU算子；默认总时限的检查点有单测，未墙钟等满900秒 |
+| 幂等与网页恢复 | 停止HTTP等待明确结果不确定，同ID重发返回同任务，三份真实任务而非四份；queued取消无编码、非法PDF422、刷新/换号恢复、退出清文件/任务 | 文件/ID只内存；关闭网页丢失发送预留，但服务端任务保留。10分钟轮询上限代码/契约核对，未真实等待10分钟 |
+| 展示/故障 | 1920/1366/390/320无横向溢出；长名、10+2任务分页、Enter记录、断连清卡→auth定时门禁→重连恢复、首改不挂任务页 | 10条额外元数据明确为分页夹具；未新做完整无障碍、BFCache/跨标签/PNG断流或损坏图实验 |
+| 数据保护 | 正式0007仅增列/新attempt表；其它表/原列、原13/复用21页完整向量/配置、旧8份BF16/R15源库不变；非空旧任务迁移回填与重复迁移通过 | 旧库保护为Git/选定文件/模型依赖指纹，不是ignored全盘审计 |
+
+[失败与修正](checks/stage2-3c-failures.json)包含seed revision、测试lifespan锁、精确路由白名单、prepare不足、正式探测错误Content-Type及工具编码/断连竞态；不降低授权或评分容差。仅既有baseline-browser-mapping提示，无依赖升级。正式服务已恢复，测试模型停止；只宣布2-3C适用子集完成，下一唯一2-4。
+
 ## 2026-11-08｜R18 / 2-3B-2实际验收
 
 [手册](stage2-3b2-runbook.md)、[汇总/修改清单](checks/stage2-3b2-verification.json)、[HTTP16项](checks/stage2-3b2-http.json)、[浏览器65项](checks/stage2-3b2-browser.json)、[正式21项](checks/stage2-3b2-formal.json)及[文档保护](checks/r18-document-checks.json)。75后端29.435秒、4原模型CPU契约2.39秒、最终18前端306.7414毫秒、tsc和生产build通过；日志runtime/verification/r18，最终以后缀final2为准。

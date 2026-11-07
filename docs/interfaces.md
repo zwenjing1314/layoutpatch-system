@@ -1,5 +1,15 @@
 # 模块与接口契约
 
+## 2026-11-08｜R19 / 2-3C已实现任务契约
+
+- GET /jobs?limit=10&cursor=：本人非删除文档的任务；limit1—50，cursor≤2048，未知/重复参数422。按created_at/id倒序；签名游标绑定当前会话和limit，非法/跨会话422 INVALID_JOB_CURSOR，进度更新不使分页失效。不是全库管理员接口。
+- GET /jobs/{id}及上传响应扩展display_name/page_count、cancel_available/retry_available、cancel_requested_at和有序attempts（状态/阶段/进度/错误、created/updated/started/ended）。保留原字段及相同job/document/version；未知/越权404。
+- POST /jobs/{id}/retry、/cancel：JSON仅`{"attempt": 当前尝试编号}`；需同源Origin、X-CSRF-Token、已首改会话及本人归属。期望attempt变化409 JOB_ATTEMPT_CHANGED，拒绝迟到操作。任务状态不可操作409；多余字段422。最多10次尝试，失败/中断/取消且源文件存在、文档尚未激活才可retry；损坏409 REUPLOAD_REQUIRED，源文件缺失时retry_available=false。
+- cancel对receiving/queued立即cancelled；running返回已保存请求，cancel_available=false，安全检查点/最终激活事务再终止；completed不可取消/重试。重启中断同步attempt，旧attempt不覆写。默认总时限900秒，LAYOUTPATCH_INGEST_MAX_SECONDS范围1—7200秒，非抢占式检查。
+- 任务及其它业务响应保持private,no-store/Vary Cookie。POST /index仍multipart单PDF、X-Upload-ID及CSRF，同标识同内容返回原任务；不能为了上传关闭保护。OpenAPI已重新导出、SDK用frontend的gen:sdk生成；旧两参search调用兼容。网页45秒上传/15秒列表控制/2.5秒轮询/10分钟暂停，仅停止客户端等待，不承诺终止GPU。
+
+原检索与原图契约保留，完整页面特征不能由预算序列替代。见[手册](stage2-3c-runbook.md)、[HTTP](checks/stage2-3c-http.json)。
+
 **2026-11-08｜R18 / 2-3B-2前端接入：**公开接口与生成SDK未改；网页用listDocuments(name,10,cursor)和searchPages(q,k,documentId)，library省略ID，document必有searchable目标。scope_version是当前名称筛选快照，不能跨筛选直接比较；切换筛选重置游标/快照但保留已选对象。返回额外校验mode/document/每页version，整包不符拒绝展示，不事后过滤Top-k。404/409清选择并重载，列表游标409/422要求刷新，401锁定，首改403不挂工作台。见[实际手册](stage2-3b2-runbook.md)。
 
 ## R17 / 2-3B-1前端对接状态（2026-11-07）

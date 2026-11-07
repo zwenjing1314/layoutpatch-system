@@ -44,7 +44,8 @@ test('workspace exposes working navigation and view controls without future feat
   const markup = render(WorkspaceShell, props);
   for (const label of ['工作台导航', '新检索', '退出 / 换号', '问题与结果', '页面预览']) assert.ok(markup.includes(label));
   assert.ok(markup.includes('单文档检索'));
-  for (const label of ['上传与任务', '检索历史', '联网搜索']) assert.ok(!markup.includes(label));
+  assert.ok(markup.includes('上传与任务'));
+  for (const label of ['检索历史', '联网搜索']) assert.ok(!markup.includes(label));
   assert.match(markup, /aria-controls="workspace-navigation"/);
   const exiting = render(WorkspaceShell, { ...props, busy: true });
   assert.match(exiting, /正在退出登录/);

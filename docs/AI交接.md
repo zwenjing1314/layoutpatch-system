@@ -1,6 +1,30 @@
 # AI交接文档
 
-## 当前交接：R18 / 2-3B-2已完成（2026-11-08，北京时间）
+## 当前交接：R19 / 2-3C完成适用验收（2026-11-08，北京时间）
+
+本轮只完成上传/任务网页、恢复与重试（含取消检查点）。见[手册](stage2-3c-runbook.md)、[汇总/修改清单](checks/stage2-3c-verification.json)、[网页36项](checks/stage2-3c-browser.json)、[HTTP39项](checks/stage2-3c-http.json)、[运行30项](checks/stage2-3c-runtime.json)、[正式29项](checks/stage2-3c-formal.json)和[文档保护](checks/r19-document-checks.json)。不进入2-4/MinerU/D/高亮/历史/预算方法。
+
+重新读取必读文档并核实0006/原2文档13页、依赖、端口、Git干净及可见同项目窗口idle/notLoaded；新预检/在线备份在checks/stage2-3c-preflight.json及runtime/verification/r19，旧项目边界为source-state-r19-before/final。历史报告未冒充新运行证据，正式凭据未读取/使用/更改。
+
+0007只在jobs追加nullable cancel_requested_at并增加job_attempts，已有任务仅回填当前attempt，不虚构历史。本人GET /jobs游标列表、GET /jobs/{id}明细及POST retry/cancel使用同一job/document/version；写入须Origin/CSRF/已首改身份和当前attempt，迟到操作409；admin普通接口无跨用户旁路。最多10次显式尝试，重试核验原PDF大小/SHA；缺失不允许重试，损坏需重新上传。
+
+取消receiving/queued可立即终止；running保存请求并在渲染后、页间、候选写入间与最终激活事务复核。当前GPU算子可继续，不能称已强杀。默认总时限900秒（1—7200可配），检查点执行，单次操作仍有原有限超时；重启running/receiving标interrupted，已请求取消则cancelled；候选保留但不激活。旧attempt/产物不覆盖。
+
+工作台接上传与本人任务，文件和幂等ID仅内存，不用localStorage存私有任务。上传45秒，列表/控制15秒，2.5秒轮询且10分钟暂停可手动刷新；停止HTTP等待明确提示服务端可能已收，同标识重发不重复创建。任务状态从服务器恢复；退出/换号/隐藏/401清状态，列表/上传/控制代号独立于query；任务变化清旧结果/图并刷新授权范围。completed只回真实列表按名称筛选，仍需显式选择ready文档。
+
+实际最终87后端38.671秒、25前端377.422毫秒、tsc/Next生产build、4原模型CPU契约2.35秒通过。首轮聚焦的seed revision白名单/测试嵌套lifespan锁，完整回归旧路由白名单均已修，失败日志保留；仅既有baseline-browser-mapping提示，无依赖升级。OpenAPI重新导出，SDK由生成器生成。
+
+隔离克隆原13页，按文件名/页数选两份此前未选的完整5/6页PDF，无gold。A在真实编码/候选核验结束且最终检查点已过、激活事务前请求取消，释放显式gate后cancelled、原13页仍活动且候选failed；同job attempt2完成。B真实CPU渲染后显式RENDER_FAILED，attempt2渲染后真正硬停后台树；重启interrupted、attempt3完成。网页/DB保留[取消,完成]及[失败,中断,完成]，每版本只一套Page。两模式A/B4次真实query与4个PNG对应，Qdrant Top-k前白名单页数5/10/6/14。
+
+共16次page forward（A取消尝试5次仍计成本）、激活11份新完整特征、4次成功query；因实际重启先后两棵worker PID40440/36316，network0。16份BF16完整1031×128/1024patch及float32导出CPU核验通过；不把预算序列给D。算法未变，未重跑官方评分/准确率/容量或GPU算子中断实验。8秒上传响应延迟、渲染失败和gate为明确隔离注入；另10个cancelled元数据仅分页/长名夹具，不冒充上传。发送等待中止/同ID重发仍三份真实任务、queued取消无编码、非法PDF422；1920/1366/390/320、Enter展开记录、换号/刷新恢复/首改门禁通过。首改未输入新密码；断连先清任务，定时auth复核后转unavailable，重连恢复，不冒充直接刷新路径。未新做完整BFCache/跨标签/损坏PNG或10分钟墙钟等待。
+
+正式0007迁移/恢复29项：只增列/attempt表，原列与其它表逐行指纹不变；仍原2文档13页、jobs/attempts/features空、integrity ok/FK0、重复迁移不变。原13/复用21页完整float32/payload/config、旧8份BF16与R15源库不变。正式仅匿名401/no-store及Origin403、首页/health200，不用正式凭据。8000实际监听PID54888（启动器33448）、3000 PID15240、6333 Docker PID49880，8001空闲且测试模型已停；PID仅快照，启停先核对CIM身份。浏览器恢复正式登录页、重置视口。
+
+[失败记录](checks/stage2-3c-failures.json)保留prepare选样不足、旧白名单、测试锁和正式首轮JSON错误请求（415，改合法multipart再验401）；错误报告另存formal-attempt1。没有未解阻塞；测试注入未进正式启动。交接/progress/testing/需求/架构/接口/路线图/指南/方案及07/08六步已同步，01—06/旧报告/.gitignore保留，旧库保护限Git/选定文件/模型依赖而非ignored全盘审计；无下载、训练、换底座、暂存/提交/推送。新增docs按原规则被忽略，跨机器须另带。
+
+**下一唯一任务：2-4，真实MinerU解析与坐标契约。等待用户明确指定，本轮停止。**
+
+## 以下为R18历史交接 / 2-3B-2已完成（2026-11-08，北京时间）
 
 本轮只完成“双模式与授权文档选择网页”。见[手册](stage2-3b2-runbook.md)、[汇总/修改清单](checks/stage2-3b2-verification.json)、[65项浏览器](checks/stage2-3b2-browser.json)、[21项正式恢复](checks/stage2-3b2-formal.json)及[文档保护](checks/r18-document-checks.json)。不提前接上传/任务恢复、MinerU、D、高亮、历史或预算方法。
 
