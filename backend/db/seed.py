@@ -90,7 +90,7 @@ def match(row, expected):
 
 
 def require_revision(connection):
-    if connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() != "0001_metadata":
+    if connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() not in ("0001_metadata", "0002_auth"):
         raise ValueError("Run the database migration first")
 
 

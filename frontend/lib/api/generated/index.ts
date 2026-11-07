@@ -8,5 +8,13 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { HealthResponse } from './models/HealthResponse';
+export type { HTTPValidationError } from './models/HTTPValidationError';
+export type { LoginInput } from './models/LoginInput';
+export type { MeResponse } from './models/MeResponse';
+export type { PasswordInput } from './models/PasswordInput';
+export type { ProfileResponse } from './models/ProfileResponse';
+export type { ValidationError } from './models/ValidationError';
 
+export { AdminService } from './services/AdminService';
+export { AuthService } from './services/AuthService';
 export { SystemService } from './services/SystemService';

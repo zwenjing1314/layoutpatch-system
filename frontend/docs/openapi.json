@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "LayoutPatch System",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "paths": {
     "/health": {
@@ -25,10 +25,158 @@
           }
         }
       }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Me",
+        "operationId": "get_me",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logout",
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/auth/password": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Password",
+        "operationId": "change_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/profiles": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Profiles",
+        "operationId": "get_profiles",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProfileResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Get Profiles"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
       "HealthResponse": {
         "properties": {
           "status": {
@@ -40,6 +188,148 @@
         },
         "type": "object",
         "title": "HealthResponse"
+      },
+      "LoginInput": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "format": "password",
+            "title": "Password",
+            "writeOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "LoginInput"
+      },
+      "MeResponse": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "must_change_password": {
+            "type": "boolean",
+            "title": "Must Change Password"
+          },
+          "csrf_token": {
+            "type": "string",
+            "title": "Csrf Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "username",
+          "role",
+          "must_change_password",
+          "csrf_token"
+        ],
+        "title": "MeResponse"
+      },
+      "PasswordInput": {
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "format": "password",
+            "title": "Current Password",
+            "writeOnly": true
+          },
+          "new_password": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 12,
+            "format": "password",
+            "title": "New Password",
+            "writeOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "PasswordInput"
+      },
+      "ProfileResponse": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "config_sha256": {
+            "type": "string",
+            "title": "Config Sha256"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "config_sha256",
+          "status"
+        ],
+        "title": "ProfileResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }

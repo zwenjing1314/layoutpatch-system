@@ -2,7 +2,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import Boolean, CheckConstraint, ForeignKey, ForeignKeyConstraint, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, CheckConstraint, Float, ForeignKey, ForeignKeyConstraint, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -115,3 +115,27 @@ class IndexGeneration(Base):
     page_count: Mapped[int] = mapped_column(Integer, default=0)
     vector_count: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class AuthSession(Base):
+    __tablename__ = "auth_sessions"
+    __table_args__ = (
+        CheckConstraint("length(token_hash)=64 AND auth_version >= 1", name="ck_session_identity"),
+        CheckConstraint("expires_at > created_at AND last_seen >= created_at", name="ck_session_times"),
+    )
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    auth_version: Mapped[int] = mapped_column(Integer)
+    csrf_token: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[float] = mapped_column(Float)
+    last_seen: Mapped[float] = mapped_column(Float)
+    expires_at: Mapped[float] = mapped_column(Float)
+    revoked_at: Mapped[float | None] = mapped_column(Float)
+
+
+class LoginAttempt(Base):
+    __tablename__ = "login_attempts"
+    __table_args__ = (CheckConstraint("failures >= 0", name="ck_login_failures"),)
+    subject_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    window_start: Mapped[float] = mapped_column(Float)
+    failures: Mapped[int] = mapped_column(Integer)

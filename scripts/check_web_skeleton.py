@@ -69,7 +69,8 @@ try:
         record(f"cycle{cycle}_no_store", proxy[1].get("cache-control", proxy[1].get("Cache-Control")) == "no-store", "Proxy preserves no-store header")
         record(f"cycle{cycle}_shell", "视觉文档检索" in page[2] and "检查连接" in page[2], "Production HTML contains shell and button")
         spec = json.loads(request("http://127.0.0.1:8000/openapi.json")[2])
-        record(f"cycle{cycle}_routes", set(spec["paths"]) == {"/health"}, "Only health business API exists")
+        expected = {"/health", "/auth/login", "/auth/me", "/auth/logout", "/auth/password", "/admin/profiles"}
+        record(f"cycle{cycle}_routes", set(spec["paths"]) == expected, "Only health, auth and read-only profiles; no retrieval routes")
         stop(backend)
         failure = request("http://127.0.0.1:3000/api/health")
         record(f"cycle{cycle}_backend_outage", failure[0] >= 500, f"Backend stopped: proxy HTTP {failure[0]}")

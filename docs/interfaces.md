@@ -1,12 +1,8 @@
 # 模块与接口契约
 
-**2026-11-06 / R08当前状态：1B-2数据库与归属已验收。** SQLAlchemy/Alembic六表、admin/A/B、A-tuGEMM5页与B-Music8页、重复初始化保护和9项数据测试通过。profile/index仍pending；未增加登录/检索路由。见[本批手册](stage1b-2-runbook.md)、[数据证据](checks/stage1b-2-verification.json)。下一批1B-3等待用户继续；下文旧轮次结论保留为历史。
+更新：2026-11-07，北京时间，R09。**已实现并验证：1A离线算法、1B-1运行骨架、1B-2元数据、1B-3认证会话。** 23项认证/数据库测试、17项真实代理检查通过，正式库0002_auth迁移与六项冒烟通过。[本批手册](stage1b-3-runbook.md)、[汇总证据](checks/stage1b-3-verification.json)。
 
-**2026-11-06 / R06当前状态：1B-1已通过。** Docker29.8.0正常；独立Qdrant就绪、密钥保护、停止/重启与镜像摘要已验，浏览器按钮显示连接正常。前后端和本项目Qdrant保留运行；命令及限制见[运行手册](stage1b-1-runbook.md)，[补验收证据](checks/r06-stage1b-1-completion.json)。下一批1B-2等待用户继续；下文R05阻塞陈述保留为历史。
-
-**2026-11-06 / R05历史更新：** 已实现`GET /health`（200、`{"status":"ok"}`、no-store）并由生成SDK经同源`/api/health`访问；OpenAPI仅含此路由。其余HTTP业务接口仍为设计，未开发认证/检索/高亮。见[1B-1实际验证](stage1b-1-runbook.md)。
-
-日期：2026-11-05。**HTTP路由与业务实体仍为建议设计。阶段1A仅实现并验证命令行算法适配器。** 浏览器统一使用 `/api` 前缀；表中的后端路径不含反向代理前缀。所有业务请求除登录/登录前 CSRF 引导外均要求认证。完整实体见 [架构](architecture.md)，本轮实测见 [阶段1A验收](stage1a-verification.md)。
+登录/改密网页、检索HTTP、对象授权和受保护预览尚未实现；profile/index仍pending。下文完整业务蓝图仍是设计，已实现部分以明确标记和证据为准。R05/R06/R08历史及失败保存在[03过程记录](过程记录/03_1b技术操作详解.md)。浏览器统一走同源`/api`，表内为后端路径。
 
 ## 1. 浏览器—业务后端
 
@@ -14,10 +10,10 @@
 
 | 方法与路径 | 输入/输出要点 | 授权 | 阶段 |
 |---|---|---|---|
-| POST /auth/login | 用户名、密码；设置会话 Cookie，返回角色与改密要求 | 同源、限速 | 1B |
-| GET /auth/me | 当前账号、角色、CSRF token；响应不缓存 | 当前有效会话 | 1B |
-| POST /auth/logout | 撤销服务端会话并清 Cookie | 当前会话＋CSRF | 1B |
-| POST /auth/password | 当前密码、新密码；撤销旧会话 | 当前用户＋CSRF | 1B |
+| POST /auth/login | 用户名、密码；设置会话 Cookie，返回角色与改密要求 | 同源、限速 | 1B-3已实现 |
+| GET /auth/me | 当前账号、角色、CSRF token；响应不缓存 | 当前有效会话 | 1B-3已实现 |
+| POST /auth/logout | 撤销服务端会话并清 Cookie | 当前会话＋CSRF | 1B-3已实现 |
+| POST /auth/password | 当前密码、新密码；撤销旧会话 | 当前用户＋CSRF | 1B-3已实现 |
 | GET /documents | 本人/共享范围、分页、状态 | 服务器限定范围 | 2 |
 | POST /index | multipart PDF；202 返回 document_id/job_id | 固定当前 owner、private | 2 |
 | GET /jobs/{job_id} | 阶段、进度、错误摘要、可否重试 | 本人或管理范围 admin | 2 |
@@ -32,12 +28,19 @@
 | PATCH /admin/users/{id} | 启用/停用；不开放任意属性绑定 | admin＋CSRF | 3 |
 | POST /admin/users/{id}/reset-password | 重置、强制改密、撤销会话 | admin＋CSRF | 3 |
 | POST /admin/documents/{id}/publish、/unpublish | 共享状态变更、增加 epoch | admin 且为管理员上传的文档 | 3 |
-| GET /admin/jobs、/admin/profiles、/admin/indexes | 系统任务、无密钥的配置身份 | admin | 3 |
+| GET /admin/profiles | name、config_sha256、status；不返回物理路径/密钥 | 已改密admin | 1B-3已实现 |
+| GET /admin/jobs、/admin/indexes | 系统任务、索引身份 | admin | 3，设计 |
 | POST /admin/indexes/rebuild、/admin/profiles/{id}/activate | 校验过的 profile；返回任务/切换结果 | admin＋CSRF＋审计 | 3 |
 
 初期用鉴权的任务轮询。原 `/progress/stream/{job_id}` 和 OCR 进度流不自动迁入；需要流时必须建立连接及每次发送时复查会话/归属，撤权就终止。原 `/clear/*`、按文件名 `/delete`、任意 `/config/update`、`/config/reset`、裸 `/files/*`、`/api/interpretability`、`/ocr/*` 不挂载为公开兼容入口。`/health` 仅给最少存活信息；依赖错误和详细状态限管理员。
 
 输入边界：`k=1..50`，问题非空且建议最多 2000 字符；PDF 大小、页数和单次文件数采用配置上限并验证真实文件格式。路径、owner、角色、checkpoint、服务 URL 不能由普通请求指定。模型服务不接受客户端任意 URL 或本地路径。
+
+### 1B-3实际认证契约
+
+login/me的200响应均含user_id、username、role、must_change_password、csrf_token；login输入username/password。password输入current_password/new_password，新密码12—128字符且不同；成功204，撤销该用户全部会话并清Cookie，须重新登录。logout成功204，无body仍须JSON Content-Type。未首次改密时受保护业务入口403；普通用户访问admin/profiles403；有效且已改密admin200。当前以profiles验证门禁，其他业务随实现接入，不能泛称所有对象已授权。
+
+写请求检查唯一可信Origin与JSON；password/logout增加唯一X-CSRF-Token。认证/admin响应含private,no-store及Vary Cookie。错误使用`{"detail":"错误码"}`，不会回显密码；下节ErrorResponse仍为未来检索业务设计，尚未统一到此格式。状态码、字段及失败限速见[手册第2节](stage1b-3-runbook.md#2-接口与正确顺序)。SDK已生成并集中注入JSON/CSRF头，UI调用与状态清理留1B-5。
 
 ## 2. 结果字段（结构定义，非运行样例）
 
@@ -65,7 +68,7 @@ ErrorResponse
 
 ## 3. 内部算法边界
 
-下列名称是业务层的目标接口。当前 `ColPaliAdapter.load/encode_page/encode_queries` 以及 `maxsim_scores/top_k` 已实现CLI编码与排序；尚无 `AllowedScope`、数据库或服务路由。接入Web后业务层负责权限，算法层只处理已授权输入，不扫描用户目录；输出ID必须属于本次输入。
+下列名称是业务层的目标接口。当前 `ColPaliAdapter.load/encode_page/encode_queries` 以及 `maxsim_scores/top_k` 已实现CLI编码与排序；已有元数据库及auth路由，尚无 `AllowedScope` 或检索服务路由。接入Web后业务层负责权限，算法层只处理已授权输入，不扫描用户目录；输出ID必须属于本次输入。
 
 | 模块 | 输入 | 输出与硬校验 |
 |---|---|---|

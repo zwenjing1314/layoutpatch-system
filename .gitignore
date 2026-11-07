@@ -15,6 +15,9 @@ __pycache__/
 runtime/
 storage/
 models/
+# Generated API schemas are TypeScript source, not model weights.
+!/frontend/lib/api/generated/models/
+!/frontend/lib/api/generated/models/*.ts
 checkpoints/
 *.sqlite*
 *.log

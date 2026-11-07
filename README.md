@@ -1,44 +1,41 @@
 # 视觉文档检索与证据定位系统
 
-**2026-11-06 / R08当前状态：1B-2数据库与归属已验收。** SQLAlchemy/Alembic六表、admin/A/B、A-tuGEMM5页与B-Music8页、重复初始化保护和9项数据测试通过。profile/index仍pending；未增加登录/检索路由。见[本批手册](docs/stage1b-2-runbook.md)、[数据证据](docs/checks/stage1b-2-verification.json)。下一批1B-3等待用户继续；下文旧轮次结论保留为历史。
+**2026-11-07 / R09：阶段1A、1B-1至1B-3已验收。** 当前具备独立前后端骨架、SQLite文档归属、登录/改密/退出、角色检查和持久会话撤销。23项认证与数据库测试、17项真实代理检查通过；正式库迁移至0002_auth，原有账号密码与文档归属不变。[本批手册](docs/stage1b-3-runbook.md)、[验收证据](docs/checks/stage1b-3-verification.json)。
 
-**阶段1B学习专册：**[03技术详解与跟做步骤](docs/过程记录/03_1b技术操作详解.md)、[04口述与学习复述](docs/过程记录/04_1b逐步口述稿.md)。后续1B记录统一在03/04维护。
+网页目前仍为健康检查壳页，登录/改密界面尚未开发；检索HTTP、授权预览、上传及区域高亮尚未实现。profile/index仍pending，向量尚未导入Qdrant。下一批只做1B-4，等待用户继续，不自动推进。
 
-**2026-11-06 / R06当前状态：1B-1已通过。** Docker29.8.0正常；独立Qdrant就绪、密钥保护、停止/重启与镜像摘要已验，浏览器按钮显示连接正常。前后端和本项目Qdrant保留运行；命令及限制见[运行手册](docs/stage1b-1-runbook.md)，[补验收证据](docs/checks/r06-stage1b-1-completion.json)。下一批1B-2等待用户继续；下文R05阻塞陈述保留为历史。
+新AI先读[交接文档](docs/AI交接.md)与根[AGENTS.md](AGENTS.md)，核对实际代码、数据与端口后再操作。阶段1B学习资料统一维护在[03技术详解](docs/过程记录/03_1b技术操作详解.md)和[04逐步口述稿](docs/过程记录/04_1b逐步口述稿.md)；早期历史留在[01技术操作](docs/过程记录/01_技术操作详解.md)与[02口述](docs/过程记录/02_逐步口述稿.md)。
 
-**2026-11-06 / R05历史状态：1B-1前后端骨架已验证，Qdrant因Docker引擎故障阻塞，整批尚未全部通过。** 启动、停止、验收与学习说明见[1B-1运行手册](docs/stage1b-1-runbook.md)。本批没有登录、检索或高亮；下方1A内容保留为历史说明。
+## 运行和学习
 
-**新AI接手先读：[AI交接文档](docs/AI交接.md)。** 2026-11-06已将阶段1B拆为可学习的小批次；每轮只完成指定批次，并同步交接与两份过程记录。当前为1B-1，前后端通过但Qdrant阻塞。
+PowerShell在项目根目录使用独立Web环境；端口已占用时先核对进程，不重复启动：
 
-更新：2026-11-05。目标：2026-12-03 前交付首版。**阶段 1A 的 ColPali 离线算法闭环已通过；当前可运行命令行页面检索，网页、登录和区域高亮尚未实现。**
+```powershell
+.venv-web/Scripts/python.exe -m scripts.inspect_database
+.venv-web/Scripts/python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --workers 1
+```
 
-本轮实际结果：两份完整 PDF 共 13 页重新编码，4 个新问题返回 Top-3；与官方 processor 评分的最大绝对差为 `3.8147×10⁻⁶`，Top-3 全部一致。运行期间网络审计未记录连接/域名解析尝试。检索仍有目标图表页未进前三、参考文献页排第一的失败样例，不能据此报告准确率达标。
+前端另开终端进入frontend目录，已有生产build时执行：
 
-本轮建议先读 [阶段1A验收与复现说明](docs/stage1a-verification.md)，再对照 [技术操作 R03](docs/过程记录/01_技术操作详解.md#r03) 和 [口述稿 R03](docs/过程记录/02_逐步口述稿.md#r03)。完整检查摘要见 [验收证据](docs/checks/stage1a-verification.json)。
+```powershell
+node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3000
+```
 
-系统主流程：登录 → 上传/管理 PDF → 入库 → 输入问题 → 返回相关页面 → 查看候选证据区域。普通用户只能访问自己的私有文档和管理员共享库；管理员可以管理全库，跨用户访问留痕。
+浏览器访问`http://127.0.0.1:3000`；同源`/api`转发至8000。Qdrant独立容器只监听loopback6333，命令见[1B-1手册](docs/stage1b-1-runbook.md)。数据库初始化、密码私密位置见[1B-2手册](docs/stage1b-2-runbook.md)；认证流程、CSRF、测试和安全停止见[1B-3手册](docs/stage1b-3-runbook.md)。不要将初始密码、Cookie或CSRF贴入日志或聊天。
 
-## 建议分三批审阅
+`.env.example`区分当前实际读取的进程变量和后续设计；后端不自动加载该文件。模型使用独立`.venv`，不能用Web安装操作更新模型锁。
 
-| 批次 | 阅读材料 | 你要检查什么 |
-|---|---|---|
-| 1，先看范围和事实 | [需求与权限](docs/requirements.md)、[源代码与环境核查](docs/source-audit.md) | 做哪些功能；哪些已存在；哪些还不能运行 |
-| 2，再看系统如何连接 | [架构与部署](docs/architecture.md)、[模块与接口契约](docs/interfaces.md) | 登录如何保护数据；ColPali 和区域排序分别在哪一步执行 |
-| 3，最后看如何交付 | [验收方案](docs/testing.md)、[进度、阻塞与下一轮](docs/progress.md) | 用什么证据判断完成；下一轮只推进什么 |
+## 已验证与后续设计
 
-文档统一标记：**[事实]** 为本轮直接读代码/检查所得；**[设计]** 为建议实现，尚未开发；**[待核实]** 为缺少运行或身份依据；**[历史记录]** 为既有文件陈述，本轮未复测。
+| 内容 | 状态与证据 |
+|---|---|
+| 原ColPali离线算法 | 1A通过，两份完整PDF共13页、4题真实编码；与参考Top-3一致，最大分数差约3.8×10⁻⁶；仍有未命中，不能称准确率达标。[详情](docs/stage1a-verification.md) |
+| 独立运行骨架 | 1B-1通过，Docker/Qdrant密钥与停止重启已验；R05引擎失败、R06恢复事实均保留。[补验收](docs/checks/r06-stage1b-1-completion.json) |
+| 数据库与归属 | 1B-2通过，A-tuGEMM5页、B-Music8页均private，初始化不覆盖已有密码/身份。[证据](docs/checks/stage1b-2-verification.json) |
+| 认证与会话 | 1B-3通过，HTTP认证/CSRF/角色/撤销；没有登录网页。[证据](docs/checks/stage1b-3-verification.json) |
+| 授权真实检索、页面预览 | 1B-4/5待实施，不能用CLI检索替代Web授权验收 |
+| 新PDF入库、区域排序/高亮、完整管理 | 后续阶段设计；不提前宣称可用 |
 
-阶段 0 结论：**有条件复用 Snappy 的 Next.js/FastAPI 工程与界面组件；不直接启动完整上游模型栈。** 计划新增账号、后端授权、元数据持久化并适配 D-no-text。阶段 0 的 D-no-text 严格加载通过；阶段 1A 已完成原 ColPali 的本地加载与真实编码，尚未迁入 Snappy 业务模块。
+[需求与权限](docs/requirements.md)、[架构](docs/architecture.md)、[接口](docs/interfaces.md)、[分阶段验收](docs/testing.md)、[进度](docs/progress.md)区分已验证、设计与待核实。系统整体目标为登录→PDF入库→授权真实检索→候选证据定位，目标交付日期2026-12-03。
 
-下一轮唯一主要任务：**阶段 1B，实现“登录 → 在授权文档范围内真实检索 → 受保护页面预览”的网页闭环。** 用 admin/A/B 账号验证后端隔离；完整上传、区域排序与高亮留在后续阶段。
-
-旧 `layoutpatch`、`layoutpatch-evidence`、`Snappy` 保持只读。本轮从已有安装包建立独立 `.venv`，在忽略的 `runtime/` 保存两份开发 PDF、渲染图和新编码结果；模型从已有缓存只读加载。没有下载模型、训练、更换底座、启动 Web 服务或推送远程。旧源库前后状态与已列出变更文件哈希一致。
-
-[环境变量草案](.env.example) 仍是业务系统设计，本轮 CLI 不读取它。CLI 使用命令参数与 [模型配置](configs/colpali_local.json)，可复现命令见验收说明。2026-11-06复核：`.venv`、`runtime`仍被忽略，当前`.gitignore`已无`/docs`条目；保留用户现状，不恢复旧规则。
-
-## 持续过程记录
-
-为便于理解和口述项目全过程，每轮工作结束时同步追加以下两份文档，按日期、轮次和相同步骤编号记录实际操作、文件变化、验证结果及简短讲稿；明确区分已实现功能与设计，保留历史记录。
-
-- [技术操作详解](docs/过程记录/01_技术操作详解.md)：逐步解释操作、技术原理、改动和证据。
-- [逐步口述稿](docs/过程记录/02_逐步口述稿.md)：整轮简报、每步短口稿及追问回答。
+仅修改本项目；旧layoutpatch、layoutpatch-evidence、Snappy只读。选择性复用Snappy工程机制并保留来源与MIT，不整体搬上游栈；不下载模型、不训练、不换底座、不覆盖旧研究结果、不擅自提交或推送。运行数据和秘密位于Git忽略的runtime目录。

@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-07",
+  "round": "R09",
+  "paired_steps": 5,
+  "oral_lengths": {
+    "r09-s01": 96,
+    "r09-s02": 96,
+    "r09-s03": 98,
+    "r09-s04": 95,
+    "r09-s05": 100
+  },
+  "python_syntax": "passed",
+  "json_syntax": "passed",
+  "local_links_checked": 153,
+  "source_and_model_snapshots_equal": true,
+  "existing_web_pins_preserved": true,
+  "formal_original_tables_equal_backup": true,
+  "generated_sdk_imports_resolve": true,
+  "generated_sdk_files_ignored": [],
+  "private_paths_ignored": [
+    "runtime/metadata.sqlite3",
+    "runtime/secrets/development-initial-passwords.json",
+    "models/private-check.bin"
+  ],
+  "known_local_secrets_scan_files": 125,
+  "known_local_secrets_scan": "passed",
+  "git_diff_check": "passed (CRLF notices only)",
+  "documentation_edit_failure": "Combined delete/add patch rejected before writing; rewritten with direct file write",
+  "initial_checker_issue": "Git warning reader used default GBK and errored despite exit0; corrected explicit UTF-8 and rechecked",
+  "overall": "passed",
+  "issues": []
+}

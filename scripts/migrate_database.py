@@ -4,7 +4,9 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
+from sqlalchemy import text
 from backend.db.connection import DEFAULT_DATABASE, ROOT, database_path
+from backend.db.connection import make_engine
 
 
 def migrate(path: Path = DEFAULT_DATABASE):
@@ -18,4 +20,10 @@ if __name__ == "__main__":
     parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE)
     args = parser.parse_args()
     migrate(args.database)
-    print("Database migration completed: 0001_metadata")
+    engine = make_engine(args.database)
+    try:
+        with engine.connect() as connection:
+            revision = connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+        print("Database migration completed: " + revision)
+    finally:
+        engine.dispose()
