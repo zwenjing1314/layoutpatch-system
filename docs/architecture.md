@@ -1,8 +1,8 @@
 # 架构、数据实体与部署设计
 
-更新：2026-11-07，北京时间，R09。**已实现并验证：1A离线算法、1B-1运行骨架、1B-2元数据、1B-3认证会话。** 23项认证/数据库测试、17项真实代理检查通过，正式库0002_auth迁移与六项冒烟通过。[本批手册](stage1b-3-runbook.md)、[汇总证据](checks/stage1b-3-verification.json)。
+更新：2026-11-07，北京时间，R11。**1B-5网页登录/检索与授权原图已实现，本批覆盖验收通过。** 45项后端、3项前端、41项真实HTTP、16项浏览器观察、16项正式恢复检查；浏览器改密提交仍由用户本人操作。[手册](stage1b-5-runbook.md)、[证据](checks/stage1b-5-verification.json)。1B-4原ColPali新query、过滤后Top-k与官方评分证据保留。
 
-登录/改密网页、检索HTTP、对象授权和受保护预览尚未实现；profile/index仍pending。下文完整业务蓝图仍是设计，已实现部分以明确标记和证据为准。R05/R06/R08历史及失败保存在[03过程记录](过程记录/03_1b技术操作详解.md)。浏览器统一走同源`/api`，表内为后端路径。
+正式0003、13页ready、profile validated不变；本批新增会话绑定图片授权，无数据库新迁移。上传、PDF与区域高亮仍为设计。后续学习记录转[05](过程记录/05_1b技术操作详解.md)/[06](过程记录/06_1b追逐口述稿.md)，03/04保持历史。
 
 ## 1. 复用决策
 
@@ -28,7 +28,7 @@ flowchart TD
     B -->|对象授权后读取| F
 ```
 
-这是逻辑结构，不拆成多个新微服务。一个 FastAPI 进程、一个受控模型执行器；同步计算放入受限工作线程/子进程，避免堵塞异步请求。ColPali 只加载一份，页面编码与问题编码共享执行互斥；首版限制并发，记录等待时间。MinerU 使用隔离的 Python 子进程和现有 CPU 模型。
+这是完整目标逻辑结构，含尚未实施的上传/解析/区域部分。1B-4模型使用内部管道连接独立.venv中的单个持久子进程，Web保持.venv-web，模型无TCP端口；每个新query实际forward，队列5秒/执行180秒上限，Next代理240秒。一个 FastAPI 进程、一个受控模型执行器；同步计算放入受限工作线程/子进程，避免堵塞异步请求。ColPali 只加载一份，页面编码与问题编码共享执行互斥；首版限制并发，记录等待时间。MinerU 使用隔离的 Python 子进程和现有 CPU 模型。
 
 页面检索先用完整 `[1031,128]` 多向量、MaxSim、无量化、无压缩、无均值池化预取。Qdrant 使用 `original` 命名向量和 `MAX_SIM`；首轮一致性检查使用 exact 搜索配置。先证明与 ColPali 参考分数/排名一致，再考虑更复杂检索配置。
 
@@ -38,9 +38,15 @@ flowchart TD
 
 Cookie：HttpOnly、SameSite=Lax、Path=/，不设跨域 Domain；HTTPS 开启 Secure，本机 HTTP 开发显式关闭。已实现空闲过期30分钟、绝对过期8小时。登录时轮换会话（尚无HTTP提权功能）；退出、改密、重置密码、停用均撤销对应会话。每次请求核验账号启用状态和 `auth_version`，不能仅在登录时检查。
 
-写请求校验固定可信 Origin；已登录写请求使用会话绑定的 CSRF token。登录限同源 JSON 请求，拒绝任意外域 CORS 和表单跨站提交；密码错误采用统一提示和轻量失败限速。浏览器请求统一走生成 SDK，CSRF header 在 SDK 中央配置注入；Cookie 不存 localStorage。管理员初始化使用交互输入，不硬编码通用账号。
+写请求校验固定可信 Origin；已登录写请求使用会话绑定的 CSRF token。登录限同源 JSON 请求，拒绝任意外域 CORS 和表单跨站提交；密码错误统一提示并限速。auth/search走生成SDK，CSRF在中央配置注入；二进制图片由专用原生fetch读取Blob、取消并处理401/404/503，避免固定生成器的文本解析；不增加请求库。Cookie/CSRF/问题/结果不存localStorage或sessionStorage。
+
+**1B-5浏览器生命周期：**请求代号＋SDK cancel拒绝迟到返回；图片独立序号/AbortController，Blob URL每次清理时释放。退出/换号/401清身份、CSRF、问题、结果/预览；退出失败不伪报成功。BroadcastChannel只广播身份变化事件，隐藏/pagehide清私有状态，重新显示/BFCache回来查me，可见会话每30秒核验。首次改密页成功后要求重新登录。
 
 ## 4. 权限过滤与一致性
+
+**1B-4/5已实现子集：**search使用AllowedScope；只选ready文档当前版本及完整IndexPage，shared须归属启用管理员；admin普通search不绕私有归属。过滤包含版本/profile/index/page白名单，空范围不启动模型/不查Qdrant；返回前新SQLite会话复核，变化409、失效401。scope_version是快照哈希，未实现持久access_epoch、历史或管理审计。
+
+**1B-5图片：**GET /pages/{page_id}/image通过共用readable_document检查当前版本/归属；preview_url由本会话CSRF对page_id/render哈希做HMAC，必须同时有签发会话的Cookie。文件限制runtime/corpus、20MiB、PNG/RGB/尺寸/哈希；读完再查授权，成功返回同一份字节。private,no-store/Vary Cookie，不走304/Range或静态目录。旧会话401，新会话旧URL/越权404，文件异常503。已交付字节无法远程收回，未实现撤权推送。后文PDF/缩略图/管理等仍为完整目标设计。
 
 SQLite 是可见性的权威来源。每次查询由服务器生成 `AllowedScope`：当前用户拥有的就绪文档版本，加当前共享的就绪版本；管理员请求管理范围时额外审核并审计。前端不能传任意 owner 或自行给出可访问文档集合。
 
@@ -110,11 +116,11 @@ D 使用的完整 `[1024,128]` patch 与压缩检索向量分开。默认保留�
 推荐首版：Windows 原生 Next.js + 独立 Python 3.11 后端/模型环境；Docker 只运行独立 Qdrant；MinerU CPU 使用独立解析环境。理由：本机已有原研究 CUDA 依赖和模型，避免上游两套 GPU 服务、Python 3.10 镜像与默认底座同时介入。
 
 - 前端 `127.0.0.1:3000`，同源 `/api/:path*` 转发到 `127.0.0.1:8000/:path*`；代理须保留 Cookie/Set-Cookie、CSRF header、二进制/Range 语义。阶段 1B 做实测。
-- 后端 `127.0.0.1:8000`，一个进程；未来命令模式为 `python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8000`，R05实际入口已建立：`python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --workers 1`（项目根目录，使用`.venv-web`）。
+- 后端 `127.0.0.1:8000`，一个进程；未来命令模式为 `python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8000`，R05实际入口已建立：`python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --workers 1 --no-access-log`（项目根目录，使用`.venv-web`）。
 - Qdrant 新容器、独立 volume/collection 前缀，6333 只绑 loopback，配置服务端 API key；浏览器不持有 key。不要复用旧 Snappy 空库卷来承载本项目文档。
 - 不对浏览器提供模型端口；本机操作系统账户的直接磁盘访问不属于此 Web 用户隔离边界。
 - 后端、前端、解析器依赖分别锁定。沿用 Snappy yarn.lock；宿主未找到 yarn，阶段 1 需核实 Corepack/锁文件对应版本。不要把旧 .venv 变成本项目可写环境。
-- 模型启动强制 offline/local_files_only，显式指定 adapter/base 本地路径；缺失就报错，不触发远程下载。GPU 当前空闲不足以证明加载可行，先 batch=1 测峰值。
+- 模型启动强制 offline/local_files_only，显式指定 adapter/base 本地路径；缺失就报错，不触发远程下载。1A/R10已有真实GPU证据；容量仍只覆盖小规模串行查询，不承诺并发负载。
 - 数据根目录默认独立项目 `runtime/`（Git 忽略），展示交付时可改为仓库外路径；迁移和备份同时覆盖 SQLite、原文件、配置身份，索引可按记录重建。
 
-R05曾因Docker引擎故障阻塞，R06已补验镜像摘要、密钥和停止重启；目前Qdrant服务运行，但尚未写入业务向量，不能声称已验证非空持久性或检索。不能通过换底座、量化或训练掩盖后续兼容问题。
+R05曾因Docker引擎故障阻塞，R06已补验镜像摘要、密钥和停止重启；R10已写入13页完整多向量并验证授权检索/官方评分；本轮未重启Qdrant容器，非空数据容器重启验证留1B-6。不能通过换底座、量化或训练掩盖后续兼容问题。

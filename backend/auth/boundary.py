@@ -9,7 +9,7 @@ class AuthBoundary:
         self.app, self.origin = app, origin
 
     async def __call__(self, scope, receive, send):
-        if scope["type"] != "http" or not scope["path"].startswith(("/auth/", "/admin/")):
+        if scope["type"] != "http" or not (scope["path"] == "/search" or scope["path"].startswith(("/auth/", "/admin/", "/pages/"))):
             await self.app(scope, receive, send)
             return
 

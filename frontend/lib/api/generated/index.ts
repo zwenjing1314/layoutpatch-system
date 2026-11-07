@@ -13,8 +13,12 @@ export type { LoginInput } from './models/LoginInput';
 export type { MeResponse } from './models/MeResponse';
 export type { PasswordInput } from './models/PasswordInput';
 export type { ProfileResponse } from './models/ProfileResponse';
+export type { SearchHit } from './models/SearchHit';
+export type { SearchResponse } from './models/SearchResponse';
 export type { ValidationError } from './models/ValidationError';
 
 export { AdminService } from './services/AdminService';
 export { AuthService } from './services/AuthService';
+export { PagesService } from './services/PagesService';
+export { SearchService } from './services/SearchService';
 export { SystemService } from './services/SystemService';

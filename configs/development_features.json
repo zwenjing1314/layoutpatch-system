@@ -1,0 +1,11 @@
+{
+  "schema": "development-feature-source-v1",
+  "source_directory": "runtime/verification/20261105-gpu-first",
+  "files": {
+    "report.json": "d1b025f09734c10c0c17083425b46f7040c33c3bd84e89c080b05dad78621920",
+    "page_embeddings.pt": "173475399ca788c9f21d2a5a979659f8d6e8ed2a1cf57e939299d0e7e9c5e49a"
+  },
+  "corpus_manifest_sha256": "741f9b955474f8536319637d1aa77fd96fd5647ab1df019a0b80bde090e87a9a",
+  "encoder_profile_sha256": "da132ccca44fd3964eea940881be0f30663f7b48957f09925cce19c5df9b0f99",
+  "provenance_note": "R03 report hash was preserved in stage1a evidence. Page tensor file hash is first pinned in R10; not claimed to be a historical R03 checksum."
+}

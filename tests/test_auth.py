@@ -261,7 +261,7 @@ class AuthTests(unittest.TestCase):
         finally:
             restarted.state.engine.dispose()
 
-    def test_https_sets_secure_and_no_search_routes(self):
+    def test_https_sets_secure_and_expected_routes(self):
         secure_app = create_app(AuthSettings(database=self.path, origin="https://localhost", secure=True))
         try:
             client = TestClient(secure_app, base_url="https://localhost")
@@ -272,7 +272,7 @@ class AuthTests(unittest.TestCase):
                 self.assertIn("secure", result.headers["set-cookie"].lower())
         finally:
             secure_app.state.engine.dispose()
-        self.assertEqual(set(self.app.openapi()["paths"]), {"/health", "/auth/login", "/auth/me", "/auth/password", "/auth/logout", "/admin/profiles"})
+        self.assertEqual(set(self.app.openapi()["paths"]), {"/health", "/auth/login", "/auth/me", "/auth/password", "/auth/logout", "/admin/profiles", "/search", "/pages/{page_id}/image"})
         with self.assertRaises(ValueError):
             AuthSettings(database=self.path, origin="http://example.com")
 

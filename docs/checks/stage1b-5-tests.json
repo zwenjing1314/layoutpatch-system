@@ -1,0 +1,10 @@
+{
+  "date":"2026-11-07",
+  "round":"R11",
+  "backend":{"passed":45,"seconds":14.622,"previews":9,"search_and_integrity":13,"auth":14,"database":9,"command":".venv-web/Scripts/python.exe -m unittest tests.test_previews tests.test_search tests.test_auth tests.test_database_initialization -v","log":"runtime/verification/r11/unittest-final.log"},
+  "after_preview_query_schema_change":{"passed":9,"seconds":2.995,"command":".venv-web/Scripts/python.exe -m unittest tests.test_previews -v","log":"runtime/verification/r11/preview-final.log"},
+  "frontend":{"passed":3,"command":"node --test tests/workspace-lifecycle.test.cjs (cwd frontend)","scope":"RequestGeneration delayed response/cancellation and private preview URL restrictions; actual browser coverage is separately reported"},
+  "sdk":{"export_openapi":"passed","generation":"passed","typecheck":"passed","final_production_build":"passed","build_seconds":9.11,"generated_sources_hand_edited":false},
+  "first_test_failure":"Fixture CookieConflict from manual replay cookie plus auto cookie on another domain; cleared jar per iteration. Imported TestCase also duplicated discovery; module import fixed. Initial55 was not independent coverage.",
+  "overall":"passed"
+}

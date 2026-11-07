@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-07",
+  "round": "R10",
+  "scope": "isolated SQLite and unique real Qdrant collection; real Next/Uvicorn and ColPali GPU",
+  "checks": [
+    {
+      "name": "test_collection_initially_absent",
+      "passed": true
+    }
+  ],
+  "run_directory": "runtime/verification/r10/live-d3a94c6c63f1",
+  "failures": [
+    "SearchUnavailable: Remote feature/payload mismatch; refused overwrite"
+  ],
+  "overall": "failed",
+  "unique_test_collection_removed": true
+}

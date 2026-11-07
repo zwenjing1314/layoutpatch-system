@@ -1,18 +1,215 @@
 "use client";
-import { useState } from "react";
-import "@/lib/api/client";
-import { SystemService } from "@/lib/api/generated";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { setCsrfToken } from "@/lib/api/client";
+import { ApiError, AuthService, SearchService } from "@/lib/api/generated";
+import type { MeResponse, SearchHit, SearchResponse } from "@/lib/api/generated";
+import { RequestGeneration, privatePreviewPath } from "@/lib/workspace-lifecycle";
+
+type Mode = "checking" | "login" | "password" | "workspace" | "unavailable";
+type Cancelable<T> = PromiseLike<T> & { cancel(): void };
+
 export default function Home() {
-  const [status, setStatus] = useState("尚未检查");
-  async function check() {
-    setStatus("检查中…");
-    try {
-      const result = await SystemService.getHealth();
-      setStatus(result.status === "ok" ? "服务连接正常" : "服务响应异常");
-    } catch { setStatus("暂时无法连接服务，请稍后重试"); }
+  const [mode, setMode] = useState<Mode>("checking");
+  const [me, setMe] = useState<MeResponse | null>(null);
+  const [notice, setNotice] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [result, setResult] = useState<SearchResponse | null>(null);
+  const [selected, setSelected] = useState<SearchHit | null>(null);
+  const [image, setImage] = useState<string | null>(null);
+  const [imageBusy, setImageBusy] = useState(false);
+  const [imageError, setImageError] = useState("");
+  const generation = useRef(new RequestGeneration());
+  const imageRequest = useRef<AbortController | null>(null);
+  const imageObject = useRef<string | null>(null);
+  const imageSequence = useRef(0);
+  const identity = useRef<string | null>(null);
+  const channel = useRef<BroadcastChannel | null>(null);
+  const form = useRef<HTMLFormElement | null>(null);
+
+  const clearImage = useCallback(() => {
+    imageSequence.current += 1; imageRequest.current?.abort(); imageRequest.current = null;
+    if (imageObject.current) URL.revokeObjectURL(imageObject.current);
+    imageObject.current = null; setImage(null); setImageBusy(false); setImageError("");
+  }, []);
+  const clearResults = useCallback(() => {
+    generation.current.reset(); clearImage(); setResult(null); setSelected(null); setBusy(false);
+  }, [clearImage]);
+  const lock = useCallback((next: Mode = "login", message = "") => {
+    clearResults(); setCsrfToken(); identity.current = null;
+    setMe(null); setQuestion(""); setMode(next); setNotice(message); form.current?.reset();
+  }, [clearResults]);
+  const announce = useCallback(() => { channel.current?.postMessage("session-changed"); }, []);
+  async function tracked<T>(request: Cancelable<T>) {
+    const release = generation.current.track(() => request.cancel());
+    try { return await request; } finally { release(); }
   }
-  return <main><p className="eyebrow">LAYOUTPATCH</p><h1>视觉文档检索<br/>与证据定位系统</h1>
-    <p>系统正在建设中，文档检索功能将在后续开放。</p>
-    <section><h2>服务连接</h2><p role="status" aria-live="polite">{status}</p>
-    <button onClick={check}>检查连接</button></section></main>;
+  const restore = useCallback(async () => {
+    lock("checking");
+    const stamp = generation.current.current();
+    try {
+      const current = await tracked(AuthService.getMe());
+      if (!generation.current.accepts(stamp) || document.visibilityState === "hidden") return;
+      identity.current = current.user_id; setMe(current); setCsrfToken(current.csrf_token);
+      setMode(current.must_change_password ? "password" : "workspace");
+    } catch (error) {
+      if (!generation.current.accepts(stamp)) return;
+      if (error instanceof ApiError && error.status === 401) lock("login");
+      else lock("unavailable", "暂时无法确认登录状态，请稍后重试。");
+    }
+  }, [lock]);
+
+  useEffect(() => {
+    channel.current = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("layoutpatch-session") : null;
+    if (channel.current) channel.current.onmessage = () => { void restore(); };
+    const visibility = () => { if (document.visibilityState === "hidden") lock("checking"); else void restore(); };
+    const pagehide = () => lock("checking");
+    const pageshow = (event: PageTransitionEvent) => { if (event.persisted) void restore(); };
+    document.addEventListener("visibilitychange", visibility);
+    window.addEventListener("pagehide", pagehide); window.addEventListener("pageshow", pageshow);
+    void restore();
+    return () => {
+      generation.current.reset(); clearImage(); setCsrfToken(); channel.current?.close(); channel.current = null;
+      document.removeEventListener("visibilitychange", visibility);
+      window.removeEventListener("pagehide", pagehide); window.removeEventListener("pageshow", pageshow);
+    };
+  }, [restore, lock, clearImage]);
+
+  useEffect(() => {
+    if (!me || mode === "checking") return;
+    const timer = window.setInterval(async () => {
+      const stamp = generation.current.current();
+      try {
+        const current = await tracked(AuthService.getMe());
+        if (!generation.current.accepts(stamp)) return;
+        if (current.user_id !== identity.current || current.csrf_token !== me.csrf_token || current.must_change_password !== me.must_change_password) void restore();
+      } catch (error) {
+        if (!generation.current.accepts(stamp)) return;
+        if (error instanceof ApiError && error.status === 401) lock("login", "登录已失效，请重新登录。");
+        else lock("unavailable", "连接中断，已隐藏当前结果。请重新连接。");
+      }
+    }, 30_000);
+    return () => window.clearInterval(timer);
+  }, [me, mode, lock, restore]);
+
+  function businessError(error: unknown) {
+    if (error instanceof ApiError) {
+      const detail = (error.body as { detail?: string } | undefined)?.detail;
+      if (error.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
+      if (error.status === 403 && detail === "PASSWORD_CHANGE_REQUIRED") {
+        clearResults(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
+      }
+      if (error.status === 409) { clearResults(); setNotice("可访问的文档已变化，请重新检索。"); return; }
+      if (error.status === 503) { setNotice(detail === "MODEL_BUSY" ? "检索服务繁忙，请稍后重试。" : "检索服务暂时不可用，请稍后重试。"); return; }
+      if (error.status === 422) { setNotice("请检查问题长度和返回页数。"); return; }
+    }
+    setNotice("连接暂时中断，请稍后重试。");
+  }
+  async function login(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); const data = new FormData(event.currentTarget);
+    const username = String(data.get("username") ?? "").trim(), password = String(data.get("password") ?? "");
+    event.currentTarget.reset(); lock("login"); setBusy(true); announce();
+    const stamp = generation.current.current();
+    try {
+      const current = await tracked(AuthService.login({ username, password }));
+      if (!generation.current.accepts(stamp)) return;
+      identity.current = current.user_id; setMe(current); setCsrfToken(current.csrf_token);
+      setMode(current.must_change_password ? "password" : "workspace"); announce();
+    } catch (error) {
+      if (!generation.current.accepts(stamp)) return;
+      setNotice(error instanceof ApiError && error.status === 401 ? "账号或密码不正确，请重试。" :
+        error instanceof ApiError && error.status === 429 ? "尝试次数较多，请五分钟后重试。" : "登录服务暂时不可用，请稍后重试。");
+    } finally { if (generation.current.accepts(stamp)) setBusy(false); }
+  }
+  async function changePassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); const data = new FormData(event.currentTarget);
+    const current_password = String(data.get("current_password") ?? ""), new_password = String(data.get("new_password") ?? "");
+    if (new_password !== String(data.get("confirm_password") ?? "")) { setNotice("两次输入的新密码不一致。"); return; }
+    if (new_password === current_password) { setNotice("新密码需要与当前密码不同。"); return; }
+    event.currentTarget.reset(); clearResults(); setBusy(true); setNotice("");
+    const stamp = generation.current.current();
+    try {
+      await tracked(AuthService.changePassword({ current_password, new_password }));
+      if (!generation.current.accepts(stamp)) return;
+      lock("login", "密码已更新，请使用新密码重新登录。"); announce();
+    } catch (error) {
+      if (!generation.current.accepts(stamp)) return;
+      if (error instanceof ApiError && error.status === 400) setNotice("当前密码不正确，请重新输入。");
+      else businessError(error);
+    } finally { if (generation.current.accepts(stamp)) setBusy(false); }
+  }
+  async function logout() {
+    const csrf = me?.csrf_token;
+    clearResults(); setQuestion(""); setNotice(""); setBusy(true);
+    const stamp = generation.current.current();
+    try {
+      setCsrfToken(csrf); await tracked(AuthService.logout());
+      if (generation.current.accepts(stamp)) { lock("login", "已安全退出，可以切换账号。"); announce(); }
+    } catch (error) {
+      if (!generation.current.accepts(stamp)) return;
+      if (error instanceof ApiError && error.status === 401) { lock("login", "已退出登录。"); announce(); }
+      else lock("unavailable", "退出尚未确认，已隐藏当前内容。请重新连接后重试退出。");
+    }
+  }
+  async function preview(hit: SearchHit, stamp = generation.current.current()) {
+    clearImage(); setSelected(hit); setImageBusy(true);
+    const sequence = imageSequence.current, controller = new AbortController(); imageRequest.current = controller;
+    try {
+      const response = await fetch(privatePreviewPath(hit.preview_url), {
+        credentials: "same-origin", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer", signal: controller.signal,
+      });
+      if (!generation.current.accepts(stamp) || sequence !== imageSequence.current) return;
+      if (response.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
+      if (response.status === 403) { clearResults(); setMode("password"); setNotice("请先设置新密码。"); return; }
+      if (response.status === 404) { clearResults(); setNotice("页面访问权限已变化，请重新检索。"); return; }
+      if (!response.ok || response.headers.get("content-type")?.split(";", 1)[0] !== "image/png") throw new Error("Preview unavailable");
+      const blob = await response.blob();
+      if (!generation.current.accepts(stamp) || sequence !== imageSequence.current) return;
+      const url = URL.createObjectURL(blob); imageObject.current = url; setImage(url);
+    } catch {
+      if (!controller.signal.aborted && generation.current.accepts(stamp) && sequence === imageSequence.current) setImageError("暂时无法加载页面，请重试。");
+    } finally { if (generation.current.accepts(stamp) && sequence === imageSequence.current) setImageBusy(false); }
+  }
+  async function search(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); const data = new FormData(event.currentTarget);
+    const q = question.trim(), k = Number(data.get("k"));
+    clearResults(); setNotice(""); setBusy(true); const stamp = generation.current.current();
+    try {
+      const response = await tracked(SearchService.searchPages(q, k));
+      if (!generation.current.accepts(stamp)) return;
+      setResult(response); if (response.items[0]) void preview(response.items[0], stamp);
+    } catch (error) { if (generation.current.accepts(stamp)) businessError(error); }
+    finally { if (generation.current.accepts(stamp)) setBusy(false); }
+  }
+
+  return <div className="app-shell">
+    <header className="topbar"><a className="brand" href="/" aria-label="LayoutPatch 首页"><span className="brand-mark" aria-hidden="true">L<span>·</span></span>LayoutPatch<span className="brand-caption">视觉文档检索</span></a>
+      {me && <div className="account"><span className="avatar" aria-hidden="true">{me.username.slice(0, 1).toUpperCase()}</span><span>{me.username}<small>{me.role === "admin" ? "管理员" : "个人空间"}</small></span><button className="button-quiet" onClick={() => void logout()} disabled={busy && mode !== "workspace"}>退出 / 换号</button></div>}
+    </header><main>
+      {mode === "checking" && <div className="center-state" role="status"><span className="spinner"/>正在确认登录状态…</div>}
+      {mode === "unavailable" && <section className="reconnect"><p className="eyebrow">连接状态</p><h1>暂时无法连接</h1><p role="alert">{notice}</p><button onClick={() => void restore()}>重新连接</button></section>}
+      {mode === "login" && <div className="auth-layout"><section className="welcome"><p className="eyebrow">从问题，找到页面</p><h1>让文档里的线索，<br/>回到眼前。</h1><p className="lead">用自然语言提问，找到相关页面，<br/>再回到原文查看上下文。</p><div className="paper-scene" aria-hidden="true"><div className="paper paper-back"/><div className="paper paper-front"><span className="paper-label">DOCUMENT / 01</span><i/><i/><i className="short"/><div className="paper-figure"><span/><span/><span/></div><i/><i/><i className="short"/></div><span className="scene-note">阅读 · 检索 · 核对</span></div><p className="privacy-note"><span aria-hidden="true">◈</span> 你的私有文档，仅在授权范围内检索。</p></section>
+        <section className="auth-card"><p className="eyebrow">欢迎回来</p><h2>登录你的工作空间</h2><p className="muted">使用管理员分配的账号。首次登录后需设置新密码。</p><form ref={form} onSubmit={login}>
+          <label htmlFor="username">账号</label><input id="username" name="username" autoComplete="username" required maxLength={64} placeholder="请输入账号" disabled={busy}/>
+          <label htmlFor="password">密码</label><input id="password" name="password" type="password" autoComplete="current-password" required maxLength={128} placeholder="请输入密码" disabled={busy}/>
+          {notice && <p className="notice" role="alert">{notice}</p>}<button className="full" disabled={busy}>{busy ? "登录中…" : "登录工作空间"}<span aria-hidden="true"> →</span></button>
+        </form><p className="form-footnote">忘记密码？请联系管理员重置。</p></section></div>}
+      {mode === "password" && <section className="password-card auth-card"><p className="eyebrow">保护你的账号</p><h1>设置新密码</h1><p className="muted">首次使用前，请替换初始密码。更新后需要重新登录。</p><form ref={form} onSubmit={changePassword}>
+        <label htmlFor="current_password">当前密码</label><input id="current_password" name="current_password" type="password" autoComplete="current-password" required maxLength={128} disabled={busy}/>
+        <label htmlFor="new_password">新密码 <span className="field-hint">12–128 个字符</span></label><input id="new_password" name="new_password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} disabled={busy}/>
+        <label htmlFor="confirm_password">再次输入新密码</label><input id="confirm_password" name="confirm_password" type="password" autoComplete="new-password" required minLength={12} maxLength={128} disabled={busy}/>
+        {notice && <p className="notice" role="alert">{notice}</p>}<button className="full" disabled={busy}>{busy ? "更新中…" : "更新密码并重新登录"}</button>
+      </form></section>}
+      {mode === "workspace" && <div className="workspace"><section className="search-intro"><p className="eyebrow">文档工作空间</p><h1>你想在文档中找到什么？</h1><p className="muted">描述你的问题，检索个人文档与管理员共享的内容。</p>
+        <form className="search-form" onSubmit={search}><label className="sr-only" htmlFor="question">检索问题</label><textarea id="question" name="q" value={question} onChange={(e) => setQuestion(e.target.value)} required maxLength={2000} placeholder="例如：文中如何比较硬件面积与能耗？" rows={2}/><div className="search-controls"><span className="scope-label">◈ 个人与共享文档</span><label htmlFor="k">返回页数</label><select id="k" name="k" defaultValue="3"><option value="3">3 页</option><option value="5">5 页</option><option value="10">10 页</option></select><button disabled={busy || !question.trim()}>{busy ? "检索中…" : "检索文档"}<span aria-hidden="true"> ↗</span></button></div></form>
+        {notice && <p className="notice" role="alert">{notice}</p>}</section>
+        {busy && <div className="center-state" role="status"><span className="spinner"/>正在查找相关页面，首次检索可能需要更久…</div>}
+        {!result && !busy && <section className="empty-state"><span className="empty-icon" aria-hidden="true">⌕</span><h2>从一个问题开始</h2><p>相关页面会显示在这里。选择结果，即可查看页面原文。</p></section>}
+        {result && result.items.length === 0 && <section className="empty-state" role="status"><span className="empty-icon" aria-hidden="true">▤</span><h2>当前没有可检索的文档</h2><p>你的空间中还没有可用页面，也暂无共享文档。请联系管理员。</p></section>}
+        {result && result.items.length > 0 && <section className="result-area" aria-label="检索结果"><div className="result-heading"><h2>相关页面 <span>{result.items.length}</span></h2><p>按相关分数排序 · 请结合原文核对</p></div><div className="result-grid"><div className="result-list">{result.items.map((hit) => <button key={hit.page_id} className={`result-card ${selected?.page_id === hit.page_id ? "is-selected" : ""}`} aria-pressed={selected?.page_id === hit.page_id} onClick={() => void preview(hit)}><span className="rank">{String(hit.page_rank).padStart(2, "0")}</span><span className="result-copy"><strong>{hit.document_name}</strong><span>第 {hit.page_number} 页 <span className="dot">·</span> 相关分数 {hit.page_score.toFixed(2)}</span><small>查看页面原文 <span aria-hidden="true">→</span></small></span></button>)}</div>
+          <div className="preview-panel"><div className="preview-toolbar"><div><span className="eyebrow">页面预览</span><h3>{selected?.document_name}</h3></div><span className="page-badge">第 {selected?.page_number} 页</span></div><div className="preview-canvas" aria-busy={imageBusy}>{imageBusy && <p role="status"><span className="spinner"/>正在加载页面…</p>}{imageError && <div role="alert"><p>{imageError}</p><button className="button-quiet" onClick={() => selected && void preview(selected)}>重试预览</button></div>}{image && selected && <img src={image} alt={`${selected.document_name}，第 ${selected.page_number} 页原文`} width={selected.width_px} height={selected.height_px}/>}</div></div>
+        </div></section>}
+      </div>}
+    </main><footer className="site-footer"><span>LayoutPatch</span><span>让问题与文档相遇</span></footer>
+  </div>;
 }

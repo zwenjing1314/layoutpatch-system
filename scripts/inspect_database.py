@@ -36,7 +36,7 @@ def inspect_database(path: Path = DEFAULT_DATABASE):
                 "foreign_key_violations": [list(row) for row in connection.execute("PRAGMA foreign_key_check")],
                 "journal_mode": connection.execute("PRAGMA journal_mode").fetchone()[0],
                 "counts": counts, "users": users, "documents": documents, "indexes": indexes,
-                "scope": "Metadata inspection only; authentication is separate; document HTTP authorization and vector indexing not implemented"}
+                "scope": "Read-only metadata; authentication and indexed search are separate HTTP checks; image/preview authorization not implemented"}
 
 
 if __name__ == "__main__":

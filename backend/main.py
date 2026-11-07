@@ -1,4 +1,4 @@
-"""1B-3 authentication only; no models loaded or retrieval routes."""
+"""Authenticated retrieval. Model starts lazily in the frozen environment."""
 from contextlib import asynccontextmanager
 import time
 from typing import Literal
@@ -14,13 +14,17 @@ from backend.auth.routes import router
 from backend.auth.settings import AuthSettings
 from backend.auth.store import SQLiteSessionStore
 from backend.db.connection import make_engine
+from backend.search.routes import router as search_router
+from backend.search.worker import ModelWorker
+from backend.search.qdrant import Qdrant
+from backend.documents.routes import router as pages_router
 
 
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
 
 
-def create_app(settings=None, clock=time.time):
+def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None):
     settings = settings or AuthSettings.from_environment()
     engine = make_engine(settings.database)
 
@@ -29,9 +33,12 @@ def create_app(settings=None, clock=time.time):
         try:
             yield
         finally:
+            app.state.model_worker.close()
             engine.dispose()
 
-    app = FastAPI(title="LayoutPatch System", version="0.2.0", lifespan=lifespan)
+    app = FastAPI(title="LayoutPatch System", version="0.4.0", lifespan=lifespan)
+    app.state.model_worker = model_worker if model_worker is not None else ModelWorker()
+    app.state.qdrant = qdrant if qdrant is not None else Qdrant()
     app.state.engine, app.state.settings, app.state.clock = engine, settings, clock
     app.state.store = SQLiteSessionStore(engine, settings, clock)
     app.add_middleware(SessionMiddleware, store=app.state.store, lifetime=settings.absolute_seconds,
@@ -53,6 +60,8 @@ def create_app(settings=None, clock=time.time):
         return HealthResponse()
 
     app.include_router(router)
+    app.include_router(search_router)
+    app.include_router(pages_router)
     return app
 
 

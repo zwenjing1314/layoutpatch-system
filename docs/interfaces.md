@@ -1,8 +1,8 @@
 # 模块与接口契约
 
-更新：2026-11-07，北京时间，R09。**已实现并验证：1A离线算法、1B-1运行骨架、1B-2元数据、1B-3认证会话。** 23项认证/数据库测试、17项真实代理检查通过，正式库0002_auth迁移与六项冒烟通过。[本批手册](stage1b-3-runbook.md)、[汇总证据](checks/stage1b-3-verification.json)。
+更新：2026-11-07，北京时间，R11。**1B-5已接入网页登录、首次改密表单、真实检索与授权原图。** 45项后端、3项前端、41项真实HTTP、16项浏览器观察及16项正式恢复检查通过；浏览器改密提交由本人操作，隔离HTTP改密已验证。[手册](stage1b-5-runbook.md)、[证据](checks/stage1b-5-verification.json)。
 
-登录/改密网页、检索HTTP、对象授权和受保护预览尚未实现；profile/index仍pending。下文完整业务蓝图仍是设计，已实现部分以明确标记和证据为准。R05/R06/R08历史及失败保存在[03过程记录](过程记录/03_1b技术操作详解.md)。浏览器统一走同源`/api`，表内为后端路径。
+正式0003、13页ready、profile validated不变，本批无新迁移。上传、PDF、区域与完整管理仍为设计；本批详细记录转[05](过程记录/05_1b技术操作详解.md)/[06](过程记录/06_1b追逐口述稿.md)，03/04不再修改。
 
 ## 1. 浏览器—业务后端
 
@@ -18,8 +18,9 @@
 | POST /index | multipart PDF；202 返回 document_id/job_id | 固定当前 owner、private | 2 |
 | GET /jobs/{job_id} | 阶段、进度、错误摘要、可否重试 | 本人或管理范围 admin | 2 |
 | POST /jobs/{job_id}/retry、/cancel | 新 attempt 或取消请求 | 本人或管理范围 admin＋CSRF | 2 |
-| GET /search?q=...&k=... | 页面列表、profile/index ID、分阶段耗时 | AllowedScope 先过滤 | 1B |
-| GET /pages/{page_id}/image、/thumbnail | 授权文件响应、原图尺寸与版本 | 文档可读 | 1B/2 |
+| GET /search?q=...&k=... | q去首尾空白1—2000字，k=1—50；页面列表/配置与索引ID/耗时 | 有效且已改密会话，AllowedScope先过滤 | 1B-4已实现 |
+| GET /pages/{page_id}/image?preview=... | 真实PNG，按会话/page/render绑定地址，错误不返回文件路径 | 当前有效已改密会话＋文档可读＋本会话preview | 1B-5已实现 |
+| GET /pages/{page_id}/thumbnail | 缩略图 | 文档可读 | 2，未挂载 |
 | GET /documents/{id}/pdf | PDF 下载/Range 预览 | 文档可读 | 2 |
 | POST /pages/{page_id}/regions/rank | question 或本人 search_record_id；候选排名 | 文档可读＋CSRF | 2 |
 | GET /history、/history/{id} | 自己的历史，命中按当前权限再次过滤 | 本人；admin 跨用户留痕 | 3 |
@@ -38,11 +39,25 @@
 
 ### 1B-3实际认证契约
 
-login/me的200响应均含user_id、username、role、must_change_password、csrf_token；login输入username/password。password输入current_password/new_password，新密码12—128字符且不同；成功204，撤销该用户全部会话并清Cookie，须重新登录。logout成功204，无body仍须JSON Content-Type。未首次改密时受保护业务入口403；普通用户访问admin/profiles403；有效且已改密admin200。当前以profiles验证门禁，其他业务随实现接入，不能泛称所有对象已授权。
+login/me的200响应均含user_id、username、role、must_change_password、csrf_token；login输入username/password。password输入current_password/new_password，新密码12—128字符且不同；成功204，撤销该用户全部会话并清Cookie，须重新登录。logout成功204，无body仍须JSON Content-Type。未首次改密时受保护业务入口403；普通用户访问admin/profiles403；有效且已改密admin200。当前以profiles/search验证门禁，其他业务随实现接入，不能泛称所有对象已授权。
 
-写请求检查唯一可信Origin与JSON；password/logout增加唯一X-CSRF-Token。认证/admin响应含private,no-store及Vary Cookie。错误使用`{"detail":"错误码"}`，不会回显密码；下节ErrorResponse仍为未来检索业务设计，尚未统一到此格式。状态码、字段及失败限速见[手册第2节](stage1b-3-runbook.md#2-接口与正确顺序)。SDK已生成并集中注入JSON/CSRF头，UI调用与状态清理留1B-5。
+写请求检查唯一可信Origin与JSON；password/logout增加唯一X-CSRF-Token。认证/admin响应含private,no-store及Vary Cookie。错误使用`{"detail":"错误码"}`，不会回显密码；下节ErrorResponse仍为未来设计。状态码/限速见[1B-3手册](stage1b-3-runbook.md#2-接口与正确顺序)。1B-5已接入SDK及UI内存CSRF生命周期，退出/换号/401清状态，浏览器改密新凭据由用户本人输入提交。
 
-## 2. 结果字段（结构定义，非运行样例）
+### 1B-4实际检索契约
+
+search返回status=ok/empty、profile_id、index_generation、scope_version、timings_ms、items。每项有document_id/document_version_id/page_id、page_index/page_number、document_name、page_rank/page_score、width_px/height_px/render_sha256、region_status=not_requested；1B-5新增preview_url。尚无search_record_id或持久access_epoch，下方完整SearchResponse仍为目标设计。额外/重复参数422，未认证401、未改密403，范围变化409 SEARCH_SCOPE_CHANGED，依赖/身份异常503 SEARCH_UNAVAILABLE，队列满503 MODEL_BUSY；错误仍为detail字段。所有响应private,no-store及Vary Cookie。
+
+模型/索引只由服务端选择；scope由SQLite生成，不信任客户端owner/profile，也不只信Qdrant的owner/visibility。新问题实际编码，即使重复问题也重新forward；空范围不调用模型/Qdrant。1B-5已接入SearchService和原文预览。
+
+### 1B-5实际预览契约
+
+preview_url是后端相对路径`/pages/{page_id}/image?preview=...`，浏览器只加同源/api前缀，禁止外域和其他路径。preview是本会话CSRF派生的HMAC(page_id/render_sha256)，不是Cookie或独立bearer令牌。GET仍检查有效会话/首次改密/ready当前版本/归属，再核验preview；未知、越权、缺失/错误/重复preview、额外参数都404 PAGE_NOT_FOUND，未登录401、未改密403，文件异常503 PREVIEW_UNAVAILABLE。
+
+成功image/png，Content-Disposition为固定page-N.png，无磁盘路径；private,no-store/Vary Cookie、nosniff、no-referrer，无ETag/Last-Modified。Range/If-None-Match不跳过授权、不产生304。退出旧Cookie401，同账号新会话旧URL404，共享撤回404。文件读取后新事务复查，已经交付的字节不能收回。无PDF/thumbnail或裸files路由。
+
+SDK重新生成PagesService及preview参数，但固定生成器通用实现把非JSON按文本读，不直接用于PNG；UI对服务器preview_url做白名单校验后用原生fetch/Blob/AbortController，统一响应401清理规则。未手改生成代码。
+
+## 2. 结果字段（完整目标设计，非当前完整响应）
 
 ```text
 SearchResponse
@@ -68,7 +83,7 @@ ErrorResponse
 
 ## 3. 内部算法边界
 
-下列名称是业务层的目标接口。当前 `ColPaliAdapter.load/encode_page/encode_queries` 以及 `maxsim_scores/top_k` 已实现CLI编码与排序；已有元数据库及auth路由，尚无 `AllowedScope` 或检索服务路由。接入Web后业务层负责权限，算法层只处理已授权输入，不扫描用户目录；输出ID必须属于本次输入。
+下列名称是业务层的目标接口。当前 `ColPaliAdapter.load/encode_page/encode_queries` 以及 `maxsim_scores/top_k` 已实现CLI编码与排序；已有元数据库、auth/search路由与AllowedScope；HTTP query经内部管道调用原adapter，Qdrant授权检索已验证。接入Web后业务层负责权限，算法层只处理已授权输入，不扫描用户目录；输出ID必须属于本次输入。
 
 | 模块 | 输入 | 输出与硬校验 |
 |---|---|---|

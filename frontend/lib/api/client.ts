@@ -4,7 +4,7 @@ OpenAPI.WITH_CREDENTIALS = true;
 OpenAPI.CREDENTIALS = "same-origin";
 
 // Set from login/me; clear on logout, password change, account switch or 401.
-// Kept in memory, never localStorage. UI lifecycle integration is scheduled for 1B-5.
+// Kept in memory only; the workspace clears this on every identity transition.
 let csrfToken: string | undefined;
 export function setCsrfToken(value?: string) {
   csrfToken = value;

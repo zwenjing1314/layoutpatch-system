@@ -1,4 +1,4 @@
-"""1B-2 identity tables. Profile/index rows are pending, not a usable search index."""
+"""Metadata, authentication and verified index membership."""
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -114,7 +114,18 @@ class IndexGeneration(Base):
     status: Mapped[str] = mapped_column(String, default="pending")
     page_count: Mapped[int] = mapped_column(Integer, default=0)
     vector_count: Mapped[int] = mapped_column(Integer, default=0)
+    feature_file_sha256: Mapped[str | None] = mapped_column(String(64))
+    source_manifest_sha256: Mapped[str | None] = mapped_column(String(64))
     created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class IndexPage(Base):
+    __tablename__ = "index_pages"
+    __table_args__ = (CheckConstraint("length(embedding_sha256)=64 AND token_count=1031", name="ck_index_page_feature"),)
+    index_id: Mapped[str] = mapped_column(ForeignKey("index_generations.id"), primary_key=True)
+    page_id: Mapped[str] = mapped_column(ForeignKey("pages.id"), primary_key=True)
+    embedding_sha256: Mapped[str] = mapped_column(String(64))
+    token_count: Mapped[int] = mapped_column(Integer)
 
 
 class AuthSession(Base):

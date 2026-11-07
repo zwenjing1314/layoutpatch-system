@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-07",
+  "round": "R11",
+  "batch": "1B-5",
+  "scope": "Actual in-app browser, production Next, real Uvicorn/Qdrant/original GPU with isolated accounts and database",
+  "checks": [
+    {"name":"login_form_visible","passed":true},
+    {"name":"initial_A_password_gate","passed":true},
+    {"name":"password_min_length12","passed":true},
+    {"name":"gate_logout_returns_login","passed":true},
+    {"name":"A_real_search_three_own_pages","passed":true},
+    {"name":"A_first_png_visible","passed":true},
+    {"name":"select_second_page_updates_image","passed":true},
+    {"name":"logout_clears_private_image_and_results","passed":true},
+    {"name":"B_login_has_empty_question_and_no_A_results","passed":true},
+    {"name":"B_real_search_only_Music","passed":true},
+    {"name":"revoked_session_preview401_clears_page","passed":true},
+    {"name":"empty_admin_explains_no_documents","passed":true},
+    {"name":"real_stopped_model503_visible_error_no_replayed_results","passed":true},
+    {"name":"mobile_workspace_no_horizontal_overflow","passed":true},
+    {"name":"mobile_login_form_visible","passed":true},
+    {"name":"second_tab_logout_locks_original_tab","passed":true}
+  ],
+  "screenshots": ["docs/checks/stage1b-5-login.png","docs/checks/stage1b-5-password-gate.png","docs/checks/stage1b-5-results.png","docs/checks/stage1b-5-outage.png","docs/checks/stage1b-5-mobile.png"],
+  "viewport_override": {"requested_width":390,"requested_height":844,"captured_content_width":375,"reset_after_check":true},
+  "screenshot_format_note": "Browser API returned JPEG bytes. Final artifact check detected .png extension mismatch; converted decoded pixels to actual PNG with Pillow without cropping or changing page content.",
+  "password_test_boundary": "Browser observed initial-change form/gate/minlength and logout. Isolated password changes used non-UI HTTP. Browser automation did not enter or submit new credentials under its mandatory user-handoff rule. Formal passwords unchanged; manual browser password submit remains user-owned.",
+  "race_test_boundary": "Delayed response cancellation is tested in frontend RequestGeneration unit tests; browser account/logout/revocation checks above use real services, not an injected delay.",
+  "tool_observations": ["First tab opened before service start hit ERR_CONNECTION_REFUSED; later old error tab binding hit data-URL policy; new tab after startup worked", "Generic alert locator also matched Next route announcer; retargeted exact observed error text without repeating search"],
+  "overall": "passed_with_manual_password_submit_not_automated"
+}
