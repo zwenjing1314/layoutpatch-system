@@ -1,5 +1,19 @@
 # 分阶段验收与检查记录
 
+## 2026-11-08｜R18 / 2-3B-2实际验收
+
+[手册](stage2-3b2-runbook.md)、[汇总/修改清单](checks/stage2-3b2-verification.json)、[HTTP16项](checks/stage2-3b2-http.json)、[浏览器65项](checks/stage2-3b2-browser.json)、[正式21项](checks/stage2-3b2-formal.json)及[文档保护](checks/r18-document-checks.json)。75后端29.435秒、4原模型CPU契约2.39秒、最终18前端306.7414毫秒、tsc和生产build通过；日志runtime/verification/r18，最终以后缀final2为准。
+
+| 适用子项 | 本轮实际证据 | 限制 |
+|---|---|---|
+| T01/T05客户端 | 退出/换号清私有状态、首改不挂工作台、撤销后auth/me401、断连先清选择再由会话复核隐藏工作台、重启重连；正式匿名401/no-store/上传Origin403 | 未输入/提交改密；浏览器/search401计划先被auth/me401处理，另有匿名HTTP/search401；未新做完整BFCache/跨标签实验 |
+| T03/T04列表与范围 | 真授权10+5分页、中英文/全半角/%_字面筛选、同名ID区分、本人未ready禁选、共享撤回404/目标非ready409/游标快照409/刷新，不回退全库 | 12个未ready对象、重名/共享为隔离元数据fixture，不冒充新上传；未新做推理中精确撤权 |
+| T06/T11网页 | A库10/选5/选4、共享4、B选8的HTTP/UI/PNG对应；Qdrant实际完整页面白名单在Top-k前；10次query同PID41392/network0、0页编码 | 含一次取消后完成及一次依赖失败；未重跑官方参考评分/准确率/预算实验，R16参考仅历史 |
+| 异步/故障 | 3秒列表晚于新筛选完成不覆盖；筛选不取消query；5秒检索迟到不跨文档；隔离Qdrant本机拒连503/恢复 | 显式延迟，不称GPU被取消；PNG迟到/断流/损坏图未新注入，保留Abort/Blob保护 |
+| 布局/焦点 | 1920/1366/390/320；最终展开列表回顶部并聚焦，刷新清旧提示，320输入边界/390预览焦点/宽屏阅读 | 65项分三构建：初版28、焦点版16、最终21；最终再跑18前端/类型/build，不称全部浏览器同一构建；非完整无障碍审计 |
+
+正式全部表/schema、原13/复用21页完整float32/payload/config、8份BF16及R15源库不变；后端/SDK/迁移/算法/锁/登录CSS不变。服务已恢复，测试模型停止，正式凭据未读取使用更改。[失败记录](checks/stage2-3b2-failures.json)保留修正和工具等待竞态，无未解阻塞。仅B-2适用子集通过，不宣布T01—T15整表或阶段2结束；下一唯一2-3C。
+
 ## 2026-11-07｜R17 / 2-3B-1实际验收
 
 [手册](stage2-3b1-runbook.md)、[汇总/文件清单](checks/stage2-3b1-verification.json)、[浏览器30项](checks/stage2-3b1-browser.json)、[正式14项](checks/stage2-3b1-formal.json)和[文档保护](checks/r17-document-checks.json)为本轮入口。最终9前端269.0387毫秒、tsc/Next生产build、75后端28.629秒、4算法CPU契约2.28秒通过；原始日志runtime/verification/r17。构建仅既有baseline-browser-mapping提示，未升级依赖。

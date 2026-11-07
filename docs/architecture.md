@@ -1,5 +1,7 @@
 # 架构、数据实体与部署设计
 
+**2026-11-08｜R18 / 2-3B-2实际补充：**Home集中两种范围与目标、列表/检索两套RequestGeneration、游标与私有状态；ScopeSwitch/DocumentPicker只负责展示/回调。列表仅document模式加载，筛选不暗换目标；同筛选快照变化保守清选择，切换范围清结果/PNG，锁定清列表。服务端继续决定可读/ready/Top-k前白名单，前端不替代授权。无表/公开API/算法/SDK变更，见[手册](stage2-3b2-runbook.md)。
+
 ## R17 / 2-3B-1实际实现（2026-11-07）
 
 前端Home保留认证/CSRF、请求代号/取消、图片Abort/Blob及广播/可见性控制，工作台JSX抽到frontend/components/workspace/workspace.tsx的Shell、Sidebar、QueryComposer、RetrievalResults、EvidencePanel。子组件只管理折叠、视图及焦点，完整response/hit仍传回Home，输入与已提交问题仅存内存。workspace.css按.ws-*作用域实现桌面三栏及窄屏独立阅读视图，不覆盖登录/首改/断连。

@@ -1,7 +1,28 @@
 # AI交接文档
 
+## 当前交接：R18 / 2-3B-2已完成（2026-11-08，北京时间）
 
-## 当前交接：R17 / 2-3B-1已完成（2026-11-07，北京时间）
+本轮只完成“双模式与授权文档选择网页”。见[手册](stage2-3b2-runbook.md)、[汇总/修改清单](checks/stage2-3b2-verification.json)、[65项浏览器](checks/stage2-3b2-browser.json)、[21项正式恢复](checks/stage2-3b2-formal.json)及[文档保护](checks/r18-document-checks.json)。不提前接上传/任务恢复、MinerU、D、高亮、历史或预算方法。
+
+先重新读取必读文档/设计和实际代码，核实0006、原2文档/13页、依赖、端口及可见窗口；其他同项目窗口idle/notLoaded。[新基线](checks/stage2-3b2-preflight.json)、runtime/verification/r18/metadata-before.sqlite3和source-state-r18-before为本轮证据，未复用旧运行结论。开工Git干净，正式凭据未读取/使用/更改。
+
+前端新增ScopeSwitch/DocumentPicker及document-selection契约，复用生成SDK。默认library；document模式真实授权列表、10条游标分页、300毫秒文件名防抖、本人/共享/页数/状态/短ID单选，未选/未ready不提交。筛选不暗换目标，独立范围提示保留选择。列表与query独立取消/代号；切模式/文档清结果/PNG，锁定/退出清列表/选择。第三参只传稳定ID；返回核对mode/document/每页version，不做全库Top-k事后过滤。后端/表/SDK/代理/算法/依赖锁与登录CSS未改。
+
+实际75后端29.435秒、4原模型CPU契约2.39秒、最终18前端306.7414毫秒、tsc与生产build通过；16项真实HTTP元数据检查无模型操作。65项浏览器分三次构建记录，最终构建补验21项。隔离只读克隆R15完整21页、随机凭据；两份A就绪文档同名，B私有同名、管理员共享4页和12个未ready元数据为明确fixture。真实A库10/选5/选4、共享4和B选8对应HTTP顺序/页码/分数与PNG；实际Qdrant白名单在Top-k前匹配授权范围。
+
+10次新query同worker PID41392/network_attempts=0，0页编码；含一次取消后仍完成和一次依赖失败，不是十次成功展示。算法/SDK未变，未重跑官方评分，R16参考仅历史。3秒列表/5秒搜索延迟为显式注入，记录确认旧列表晚于新响应完成但未覆盖UI，筛选不取消内容query。真实撤共享404、目标非ready409、游标快照409/刷新、隔离Qdrant本机拒连503/恢复通过；Qdrant未启停。撤销先被定时auth/me401处理，不冒充浏览器/search401，另测匿名HTTP/search401。断连先清选择，后由会话复核锁到unavailable；重启重连保留会话但不恢复私有工作区。
+
+1920/1366/390/320布局检查；修复更换文档展开仍停旧滚动位置，滚到选择器并聚焦文件名；修复刷新成功后旧列表提示残留。最终320选择器可见、390预览焦点、宽屏阅读/输入边界补验。首改仅观察门禁，未输入/提交新密码。未新做完整BFCache/跨标签/PNG迟到或损坏图注入、容量/完整无障碍审计；原Abort/Blob/广播保护及后端回归保留，不扩大声明。
+
+21项正式检查确认全部表/schema逻辑内容、原13/复用21页完整float32/payload/config、8份完整BF16特征及R15源库不变；匿名401/no-store、上传Origin403、首页/health200。当前8000实际监听PID34092（启动器58492）、3000 PID54972、6333 Docker PID49880，8001无监听、测试模型已停；正式模型按需加载。PID是快照，启停前重查CIM命令/创建时间；浏览器回正式登录页并重置视口。
+
+[失败修正](checks/stage2-3b2-failures.json)保留SSR属性顺序断言、Job错误字段准备失败（ui-prepare-attempt1保留）、只读路径错误及UI等待/视图/定时器竞态；文档批量补丁首轮因错误标题安全拒绝、未写文件。无本批未解阻塞，只有既有baseline-browser-mapping提示，未升级。旧项目保护是Git/选定文件/模型依赖指纹，不是ignored全盘审计；01—06、旧报告/.gitignore不变，无下载、训练、换底座、暂存/提交/推送。
+
+交接/progress/testing和需求/架构/接口/方案/路线图/指南同步；07/08续写R18-S01—S05，日期/步骤配对、每步口稿60—100字。新增docs受原忽略规则影响，跨机器需另带。
+
+**下一唯一任务：2-3C，上传/任务网页、恢复与重试（含取消检查点）。等待用户指定；本轮停止。**
+
+## 以下为R17历史交接（不能替代顶部R18当前状态）
 
 本轮只做工作台外壳与展示组件拆分。见[交付手册](stage2-3b1-runbook.md)、[汇总/修改文件](checks/stage2-3b1-verification.json)、[30项浏览器检查](checks/stage2-3b1-browser.json)、[14项正式恢复](checks/stage2-3b1-formal.json)和[文档保护](checks/r17-document-checks.json)。没有提前接双模式/文档列表、名称筛选网页、上传/任务恢复、历史、MinerU、D或高亮。
 

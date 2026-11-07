@@ -1,5 +1,7 @@
 # 模块与接口契约
 
+**2026-11-08｜R18 / 2-3B-2前端接入：**公开接口与生成SDK未改；网页用listDocuments(name,10,cursor)和searchPages(q,k,documentId)，library省略ID，document必有searchable目标。scope_version是当前名称筛选快照，不能跨筛选直接比较；切换筛选重置游标/快照但保留已选对象。返回额外校验mode/document/每页version，整包不符拒绝展示，不事后过滤Top-k。404/409清选择并重载，列表游标409/422要求刷新，401锁定，首改403不挂工作台。见[实际手册](stage2-3b2-runbook.md)。
+
 ## R17 / 2-3B-1前端对接状态（2026-11-07）
 
 本批公开HTTP/OpenAPI/生成SDK无变化；新工作台继续SearchService.searchPages(q,k)两参文档库查询，未调用授权列表或传document_id。结果组件收到完整SearchResponse/SearchHit，选页回调原preview，授权签名PNG、no-store、同源路径限制和Blob释放不变。组件无独立网络/持久缓存；B-2才接双模式及文档选择。实际UI/HTTP对应及边界见[手册](stage2-3b1-runbook.md)。

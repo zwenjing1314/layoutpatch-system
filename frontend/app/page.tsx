@@ -1,9 +1,11 @@
 "use client";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { setCsrfToken } from "@/lib/api/client";
-import { ApiError, AuthService, SearchService } from "@/lib/api/generated";
-import type { MeResponse, SearchHit, SearchResponse } from "@/lib/api/generated";
+import { ApiError, AuthService, DocumentsService, SearchService } from "@/lib/api/generated";
+import type { DocumentListItem, DocumentListResponse, MeResponse, SearchHit, SearchResponse } from "@/lib/api/generated";
 import { RequestGeneration, privatePreviewPath } from "@/lib/workspace-lifecycle";
+import { matchesSearchTarget, searchDocumentId } from "@/lib/document-selection";
+import type { SearchMode } from "@/lib/document-selection";
 import { WorkspaceShell } from "@/components/workspace/workspace";
 import "./workspace.css";
 
@@ -22,6 +24,17 @@ export default function Home() {
   const [image, setImage] = useState<string | null>(null);
   const [imageBusy, setImageBusy] = useState(false);
   const [imageError, setImageError] = useState("");
+  const [searchMode, setSearchMode] = useState<SearchMode>("library");
+  const [targetDocument, setTargetDocument] = useState<DocumentListItem | null>(null);
+  const targetRef = useRef<DocumentListItem | null>(null);
+  const [documentName, setDocumentName] = useState("");
+  const [documentList, setDocumentList] = useState<DocumentListResponse | null>(null);
+  const [listBusy, setListBusy] = useState(false);
+  const [listError, setListError] = useState("");
+  const [listCursors, setListCursors] = useState<(string | null)[]>([null]);
+  const [listRefresh, setListRefresh] = useState(0);
+  const listGeneration = useRef(new RequestGeneration());
+  const listScope = useRef<string | null>(null);
   const generation = useRef(new RequestGeneration());
   const imageRequest = useRef<AbortController | null>(null);
   const imageObject = useRef<string | null>(null);
@@ -38,10 +51,15 @@ export default function Home() {
   const clearResults = useCallback(() => {
     generation.current.reset(); clearImage(); setResult(null); setSelected(null); setSubmittedQuestion(""); setBusy(false);
   }, [clearImage]);
+  const clearDocuments = useCallback(() => {
+    listGeneration.current.reset(); listScope.current = null; targetRef.current = null;
+    setSearchMode("library"); setTargetDocument(null); setDocumentName(""); setDocumentList(null);
+    setListBusy(false); setListError(""); setListCursors([null]);
+  }, []);
   const lock = useCallback((next: Mode = "login", message = "") => {
-    clearResults(); setCsrfToken(); identity.current = null;
+    clearResults(); clearDocuments(); setCsrfToken(); identity.current = null;
     setMe(null); setQuestion(""); setMode(next); setNotice(message); form.current?.reset();
-  }, [clearResults]);
+  }, [clearResults, clearDocuments]);
   const announce = useCallback(() => { channel.current?.postMessage("session-changed"); }, []);
   async function tracked<T>(request: Cancelable<T>) {
     const release = generation.current.track(() => request.cancel());
@@ -72,7 +90,7 @@ export default function Home() {
     window.addEventListener("pagehide", pagehide); window.addEventListener("pageshow", pageshow);
     void restore();
     return () => {
-      generation.current.reset(); clearImage(); setCsrfToken(); channel.current?.close(); channel.current = null;
+      generation.current.reset(); listGeneration.current.reset(); clearImage(); setCsrfToken(); channel.current?.close(); channel.current = null;
       document.removeEventListener("visibilitychange", visibility);
       window.removeEventListener("pagehide", pagehide); window.removeEventListener("pageshow", pageshow);
     };
@@ -100,13 +118,66 @@ export default function Home() {
       const detail = (error.body as { detail?: string } | undefined)?.detail;
       if (error.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
       if (error.status === 403 && detail === "PASSWORD_CHANGE_REQUIRED") {
-        clearResults(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
+        clearResults(); clearDocuments(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
       }
-      if (error.status === 409) { clearResults(); setNotice("可访问的文档已变化，请重新检索。"); return; }
+      if (error.status === 404 || error.status === 409) { invalidateDocumentScope(); return; }
       if (error.status === 503) { setNotice(detail === "MODEL_BUSY" ? "检索服务繁忙，请稍后重试。" : "检索服务暂时不可用，请稍后重试。"); return; }
       if (error.status === 422) { setNotice("请检查问题长度和返回页数。"); return; }
     }
     setNotice("连接暂时中断，请稍后重试。");
+  }
+  function invalidateDocumentScope(message = searchMode === "document" ? "文档或访问范围已变化，请重新选择文档后检索。" : "可访问的文档已变化，请重新检索。") {
+    clearResults(); targetRef.current = null; setTargetDocument(null);
+    listGeneration.current.reset(); setDocumentList(null); setListCursors([null]); setListRefresh(value => value + 1);
+    setNotice(message);
+  }
+  useEffect(() => {
+    if (mode !== "workspace" || !me || searchMode !== "document") return;
+    const stamp = listGeneration.current.reset();
+    setDocumentList(null); setListError(""); setListBusy(true);
+    const timer = window.setTimeout(async () => {
+      const request = DocumentsService.listDocuments(documentName, 10, listCursors[listCursors.length - 1]);
+      const release = listGeneration.current.track(() => request.cancel());
+      try {
+        const response = await request;
+        if (!listGeneration.current.accepts(stamp)) return;
+        if (targetRef.current && listScope.current && listScope.current !== response.scope_version) {
+          clearResults(); targetRef.current = null; setTargetDocument(null);
+          setNotice("文档列表已变化，请重新选择文档。");
+        }
+        const updated = response.items.find(item => item.document_id === targetRef.current?.document_id);
+        if (updated && !updated.searchable) {
+          clearResults(); targetRef.current = null; setTargetDocument(null); setNotice("所选文档暂不可检索，请重新选择。");
+        } else if (updated) { targetRef.current = updated; setTargetDocument(updated); }
+        listScope.current = response.scope_version; setDocumentList(response);
+      } catch (error) {
+        if (!listGeneration.current.accepts(stamp)) return;
+        clearResults(); targetRef.current = null; setTargetDocument(null); setDocumentList(null);
+        if (error instanceof ApiError && (error.status === 401 || error.status === 403)) { businessError(error); return; }
+        const message = error instanceof ApiError && (error.status === 409 || error.status === 422)
+          ? "文档列表或分页已变化，请刷新列表。" : "文档列表暂时无法加载，请刷新列表。";
+        setListError(message); setNotice(message);
+      } finally { release(); if (listGeneration.current.accepts(stamp)) setListBusy(false); }
+    }, documentName ? 300 : 0);
+    return () => { window.clearTimeout(timer); listGeneration.current.reset(); };
+    // Private list requests have their own generation: typing cannot cancel a content query.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, me?.user_id, searchMode, documentName, listCursors, listRefresh, clearResults]);
+
+  function changeSearchMode(next: SearchMode) {
+    if (next === searchMode) return;
+    clearResults(); clearDocuments(); setSearchMode(next); setNotice("");
+  }
+  function chooseDocument(document: DocumentListItem) {
+    if (!document.searchable) return;
+    if (document.document_id !== targetRef.current?.document_id || document.document_version_id !== targetRef.current.document_version_id) clearResults();
+    targetRef.current = document; setTargetDocument(document); setNotice("");
+  }
+  function changeDocumentName(value: string) {
+    // The server snapshot is specific to the normalized filename filter.
+    listGeneration.current.reset(); listScope.current = null;
+    setNotice(current => current === listError ? "" : current);
+    setDocumentName(value); setDocumentList(null); setListError(""); setListCursors([null]);
   }
   async function login(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const data = new FormData(event.currentTarget);
@@ -143,7 +214,7 @@ export default function Home() {
   }
   async function logout() {
     const csrf = me?.csrf_token;
-    clearResults(); setQuestion(""); setNotice(""); setBusy(true);
+    clearResults(); clearDocuments(); setQuestion(""); setNotice(""); setBusy(true);
     const stamp = generation.current.current();
     try {
       setCsrfToken(csrf); await tracked(AuthService.logout());
@@ -163,8 +234,8 @@ export default function Home() {
       });
       if (!generation.current.accepts(stamp) || sequence !== imageSequence.current) return;
       if (response.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
-      if (response.status === 403) { clearResults(); setMode("password"); setNotice("请先设置新密码。"); return; }
-      if (response.status === 404) { clearResults(); setNotice("页面访问权限已变化，请重新检索。"); return; }
+      if (response.status === 403) { clearResults(); clearDocuments(); setMode("password"); setNotice("请先设置新密码。"); return; }
+      if (response.status === 404) { invalidateDocumentScope("页面访问权限已变化，请重新检索。"); return; }
       if (!response.ok || response.headers.get("content-type")?.split(";", 1)[0] !== "image/png") throw new Error("Preview unavailable");
       const blob = await response.blob();
       if (!generation.current.accepts(stamp) || sequence !== imageSequence.current) return;
@@ -176,10 +247,16 @@ export default function Home() {
   async function search(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); const data = new FormData(event.currentTarget);
     const q = question.trim(), k = Number(data.get("k"));
+    if (!q || q.length > 2000 || !Number.isInteger(k) || k < 1 || k > 50) { setNotice("请检查问题长度和返回页数。"); return; }
+    const target = targetRef.current;
+    let documentId: string | undefined;
+    try { documentId = searchDocumentId(searchMode, target); }
+    catch { setNotice("请先选择一份已就绪的文档，再检索内容。"); return; }
     clearResults(); setSubmittedQuestion(q); setNotice(""); setBusy(true); const stamp = generation.current.current();
     try {
-      const response = await tracked(SearchService.searchPages(q, k));
+      const response = await tracked(SearchService.searchPages(q, k, documentId));
       if (!generation.current.accepts(stamp)) return;
+      if (!matchesSearchTarget(response, searchMode, target)) { clearResults(); setNotice("返回的检索范围不一致，请重新选择后检索。"); return; }
       setResult(response); if (response.items[0]) void preview(response.items[0], stamp);
     } catch (error) { if (generation.current.accepts(stamp)) businessError(error); }
     finally { if (generation.current.accepts(stamp)) setBusy(false); }
@@ -189,6 +266,13 @@ export default function Home() {
     username={me.username} role={me.role} question={question} submittedQuestion={submittedQuestion}
     busy={busy} notice={notice} result={result} selected={selected}
     image={image} imageBusy={imageBusy} imageError={imageError}
+    searchMode={searchMode} targetDocument={targetDocument} onModeChange={changeSearchMode}
+    documentPicker={{ name: documentName, response: documentList, busy: listBusy, error: listError, selected: targetDocument, page: listCursors.length,
+      onNameChange: changeDocumentName, onSelect: chooseDocument,
+      onPrevious: () => { listGeneration.current.reset(); setListCursors(value => value.slice(0, -1)); },
+      onNext: () => { if (documentList?.next_cursor) { listGeneration.current.reset(); setListCursors(value => [...value, documentList.next_cursor]); } },
+      onRefresh: () => { listGeneration.current.reset(); setNotice(current => current === listError ? "" : current); setListCursors([null]); setListRefresh(value => value + 1); },
+    }}
     onQuestionChange={setQuestion} onSearch={search} onSelect={hit => void preview(hit)}
     onNewSearch={() => { clearResults(); setQuestion(""); setNotice(""); }}
     onLogout={() => void logout()}

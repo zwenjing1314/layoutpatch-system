@@ -1,17 +1,9 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const vm = require('node:vm');
-const ts = require('typescript');
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
-
-const compiled = ts.transpileModule(fs.readFileSync('components/workspace/workspace.tsx', 'utf8'), {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
-});
-const context = { exports: {}, require };
-vm.runInNewContext(compiled.outputText, context);
-const { RetrievalResults, EvidencePanel, QueryComposer, WorkspaceShell } = context.exports;
+const { loadTs } = require('./load-workspace.cjs');
+const { RetrievalResults, EvidencePanel, QueryComposer, WorkspaceShell } = loadTs('components/workspace/workspace.tsx');
 const render = (component, props) => renderToStaticMarkup(React.createElement(component, props));
 const hit = { page_id: 'page-a', document_name: '研究 <script>alert(1)</script> & 全角.pdf', page_number: 7, page_rank: 2, page_score: 12.345, width_px: 1200, height_px: 1600 };
 
@@ -48,10 +40,11 @@ test('composer disallows blank or busy submissions and exposes the current libra
   assert.match(ready, /maxLength="2000"/i);
 });
 test('workspace exposes working navigation and view controls without future feature placeholders', () => {
-  const props = { username: 'isolated-ui', role: 'user', question: '', submittedQuestion: '', busy: false, notice: '', result: null, selected: null, image: null, imageBusy: false, imageError: '', onQuestionChange() {}, onSearch() {}, onSelect() {}, onNewSearch() {}, onLogout() {} };
+  const props = { username: 'isolated-ui', role: 'user', question: '', submittedQuestion: '', busy: false, notice: '', result: null, selected: null, image: null, imageBusy: false, imageError: '', searchMode: 'library', targetDocument: null, onModeChange() {}, onQuestionChange() {}, onSearch() {}, onSelect() {}, onNewSearch() {}, onLogout() {} };
   const markup = render(WorkspaceShell, props);
   for (const label of ['工作台导航', '新检索', '退出 / 换号', '问题与结果', '页面预览']) assert.ok(markup.includes(label));
-  for (const label of ['单文档检索', '上传与任务', '检索历史', '联网搜索']) assert.ok(!markup.includes(label));
+  assert.ok(markup.includes('单文档检索'));
+  for (const label of ['上传与任务', '检索历史', '联网搜索']) assert.ok(!markup.includes(label));
   assert.match(markup, /aria-controls="workspace-navigation"/);
   const exiting = render(WorkspaceShell, { ...props, busy: true });
   assert.match(exiting, /正在退出登录/);
