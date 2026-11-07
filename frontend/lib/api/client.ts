@@ -11,6 +11,10 @@ export function setCsrfToken(value?: string) {
 }
 OpenAPI.HEADERS = async (options): Promise<Record<string, string>> => {
   if (["GET", "HEAD", "OPTIONS"].includes(options.method)) return {};
+  if (options.formData) {
+    // Browser/fetch sets multipart boundary; retain the session CSRF header.
+    return csrfToken ? { "X-CSRF-Token": csrfToken } : {};
+  }
   // logout has no request body in OpenAPI, but all auth writes require JSON.
   return csrfToken
     ? { "Content-Type": "application/json", "X-CSRF-Token": csrfToken }

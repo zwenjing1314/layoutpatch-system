@@ -1,5 +1,43 @@
 # 分阶段验收与检查记录
 
+## 2026-11-07｜R15 / 阶段2-2实际验收
+
+本轮仅验完整页面入库与安全激活，不宣布T01—T15整表通过。入口：[手册](stage2-2-runbook.md)、[增量修改清单/汇总](checks/stage2-2-verification.json)、[收尾保护](checks/r15-document-checks.json)，学习记录[07](过程记录/07_2技术操作详解.md)/[08](过程记录/08_2逐步口述稿.md) R15-S01—S05。
+
+| T项适用子集 | 本轮实际证据 | 未覆盖 |
+|---|---|---|
+| T03 | A/B同名新PDF独立归属、跨用户文档/job/PNG404；动态A5→9/B8→12页白名单；原授权回归仍通过 | history/crop未实现；新单文档模式尚未接入 |
+| T06 | 两份新完整PDF各4页经HTTP上传、144dpi/RGB渲染、原ColPali真实8次page forward，4次真实query（含重复问题），同一PID/network0；新图和完整特征身份通过 | 不计准确率、不含MinerU/D；模型关闭失败是旧回归而非本轮新GPU停机实验 |
+| T09 | 实际停止/重启后completed、活动代、会话和新PNG保留；queued自动领取，running→interrupted和building→failed有单元模拟 | 没有真实运行中断电/杀进程试验，显式retry/cancel与清理未实现 |
+| T11 | 4组同次query向量、同一授权完整页面库，对官方processor＋CPU float32 MaxSim，非并列排名一致；最大差2.625610351358887e-6，原atol1e-4/rtol1e-5不变；8份BF16完整1031×128/1024patch | 区域算法、预算策略、正式评价集和大库性能未验 |
+
+最终63后端（旧55＋新8）在最终错误码补丁后25.749秒通过，日志runtime/verification/r15/backend-final-after-error-code.log；4个原模型环境CPU算法契约、4前端node测试与tsc通过。新增失败测试使用明确encoder/vector替身，覆盖中途编码、部分Qdrant写入、SQLite激活回滚、停用、身份篡改与恢复，不能替代真实GPU证据。OpenAPI与frontend/docs/openapi.json完全相同，未改SDK/前端，不重复生产build。
+
+[真实HTTP第二轮48项](checks/stage2-2-http-attempt2.json)通过：13→17→21且旧集合全向量/payload/config不变；[官方4组](checks/stage2-2-reference.json)通过。实际查看8页contact-sheet，无明显缺页/黑块/裁切，只是缩略视觉QA。[正式首次19项](checks/stage2-2-formal.json)保留；最终补丁重启后[正式20项](checks/stage2-2-formal-final.json)通过：0005只增加2表、原10业务/认证表等于R15备份、jobs/features空、正式原13页、integrity ok/FK0/重复迁移无变化，匿名/Origin保护仍正确；未用正式凭据。T01/T05只沿用回归及正式匿名/同源子项，不扩大覆盖声明。
+
+[首轮选样失败](checks/stage2-2-http-attempt1.json)保留：新PDF没有2—3页，GPU前终止；改为按文件名首两份2—4页，无gold/标签参与。单测import重复收集已修，原日志保留；pypdf xref提示未改源SHA；一次GBK读取错误已显式UTF-8重查。没有2-2阻塞；全代复制存储/写放大、失败私有残留、并发容量与断电属于限制。下一唯一任务2-3A，不自动推进。
+
+## 2026-11-07｜R14补充：工作台改版待验收计划
+
+[前端改版方案](前端工作台改版方案与复用评估.md)要求在2-3B-1/B-2保留身份五态、首改、CSRF、代号/取消、Blob清理、跨标签失效及签名图片行为；执行生命周期回归、typecheck/build，并实际检查两种范围、同名文档、故障、迟到请求和宽窄屏。历史到3-4按当前权限重开。本轮仅源码/报告静态阅读与文档检查，未启动参考仓库、改应用或重跑服务测试；[本轮检查](checks/r14-workspace-redesign-checks.json)不增加应用通过项。
+
+## 2026-11-07｜R14补充：单文档检索待验收计划
+
+[新增设计第6节](单文档检索功能设计与分批计划.md)列2-3A/B的范围、名称、权限和UI检查：同一账号至少可见两份ready文档；单文档Top-k在目标页集合中产生并做真实参考对照；同名A/B隔离，未ready/无权不回退全库；中英文/大小写/全半角/通配字符字面量及分页；模式切换和迟到请求不串结果。T01/T03/T04/T05/T06/T11仅列计划，不新增任何通过项。本轮只静态阅读和文档检查，未重跑2-1服务/算法测试；[文档结果](checks/r14-single-document-design-checks.json)。
+
+## 2026-11-07｜R14 / 阶段2-1
+
+本轮实际覆盖受保护multipart、服务端归属/private、版本1、持久upload job与状态查询。没有把既有T项整项判通过：T01适用部分是匿名访问新路由401；T03为A/B文档/job隔离404；T05为该multipart Origin/CSRF/首改保护；T06仅验证PDF输入和任务排队、不含全页入库/编码/真实问题；T09仅文档/job可持久、queued/failed保留及receiving→interrupted，不含retry，不代表完整生命周期目标。
+
+[本批汇总与修改清单](checks/stage2-1-verification.json)、[收尾文档和保护检查](checks/r14-document-checks.json)为最终入口；技术与口稿使用[07](过程记录/07_2技术操作详解.md)/[08](过程记录/08_2逐步口述稿.md)。
+
+- [预检](checks/stage2-1-preflight.json)：初始状态、端口、包、正式0003快照及R14在线备份。
+- [隔离真实HTTP](checks/stage2-1-http-attempt2.json)：29项，第二次尝试成功；首轮脚本错误[单独保留](checks/stage2-1-http.json)。验证20MiB边界、A/B同名不同内容、重启、写盘失败和旧scope/Qdrant指纹。
+- [正式迁移与Next代理](checks/stage2-1-formal.json)：18项；0004只增空jobs，旧九表逻辑行指纹一致、integrity ok/FK0/重复迁移不变；匿名/Origin/上传body边界通过，未使用正式凭据。
+- 自动：Web环境55项unittest；模型环境4项CPU算法接口契约pytest；前端4项node测试＋tsc；OpenAPI/SDK生成和Next build通过。首轮发现及修正写在runtime/verification/r14日志与stage2-1-runbook。
+
+通过仅限2-1后端及隔离存储任务基础。不含浏览器上传UI、页面渲染/编码/GPU、MinerU、D、区域、重试取消、并发容量、断电、全阶段准确率；不得据此宣布T01/T03/T05/T06/T09整项通过。
+
 更新：2026-11-07，R12。下面T01—T15是 **[设计] 总体验收目标**，不能整表视作通过。阶段0/1A历史保留；1B-3认证、1B-4检索、1B-5网页/图片及1B-6整体启停实际覆盖分别见第6/7/8/9节，PDF和完整管理仍待后续。
 
 ## 1. 验收方法

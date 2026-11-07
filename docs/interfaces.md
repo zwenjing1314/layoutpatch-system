@@ -1,5 +1,31 @@
 # 模块与接口契约
 
+## R15 / 2-2实际任务语义（2026-11-07）
+
+本批无新增公开路由/字段，实际OpenAPI与已生成SDK完全相同。POST /index仍以同源/CSRF/已改密会话上传且202，服务端owner/private；响应后后台自动处理，GET /jobs/{id}可见status=running及stage=rendering/encoding/indexing/activating，成功status/stage=completed、progress=100，GET /documents/{id}变ready。失败以固定error_code和最后stage表达，页面不激活；attempt仍1，无retry/cancel接口。重复upload key语义沿用2-1，不能将已完成任务重跑。
+
+0005增加内部system_state活动索引指针、page_features全特征来源，不向客户端暴露路径/张量。启动时receiving→UPLOAD_INTERRUPTED、running→INGEST_INTERRUPTED、building索引→failed；queued仍可领取，completed保留。LAYOUTPATCH_INGEST_ENABLED=false为服务端暂停领任务开关，不是客户端参数。新PNG继续GET /pages/{id}/image会话签名、当前归属和哈希校验；不挂裸文件目录。索引代切换使进行中查询scope变化时返回现有409 SEARCH_SCOPE_CHANGED。
+
+页面/问题共享ModelWorker内部stdin/stdout协议及锁，page输出完整BF16 1031×128和float32导出身份；接口不对网络公开。完整特征保留供D，不接受预算压缩代替。实测和错误边界见[2-2手册](stage2-2-runbook.md)。下面2-1表中registered/queued为R14当时出口，当前由上述自动流水线推进；2-3A列表/单文档仍只是设计。
+
+## R14补充：单文档检索接口设计（尚未实现）
+
+规划在2-3A新增`GET /documents?name=...&limit=20&cursor=...`，提供授权分页文档列表和文件名包含式匹配；扩展`GET /search`的可选`document_id`，省略时保持文档库范围，提供时仅检索该文档ready当前版本。单对象`GET /documents/{id}`已实现不代表列表已实现。授权后再筛选/分页，单文档范围在Top-k之前生效，返回前以同一目标重查；未知/无权统一404，已授权未ready明确409，不回退全库。文件名不作唯一ID，不编码文件名向量；索引总点数与查询页面白名单分开。完整建议字段、状态与验收见[设计](单文档检索功能设计与分批计划.md)；实际OpenAPI/SDK本轮未变。
+
+## 2-1实际上传和状态接口（R14，2026-11-07）
+
+本节区分本批已实现接口与后文目标设计。数据库0004新增jobs，复用documents/document_versions；未新增页面、候选或索引。文件尚未渲染时文档保持registered、active_version_id为空、任务queued；不进入现有ready search范围。
+
+| 方法与路径 | 输入/输出 | 授权与状态 |
+|---|---|---|
+| `POST /index` | 一个multipart字段`file`；UUID头`X-Upload-ID`。202 JobResponse：job/document/version ID、kind/stage/status/progress/attempt/error_code/time/retry_available | 已改密有效会话＋唯一可信Origin＋X-CSRF-Token；owner由后端指定、private固定；幂等冲突409 |
+| `GET /jobs/{job_id}` | JobResponse，不返回路径或异常文本 | 仅本人关联文档；跨用户/不存在404 |
+| `GET /documents/{document_id}` | document/version ID、展示名、private、registered、版本、PDF SHA256、页数 | 仅本人；跨用户/不存在404 |
+
+`jobs`保存owner_id、document_version_id、upload_key、request_sha256、upload_bytes、kind/stage/status/progress/attempt/error_code、created/updated。owner＋upload_key、document_version_id分别唯一。状态允许receiving/queued/failed/interrupted/running/completed/cancelled；本批仅实际使用receiving/queued/failed/interrupted，attempt=1。接收恢复不代表2-3完整scheduler、retry/cancel已实现。
+
+2-1限额默认为20MiB/100页，配置见[批次手册](stage2-1-runbook.md)。multipart只对/index开放，不影响JSON写边界。OpenAPI/生成SDK含DocumentsService，但前端无上传页面；中央SDK头部在formData时只加CSRF，Content-Type由浏览器生成boundary。所有保护响应private,no-store/Vary Cookie。
+
 **R12 / 1B-6补充：**本轮没有更改API/SDK/迁移；对现有路由完成78项真实生命周期、13项浏览器观察和10项正式恢复检查，5组本次官方评分一致。非空Qdrant与前后端重启、故障503和实际恢复见[汇总](checks/stage1b-6-verification.json)及[部署手册](stage1b-6-runbook.md)。下文R11接口定义继续有效；PDF/区域/完整管理仍为设计。health只是Web存活，不表示依赖就绪。本批结束不推进阶段2。
 
 更新：2026-11-07，北京时间，R11。**1B-5已接入网页登录、首次改密表单、真实检索与授权原图。** 45项后端、3项前端、41项真实HTTP、16项浏览器观察及16项正式恢复检查通过；浏览器改密提交由本人操作，隔离HTTP改密已验证。[手册](stage1b-5-runbook.md)、[证据](checks/stage1b-5-verification.json)。

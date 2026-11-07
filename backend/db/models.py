@@ -128,6 +128,50 @@ class IndexPage(Base):
     token_count: Mapped[int] = mapped_column(Integer)
 
 
+class Job(Base):
+    __tablename__ = "jobs"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "upload_key", name="uq_job_upload_key"),
+        UniqueConstraint("document_version_id", name="uq_job_version"),
+        CheckConstraint("kind='ingest'", name="ck_job_kind"),
+        CheckConstraint("status IN ('receiving','queued','failed','interrupted','running','completed','cancelled')", name="ck_job_status"),
+        CheckConstraint("attempt >= 1 AND progress >= 0 AND progress <= 100 AND upload_bytes > 0", name="ck_job_counts"),
+        CheckConstraint("length(request_sha256)=64", name="ck_job_request_hash"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    document_version_id: Mapped[str] = mapped_column(ForeignKey("document_versions.id"))
+    upload_key: Mapped[str] = mapped_column(String(36))
+    request_sha256: Mapped[str] = mapped_column(String(64))
+    upload_bytes: Mapped[int] = mapped_column(Integer)
+    kind: Mapped[str] = mapped_column(String(16), default="ingest")
+    stage: Mapped[str] = mapped_column(String(32), default="upload")
+    status: Mapped[str] = mapped_column(String(16), default="receiving")
+    progress: Mapped[int] = mapped_column(Integer, default=0)
+    attempt: Mapped[int] = mapped_column(Integer, default=1)
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class SystemState(Base):
+    __tablename__ = "system_state"
+    __table_args__ = (CheckConstraint("id=1", name="ck_system_singleton"),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    active_index_id: Mapped[str | None] = mapped_column(ForeignKey("index_generations.id"))
+
+
+class PageFeature(Base):
+    __tablename__ = "page_features"
+    __table_args__ = (CheckConstraint("length(encoder_sha256)=64 AND length(tensor_sha256)=64 AND length(export_sha256)=64", name="ck_feature_hashes"),)
+    page_id: Mapped[str] = mapped_column(ForeignKey("pages.id"), primary_key=True)
+    encoder_sha256: Mapped[str] = mapped_column(String(64))
+    tensor_path: Mapped[str] = mapped_column(String)
+    tensor_sha256: Mapped[str] = mapped_column(String(64))
+    export_path: Mapped[str] = mapped_column(String)
+    export_sha256: Mapped[str] = mapped_column(String(64))
+
+
 class AuthSession(Base):
     __tablename__ = "auth_sessions"
     __table_args__ = (

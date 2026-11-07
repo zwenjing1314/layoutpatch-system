@@ -1,5 +1,51 @@
 # AI交接文档
 
+## 当前交接：R15 / 2-2已完成（2026-11-07，北京时间）
+
+用户明确启动2-2，已按最新[工作台改版方案](前端工作台改版方案与复用评估.md)保留后续A/B-1/B-2/C拆分。本批只完成完整页面渲染、原ColPali编码及索引安全激活；没有提前做文档列表、单文档范围、前端改版、MinerU、D或高亮。详见[2-2手册](stage2-2-runbook.md)、[汇总/增量文件清单](checks/stage2-2-verification.json)及[文档保护检查](checks/r15-document-checks.json)。
+
+实际开工核实：正式0004、2文档/2版本/13页、jobs0、单ready索引；integrity ok/FK0；3000/8000/6333监听，已有一棵正式按需模型树。其他可见同项目窗口idle；所有既有2-1/设计及.gitignore改动保留。[R15基线](checks/stage2-2-preflight.json)、runtime/verification/r15/metadata-before.sqlite3在线备份和source-state-r15-before快照为本轮起点，不复用R14报告冒充新证据。
+
+实现：0005只增system_state活动指针和page_features完整特征来源。单调度线程自动领取持久queued任务，rendering→encoding→indexing→activating→completed；失败/中断不激活。复用本地PyMuPDF1.28.2 CPU子进程，144dpi/RGB/PNG，记录裁剪/旋转/页码/尺寸/哈希；页面与query共用原adapter、同一ModelWorker和锁。每页保留BF16完整1031×128及1024视觉patch身份，另存float32索引导出，D以后读完整特征；没有预算压缩或底座变化。
+
+采用新索引代：只读核验并复制当前Qdrant点表示，加入新页，候选集合全部核验后，SQLite短事务原子提交Page/IndexPage/Feature、文档ready、任务completed与活动指针。旧13页没有重编码或从旧缓存重新导入，旧集合不变。所有旧代/失败候选保留；全代复制有存储/写放大，仅验证小样本，不声称大库方案。文件与DB非同一事务，私有孤儿产物清理和显式retry/cancel留后批。
+
+本轮证据：最终63后端（旧55＋新8）通过25.749秒；原模型环境4个CPU算法契约、前端4测试和tsc通过。OpenAPI实际比较未变，无SDK/前端代码变化，未重复build。[隔离真实HTTP第二轮48项](checks/stage2-2-http-attempt2.json)：两份新完整PDF各4页，实际8页forward＋4query，同一模型PID、network0，13→17→21动态规模，A5→9/B8→12授权、跨用户job/文档/PNG404、新图及completed重启保持通过。[4组官方参考](checks/stage2-2-reference.json)：同次query、同一授权完整页面库，CPU float32/官方processor排名一致，最大差2.625610351358887e-6，原容差不变。8份完整张量身份核验；8页contact-sheet已实际查看，无明显裁切/缺页/黑块，非OCR/坐标精度验收。
+
+正式恢复：[首次19项](checks/stage2-2-formal.json)保留；最终错误码补丁加载后[20项复查](checks/stage2-2-formal-final.json)通过。正式0005仅新增2表，原10业务/认证表逻辑行指纹与R15基线完全相同，jobs/features仍空、正式仍原13页；integrity ok/FK0、重复迁移无变化、原集合float32/payload/config指纹不变。未使用或更改正式凭据，正式只测匿名/Origin保护及首页/health；真实新上传在隔离环境。
+
+当前运行快照：后端8000 PID45388（工具会话44815，已加载最终补丁），前端3000 PID30652，Qdrant6333 PID49880。隔离8001及其模型树已停，正式模型按需启动。PID仅当时快照，启停前重查CIM命令/创建时间；只停止本项目树，不杀Docker Desktop，不删卷。
+
+失败保留：首轮选样无新2—3页PDF，GPU前终止，改按文件名首两份2—4页，无gold；[首轮报告](checks/stage2-2-http-attempt1.json)及独立目录保留。单元import重复收集旧测试已修；pypdf xref/object-stream提示未改源SHA；临时GBK读取错误改显式UTF-8。中途编码/部分Qdrant/SQLite激活/停用/身份篡改和running恢复是单元替身/模拟，不能冒充真实GPU故障、断电或并发容量验收。没有2-2未解决阻塞。
+
+学习记录续写[07技术](过程记录/07_2技术操作详解.md)、[08口述](过程记录/08_2逐步口述稿.md) R15-S01—S05；01—06、旧报告及.gitignore不改。当前docs规则会忽略新文档/报告，均显式检查本地文件，跨机器要另带。旧库可检查Git状态/选定算法配置/模型依赖保护，不是ignored全盘审计；无下载、训练、换底座、暂存、提交或推送。
+
+**下一唯一任务：2-3A，授权文档列表、文件名包含式筛选、单文档检索后端/SDK，等待用户指定。** 此后B-1/B-2分批改工作台，C再做上传/任务网页与恢复；本轮到此停止。
+
+## 以下为R14历史交接（不能替代顶部R15当前状态）
+
+**R14工作台设计补充（同日，未改应用）：**已只读核对本机deepseek-webui，HEAD为0857074e2f9fca30b82a7fac1df7769ef98bbf25；它是HTML/JS＋PHP聊天代理，default_user目录历史和上传地址不用于替代本系统授权链。建议在现有Next.js做侧栏＋中央检索＋右侧证据，使用LayoutPatch品牌；2-3B分B-1外壳/组件和B-2双模式选择，持久历史仍到3-4，未增加聊天模型或答案生成。见[改版方案](前端工作台改版方案与复用评估.md)及[文档/只读保护检查](checks/r14-workspace-redesign-checks.json)。07/08追加S08/S09；下一唯一开发仍2-2。参考仓库只读，README称MIT但LICENSE为Apache2，未复制代码或运行PHP。
+
+**R14补充设计（同日）：**用户新增单文档检索、可见文档列表和文件名模糊搜索需求；本轮仅核对代码/报告并写[设计与分批计划](单文档检索功能设计与分批计划.md)，没有实现接口/UI。下一唯一开发仍是2-2；原2-3拆为2-3A列表/名称筛选/限定检索后端、2-3B双模式网页、2-3C原上传/任务网页与恢复。文件名只展示，ID关联复用；ready前不可搜，授权和所选文档交集在Top-k前过滤，不能扩大成全库。07/08追加S06/S07，01—06与R14旧报告不改；[补充检查](checks/r14-single-document-design-checks.json)只验证文档。
+
+本次实际`git check-ignore -v`显示`.gitignore:26:docs`会忽略新增设计/检查文件，不仅过程记录；本轮保持规则不变。新文档在本机存在，跨机器交接另行携带；旧Git状态中的业务改动属于开工前已有内容，本轮未改。
+
+初始核实：Git干净，其他可见同项目窗口idle，上传/jobs尚未实现；正式0003、2文档/2版本/13页、integrity ok/FK0。见[预检](checks/stage2-1-preflight.json)。在线备份runtime/verification/r14/metadata-before.sqlite3保留，未打印或使用正式凭据。01—06及.gitignore保持原字节；阶段2记录使用用户指定[07技术](过程记录/07_2技术操作详解.md)、[08口述](过程记录/08_2逐步口述稿.md)，本轮S01—S05对应。
+
+已实现：0004只新增jobs；复用documents/document_versions建版本1。POST /index单PDF multipart、Origin/CSRF/首改保护；服务端owner且private，UUID路径，默认20MiB/100页、严格PDF可读/加密/几何检查；GET /jobs/{id}、/documents/{id}仅本人（admin普通接口无旁路）。先receiving预约、写盘并复核身份后queued；失败failed，重启receiving转interrupted。本人X-Upload-ID同输入复用，异输入409，新key新文档，不跨用户去重。文档registered且active_version_id空，不进入ready搜索。render_profile为pending标记，不代表执行渲染。无上传UI、retry/cancel、编码、MinerU、D、高亮。
+
+实际验证：55后端unittest＋4原模型环境CPU算法契约pytest，4前端测试、typecheck、SDK生成和Next生产build通过；[真实HTTP第二轮29项](checks/stage2-1-http-attempt2.json)，[正式迁移/代理18项](checks/stage2-1-formal.json)。旧13页scope及Qdrant13点/13403向量的完整float32/payload/config指纹不变；正式0004仅增空jobs，旧9表逻辑指纹等于备份，integrity ok/FK0、迁移重复无变化。Web只增python-multipart0.0.20，原30包版本不变，模型环境未改。没有新GPU forward/官方评分重跑；上传成功是隔离后端直连，正式Next代理是匿名/Origin/20MiB边界，未测浏览器上传UI。
+
+失败保留：首轮unittest误发现Web未装pytest、旧路由白名单、Windows文件名测试预期；次轮额外表单暴露Starlette异常基类捕获问题，修复后全回归通过。前端第一次cwd错误已纠正；[HTTP首轮失败](checks/stage2-1-http.json)为验收脚本join歧义，显式条件后用新目录重跑。日志在runtime/verification/r14，未覆盖旧批报告。构建只有baseline-browser-mapping陈旧提示，未升级。见[手册](stage2-1-runbook.md)。无2-1未解决阻塞。
+
+当前运行：生产前端3000 PID30652（会话24251），后端8000 PID56496（会话26638），Qdrant6333 PID49880；8001隔离验收已停止。停止前重查PID/命令/创建时间，不复用快照。正式凭据/首改要求未变，未跑模型。数据库/文件非单一事务，崩溃可能留下内部孤儿文件，receiving只标中断、不自动激活或清理；完整调度重试在后批实现。
+
+[本批汇总和修改文件清单](checks/stage2-1-verification.json)、[文档/保护检查](checks/r14-document-checks.json)已交付；5对口稿89—98字、63个Python语法、163处本地文件链接检查通过。无本批阻塞，01—06/旧报告保留；无提交或推送。
+
+**下一唯一任务：R15 / 2-2，完整页面渲染、原ColPali全页编码与索引安全激活，等待用户指定。** 先核对本批证据和pending render身份，设计增量索引如何保留旧13页。完整页面特征须保留供D使用，预算表示另存。本轮到此停止，不进入2-2。
+
+## 以下为R13及更早历史（不能替代R14当前状态）
+
 本文件用于AI换窗口或上下文恢复：先了解当前背景、约束与证据，再核实现状。重要操作、修改、测试、故障或决策后须更新；可精简过时内容，保留仍影响接手的失败和限制。
 
 最近更新：**2026-11-07（北京时间），R13仅完成后续阶段文档规划。** 最后代码验收为R12 / 1B-6；阶段1B在现有13页登录→授权检索→PNG→启停恢复范围收尾，阶段2尚未开始。[路线图](项目开发阶段规划与任务.md)把阶段2/3/4拆为6/5/4批；下一唯一开发任务为2-1，等待用户明确指定。本轮未启停服务、运行模型、迁移数据库或重跑应用测试。先读根AGENTS，再核对实际代码/端口/库；历史记录不能替代新运行证据。

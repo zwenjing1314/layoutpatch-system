@@ -5,7 +5,7 @@ import json
 from sqlalchemy import and_, select
 
 from backend.db.connection import ROOT
-from backend.db.models import Document, DocumentVersion, IndexGeneration, IndexPage, Page, PipelineProfile, User
+from backend.db.models import Document, DocumentVersion, IndexGeneration, IndexPage, Page, PipelineProfile, SystemState, User
 from backend.db.seed import canonical, sha
 from backend.documents.access import readable_document
 from .qdrant import SearchUnavailable
@@ -42,12 +42,20 @@ class AllowedScope:
         return sha(canonical(asdict(self)).encode())
 
 
-def allowed_scope(db, user):
-    rows = db.execute(select(IndexGeneration, PipelineProfile).join(PipelineProfile)
-                      .where(IndexGeneration.status == "ready", PipelineProfile.status == "validated")).all()
+def active_index(db):
+    statement = select(IndexGeneration, PipelineProfile).join(PipelineProfile).where(
+        IndexGeneration.status == "ready", PipelineProfile.status == "validated")
+    state = db.get(SystemState, 1)
+    if state and state.active_index_id:
+        statement = statement.where(IndexGeneration.id == state.active_index_id)
+    rows = db.execute(statement).all()
     if len(rows) != 1:
         raise SearchUnavailable("No single validated index")
-    index, profile = rows[0]
+    return rows[0]
+
+
+def allowed_scope(db, user):
+    index, profile = active_index(db)
     try:
         config = json.loads(profile.config_json)
         encoder_bytes = (ROOT / "configs/colpali_local.json").read_bytes()

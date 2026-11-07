@@ -7,8 +7,10 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { DocumentResponse } from './models/DocumentResponse';
 export type { HealthResponse } from './models/HealthResponse';
 export type { HTTPValidationError } from './models/HTTPValidationError';
+export type { JobResponse } from './models/JobResponse';
 export type { LoginInput } from './models/LoginInput';
 export type { MeResponse } from './models/MeResponse';
 export type { PasswordInput } from './models/PasswordInput';
@@ -19,6 +21,7 @@ export type { ValidationError } from './models/ValidationError';
 
 export { AdminService } from './services/AdminService';
 export { AuthService } from './services/AuthService';
+export { DocumentsService } from './services/DocumentsService';
 export { PagesService } from './services/PagesService';
 export { SearchService } from './services/SearchService';
 export { SystemService } from './services/SystemService';

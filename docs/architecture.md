@@ -1,5 +1,21 @@
 # 架构、数据实体与部署设计
 
+## R15 / 阶段2-2实际实现（2026-11-07）
+
+0005_ingestion仅增system_state单例活动索引指针、page_features全页特征来源表，不重建旧表。PageFeature按page_id保存encoder配置SHA、完整BF16 tensor/float32导出路径及哈希。已有ready索引仍保留；是否活动由指针决定，空指针只允许唯一validated/ready索引引导，多代无指针拒绝。正式迁移保留原10表数据，仍原13页。
+
+单进程/单调度线程从SQLite领取queued任务；渲染走已有模型环境的CPU隔离子进程，144dpi/RGB/PNG并记录PDF几何和完整身份；页面与query共用单份ModelWorker及锁。保留完整1031×128 BF16特征供D，float32 JSON用于Qdrant，未用预算向量替代。后台任务不依赖浏览器保持连接；启动将running标INGEST_INTERRUPTED、building候选标failed，queued可继续、completed不重跑。
+
+索引采用copy-on-write完整候选代：从活动Qdrant只读获取并核验旧点表示，复制时仅变更index_generation，加入新页，逐点复核候选；短BEGIN IMMEDIATE事务一次写Page/IndexPage/Feature、文档ready、任务completed和活动指针。旧集合及原页面不写入/重编码，候选中途失败不影响旧活动范围；切换重叠查询由返回前scope复核给409。文件与DB并非单事务，候选残留保持私有不可搜，清理/retry/cancel后置。完整代复制有存储与写放大，未声称大库适用。
+
+已实测隔离13→17→21页和8新页真实编码；API schema及前端未变。当前实现/失败与限制以[2-2手册](stage2-2-runbook.md)及[汇总](checks/stage2-2-verification.json)为准。以下R14/R12段落为历史实施状态，后文其他实体仍可能是目标设计；MinerU/D/高亮、文档列表与单文档范围尚未实现。
+
+## R14 / 阶段2-1增量实现（2026-11-07）
+
+0004_upload_jobs新增持久jobs表和owner索引，沿用既有Document/DocumentVersion，不改Page/Search/Index/Qdrant。新PDF验证和存储后建立版本1；render_profile为pending标记，未选择或运行renderer。文档registered且active_version_id为空，现有ready过滤将其排除，所以新增未完成文件不会破坏13页ready索引。
+
+上传为单后端worker下的短事务：授权与Origin/CSRF先验，写receiving预约；PDF字节写受控runtime目录的UUID路径，临时文件fsync后原子替换；再新事务复核会话身份，状态改queued。异常删除文件并尝试记failed；预约后进程意外退出，重启将receiving标interrupted。数据库、文件系统不构成单一事务，若失败记录也遇DB故障，接收中记录由启动恢复。页面编码/索引激活留2-2，显式重试/取消和更完整scheduler留后续批。
+
 更新：2026-11-07，北京时间，R12。**1B-6整体启停与非空持久化通过适用范围，现有13页链路收尾。** 本轮45后端/3前端回归、78生命周期、13浏览器观察、10正式恢复、5组官方评分通过；[本机部署手册](stage1b-6-runbook.md)、[汇总](checks/stage1b-6-verification.json)。浏览器改密提交仍由用户本人操作，阶段2未开始。
 
 正式0003、13页ready、profile validated不变；会话绑定图片授权在R11实现，本轮无应用/API变化或数据库迁移。下方包含完整目标设计，上传、PDF与区域仍未实现。学习记录见[05](过程记录/05_1b技术操作详解.md#r12)/[06](过程记录/06_1b逐步口述稿.md#r12)，03/04保持历史。后续分批实施顺序见[R13路线图](项目开发阶段规划与任务.md)；该规划未改变本节R12验收范围。
