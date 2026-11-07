@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-07",
+  "round": "R12",
+  "atol": 0.0001,
+  "rtol": 1e-05,
+  "cases": [
+    {
+      "name": "A_B_related_question",
+      "authorized_pages": 5,
+      "returned": 3,
+      "max_abs_diff": 1.8565673833847995e-06,
+      "top_k_matches": true,
+      "non_tied": true
+    },
+    {
+      "name": "B_before_restart",
+      "authorized_pages": 8,
+      "returned": 3,
+      "max_abs_diff": 4.5788574354332923e-07,
+      "top_k_matches": true,
+      "non_tied": true
+    },
+    {
+      "name": "A_after_qdrant_restart",
+      "authorized_pages": 5,
+      "returned": 3,
+      "max_abs_diff": 1.8565673833847995e-06,
+      "top_k_matches": true,
+      "non_tied": true
+    },
+    {
+      "name": "A_new_question_after_backend_restart",
+      "authorized_pages": 5,
+      "returned": 3,
+      "max_abs_diff": 2.284912110184223e-06,
+      "top_k_matches": true,
+      "non_tied": true
+    },
+    {
+      "name": "A_model_auto_recovery",
+      "authorized_pages": 5,
+      "returned": 3,
+      "max_abs_diff": 1.8565673833847995e-06,
+      "top_k_matches": true,
+      "non_tied": true
+    }
+  ],
+  "query_source": "actual live HTTP worker vectors, freshly encoded, not R03 query cache",
+  "reference": "official ColPaliProcessor and CPU float32 MaxSim",
+  "overall": "passed"
+}

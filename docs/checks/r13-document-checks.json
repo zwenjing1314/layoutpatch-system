@@ -1,0 +1,1239 @@
+{
+  "round": "R13",
+  "date": "2026-11-07",
+  "generated_at_local": "2026-11-07T18:20:43.469276+08:00",
+  "scope": "Documentation planning and file checks only; no application tests, model execution, service start/stop, or database migration.",
+  "status": "passed",
+  "stage_status": {
+    "stage_1b": "completed within R12 recorded scope",
+    "stage_2": "not_started",
+    "stage_3": "not_started",
+    "stage_4": "not_started",
+    "next_proposed_batch": "2-1; await explicit user instruction"
+  },
+  "document_checks": {
+    "utf8_and_fences": 10,
+    "local_links": 180,
+    "link_details": [
+      {
+        "file": "README.md",
+        "line": 3,
+        "target": "docs/项目开发阶段规划与任务.md"
+      },
+      {
+        "file": "README.md",
+        "line": 3,
+        "target": "docs/checks/r13-document-checks.json"
+      },
+      {
+        "file": "README.md",
+        "line": 5,
+        "target": "docs/stage1b-6-runbook.md"
+      },
+      {
+        "file": "README.md",
+        "line": 5,
+        "target": "docs/checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "README.md",
+        "line": 9,
+        "target": "docs/AI交接.md"
+      },
+      {
+        "file": "README.md",
+        "line": 9,
+        "target": "AGENTS.md"
+      },
+      {
+        "file": "README.md",
+        "line": 9,
+        "target": "docs/过程记录/05_1b技术操作详解.md"
+      },
+      {
+        "file": "README.md",
+        "line": 9,
+        "target": "docs/过程记录/06_1b逐步口述稿.md"
+      },
+      {
+        "file": "README.md",
+        "line": 9,
+        "target": "docs/过程记录/03_1b技术操作详解.md"
+      },
+      {
+        "file": "README.md",
+        "line": 9,
+        "target": "docs/过程记录/04_1b逐步口述稿.md"
+      },
+      {
+        "file": "README.md",
+        "line": 9,
+        "target": "docs/过程记录/01_技术操作详解.md"
+      },
+      {
+        "file": "README.md",
+        "line": 9,
+        "target": "docs/过程记录/02_逐步口述稿.md"
+      },
+      {
+        "file": "README.md",
+        "line": 26,
+        "target": "docs/stage1b-6-runbook.md"
+      },
+      {
+        "file": "README.md",
+        "line": 26,
+        "target": "docs/stage1b-2-runbook.md"
+      },
+      {
+        "file": "README.md",
+        "line": 26,
+        "target": "docs/stage1b-3-runbook.md"
+      },
+      {
+        "file": "README.md",
+        "line": 26,
+        "target": "docs/stage1b-4-runbook.md"
+      },
+      {
+        "file": "README.md",
+        "line": 26,
+        "target": "docs/stage1b-5-runbook.md"
+      },
+      {
+        "file": "README.md",
+        "line": 34,
+        "target": "docs/stage1a-verification.md"
+      },
+      {
+        "file": "README.md",
+        "line": 35,
+        "target": "docs/checks/r06-stage1b-1-completion.json"
+      },
+      {
+        "file": "README.md",
+        "line": 36,
+        "target": "docs/checks/stage1b-2-verification.json"
+      },
+      {
+        "file": "README.md",
+        "line": 37,
+        "target": "docs/checks/stage1b-3-verification.json"
+      },
+      {
+        "file": "README.md",
+        "line": 38,
+        "target": "docs/checks/stage1b-4-verification.json"
+      },
+      {
+        "file": "README.md",
+        "line": 39,
+        "target": "docs/checks/stage1b-5-results.png"
+      },
+      {
+        "file": "README.md",
+        "line": 40,
+        "target": "docs/checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "README.md",
+        "line": 43,
+        "target": "docs/requirements.md"
+      },
+      {
+        "file": "README.md",
+        "line": 43,
+        "target": "docs/architecture.md"
+      },
+      {
+        "file": "README.md",
+        "line": 43,
+        "target": "docs/interfaces.md"
+      },
+      {
+        "file": "README.md",
+        "line": 43,
+        "target": "docs/testing.md"
+      },
+      {
+        "file": "README.md",
+        "line": 43,
+        "target": "docs/progress.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 5,
+        "target": "项目开发阶段规划与任务.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 11,
+        "target": "过程记录/05_1b技术操作详解.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 11,
+        "target": "过程记录/06_1b逐步口述稿.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 16,
+        "target": "checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 16,
+        "target": "stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 20,
+        "target": "checks/stage1b-6-tests.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 21,
+        "target": "checks/stage1b-6-lifecycle.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 23,
+        "target": "checks/stage1b-6-reference.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 24,
+        "target": "checks/stage1b-6-browser.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 25,
+        "target": "checks/stage1b-6-formal.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 26,
+        "target": "checks/source-state-r12-before.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 26,
+        "target": "checks/source-state-r12-after.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 26,
+        "target": "checks/r12-document-checks.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 43,
+        "target": "interfaces.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 43,
+        "target": "stage1b-3-runbook.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 43,
+        "target": "stage1b-4-runbook.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 43,
+        "target": "stage1b-5-runbook.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 47,
+        "target": "checks/r12-lifecycle-first-failure.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 47,
+        "target": "checks/r12-browser-first-check.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 50,
+        "target": "checks/r06-stage1b-1-completion.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 50,
+        "target": "checks/stage1b-2-verification.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 50,
+        "target": "checks/stage1b-3-verification.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 50,
+        "target": "checks/stage1b-4-verification.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 50,
+        "target": "checks/stage1b-5-verification.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 57,
+        "target": "stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 59,
+        "target": "checks/r13-document-checks.json"
+      },
+      {
+        "file": "docs/AI交接.md",
+        "line": 61,
+        "target": "项目开发阶段规划与任务.md#next"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 3,
+        "target": "项目开发阶段规划与任务.md"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 5,
+        "target": "过程记录/05_1b技术操作详解.md#r13"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 5,
+        "target": "过程记录/06_1b逐步口述稿.md#r13"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 5,
+        "target": "checks/r13-document-checks.json"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 11,
+        "target": "checks/stage1a-verification.json"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 12,
+        "target": "checks/r06-stage1b-1-completion.json"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 13,
+        "target": "checks/stage1b-2-verification.json"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 14,
+        "target": "checks/stage1b-3-verification.json"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 15,
+        "target": "checks/stage1b-4-verification.json"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 16,
+        "target": "checks/stage1b-5-verification.json"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 17,
+        "target": "checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 21,
+        "target": "stage1b-3-runbook.md"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 47,
+        "target": "stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 47,
+        "target": "过程记录/05_1b技术操作详解.md#r12"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 47,
+        "target": "过程记录/06_1b逐步口述稿.md#r12"
+      },
+      {
+        "file": "docs/progress.md",
+        "line": 53,
+        "target": "项目开发阶段规划与任务.md#stage2"
+      },
+      {
+        "file": "docs/architecture.md",
+        "line": 3,
+        "target": "stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/architecture.md",
+        "line": 3,
+        "target": "checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "docs/architecture.md",
+        "line": 5,
+        "target": "过程记录/05_1b技术操作详解.md#r12"
+      },
+      {
+        "file": "docs/architecture.md",
+        "line": 5,
+        "target": "过程记录/06_1b逐步口述稿.md#r12"
+      },
+      {
+        "file": "docs/architecture.md",
+        "line": 5,
+        "target": "项目开发阶段规划与任务.md"
+      },
+      {
+        "file": "docs/interfaces.md",
+        "line": 3,
+        "target": "checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "docs/interfaces.md",
+        "line": 3,
+        "target": "stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/interfaces.md",
+        "line": 5,
+        "target": "stage1b-5-runbook.md"
+      },
+      {
+        "file": "docs/interfaces.md",
+        "line": 5,
+        "target": "checks/stage1b-5-verification.json"
+      },
+      {
+        "file": "docs/interfaces.md",
+        "line": 7,
+        "target": "过程记录/05_1b技术操作详解.md"
+      },
+      {
+        "file": "docs/interfaces.md",
+        "line": 7,
+        "target": "过程记录/06_1b逐步口述稿.md"
+      },
+      {
+        "file": "docs/interfaces.md",
+        "line": 7,
+        "target": "项目开发阶段规划与任务.md"
+      },
+      {
+        "file": "docs/interfaces.md",
+        "line": 46,
+        "target": "stage1b-3-runbook.md#2-接口与正确顺序"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 56,
+        "target": "source-audit.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 68,
+        "target": "progress.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 85,
+        "target": "stage1a-verification.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 85,
+        "target": "checks/stage1a-verification.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 89,
+        "target": "checks/stage1b-3-tests.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 90,
+        "target": "checks/stage1b-3-http.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 91,
+        "target": "checks/stage1b-3-formal.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 94,
+        "target": "checks/stage1b-3-verification.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 94,
+        "target": "stage1b-3-runbook.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 98,
+        "target": "checks/stage1b-4-http.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 103,
+        "target": "checks/stage1b-4-reference.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 104,
+        "target": "checks/stage1b-4-formal.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 106,
+        "target": "checks/r10-http-first-failure.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 106,
+        "target": "checks/r10-http-proxy-timeout.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 106,
+        "target": "stage1b-4-runbook.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 112,
+        "target": "checks/stage1b-5-http.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 113,
+        "target": "checks/stage1b-5-browser.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 115,
+        "target": "checks/stage1b-5-formal.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 117,
+        "target": "stage1b-5-runbook.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 117,
+        "target": "过程记录/05_1b技术操作详解.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 117,
+        "target": "过程记录/06_1b逐步口述稿.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 121,
+        "target": "checks/stage1b-6-lifecycle.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 121,
+        "target": "checks/stage1b-6-tests.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 121,
+        "target": "checks/stage1b-6-browser.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 121,
+        "target": "checks/stage1b-6-formal.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 121,
+        "target": "checks/stage1b-6-reference.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 123,
+        "target": "checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 134,
+        "target": "checks/r12-browser-first-check.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 134,
+        "target": "checks/stage1b-6-recovered.png"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 136,
+        "target": "checks/r12-lifecycle-first-failure.json"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 138,
+        "target": "过程记录/05_1b技术操作详解.md#r12"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 138,
+        "target": "过程记录/06_1b逐步口述稿.md#r12"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 138,
+        "target": "stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 142,
+        "target": "项目开发阶段规划与任务.md"
+      },
+      {
+        "file": "docs/testing.md",
+        "line": 142,
+        "target": "checks/r13-document-checks.json"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 5,
+        "target": "progress.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 5,
+        "target": "testing.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 22,
+        "target": "stage1a-verification.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 22,
+        "target": "checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 22,
+        "target": "checks/r12-document-checks.json"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 76,
+        "target": "interfaces.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 151,
+        "target": "progress.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 152,
+        "target": "testing.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 153,
+        "target": "AI交接.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 154,
+        "target": "过程记录/05_1b技术操作详解.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 154,
+        "target": "过程记录/06_1b逐步口述稿.md"
+      },
+      {
+        "file": "docs/项目开发阶段规划与任务.md",
+        "line": 168,
+        "target": "checks/r13-document-checks.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 3,
+        "target": "#r13"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 3,
+        "target": "#r12"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 5,
+        "target": "06_1b逐步口述稿.md"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 5,
+        "target": "../stage1b-5-runbook.md"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 19,
+        "target": "../checks/source-state-r11-before.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 53,
+        "target": "../stage1b-5-runbook.md#5-本人跟做先只读再隔离测试"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 63,
+        "target": "../checks/stage1b-5-browser.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 71,
+        "target": "../stage1b-5-runbook.md"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 72,
+        "target": "../checks/stage1b-5-verification.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 73,
+        "target": "../checks/r11-document-checks.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 80,
+        "target": "../stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 80,
+        "target": "../checks/stage1b-6-verification.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 88,
+        "target": "../checks/source-state-r12-before.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 95,
+        "target": "../../scripts/check_stage1b_acceptance.py"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 108,
+        "target": "../checks/r12-lifecycle-first-failure.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 109,
+        "target": "../checks/stage1b-6-lifecycle.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 115,
+        "target": "../checks/stage1b-6-tests.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 117,
+        "target": "../checks/stage1b-6-reference.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 118,
+        "target": "../checks/stage1b-6-browser.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 119,
+        "target": "../checks/r12-browser-first-check.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 128,
+        "target": "../checks/stage1b-6-formal.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 129,
+        "target": "../stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 136,
+        "target": "../checks/source-state-r12-before.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 136,
+        "target": "../checks/source-state-r12-after.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 138,
+        "target": "../checks/r12-document-checks.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 141,
+        "target": "../checks/r12-document-checks.json"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 147,
+        "target": "../项目开发阶段规划与任务.md"
+      },
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "line": 164,
+        "target": "../checks/r13-document-checks.json"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 3,
+        "target": "#r13"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 3,
+        "target": "#r12"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 5,
+        "target": "05_1b技术操作详解.md"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 21,
+        "target": "05_1b技术操作详解.md#r11-s01"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 29,
+        "target": "05_1b技术操作详解.md#r11-s02"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 37,
+        "target": "05_1b技术操作详解.md#r11-s03"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 45,
+        "target": "05_1b技术操作详解.md#r11-s04"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 53,
+        "target": "05_1b技术操作详解.md#r11-s05"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 61,
+        "target": "05_1b技术操作详解.md#r11-s06"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 65,
+        "target": "../stage1b-5-runbook.md#5-本人跟做先只读再隔离测试"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 90,
+        "target": "05_1b技术操作详解.md#r12-s01"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 98,
+        "target": "05_1b技术操作详解.md#r12-s02"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 106,
+        "target": "05_1b技术操作详解.md#r12-s03"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 114,
+        "target": "05_1b技术操作详解.md#r12-s04"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 122,
+        "target": "05_1b技术操作详解.md#r12-s05"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 130,
+        "target": "05_1b技术操作详解.md#r12-s06"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 134,
+        "target": "../stage1b-6-runbook.md"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 161,
+        "target": "05_1b技术操作详解.md#r13-s01"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 169,
+        "target": "05_1b技术操作详解.md#r13-s02"
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "line": 180,
+        "target": "../项目开发阶段规划与任务.md"
+      }
+    ],
+    "paired_steps": [
+      "R13-S01",
+      "R13-S02"
+    ],
+    "speech_lengths": [
+      {
+        "step": "R13-S01",
+        "characters_including_punctuation": 94,
+        "in_range_60_100": true
+      },
+      {
+        "step": "R13-S02",
+        "characters_including_punctuation": 95,
+        "in_range_60_100": true
+      }
+    ],
+    "planned_batches": {
+      "2": [
+        "2-1",
+        "2-2",
+        "2-3",
+        "2-4",
+        "2-5",
+        "2-6"
+      ],
+      "3": [
+        "3-1",
+        "3-2",
+        "3-3",
+        "3-4",
+        "3-5"
+      ],
+      "4": [
+        "4-1",
+        "4-2",
+        "4-3",
+        "4-4"
+      ]
+    }
+  },
+  "file_protection": {
+    "baseline_count": 196,
+    "unchanged_count": 189,
+    "changed_baseline_files": [
+      "AGENTS.md",
+      "README.md",
+      "docs/AI交接.md",
+      "docs/architecture.md",
+      "docs/interfaces.md",
+      "docs/progress.md",
+      "docs/testing.md"
+    ],
+    "new_nonignored_files_at_check": [
+      "docs/checks/r13-document-checks.json",
+      "docs/项目开发阶段规划与任务.md"
+    ],
+    "missing": [],
+    "outside_allowed_scope": [],
+    "allowed_document_paths": [
+      "AGENTS.md",
+      "README.md",
+      "docs/AI交接.md",
+      "docs/architecture.md",
+      "docs/checks/r13-document-checks.json",
+      "docs/interfaces.md",
+      "docs/progress.md",
+      "docs/testing.md",
+      "docs/过程记录/05_1b技术操作详解.md",
+      "docs/过程记录/06_1b逐步口述稿.md",
+      "docs/项目开发阶段规划与任务.md"
+    ],
+    "unchanged_file_hashes": {
+      ".env.example": "24dfbe6e8912940fadfaa83982d3bf1b6ae416a73394ee45e4cbbb611497ae14",
+      ".gitignore": "46db0ef0454252392c6c37e6dc236d3810afd9e2a08bcd795c8b0628b52b3559",
+      "alembic.ini": "e7955a0ffb9c32a9c5067d7885ee9197328f17a4a12fb4a5bb556c2b85763aa2",
+      "backend/__init__.py": "af7af53bbafa636c95bb5545ea57f3360f5071eb20000cfc40b428f9bcd82719",
+      "backend/algorithms/__init__.py": "3d1348b93aa946b3cf197575b8429b05f5cbfeff6721fb4e86e2bed8e1553e49",
+      "backend/algorithms/colpali_adapter.py": "36a50768dd4a2129bcf4825b7a407066ee1fe9dc27210d438772b78bb40709ee",
+      "backend/algorithms/contracts.py": "f8425d8022e54d10c567d136771d3b7a790bd8a203b7f7c5464805d61b311ca3",
+      "backend/auth/__init__.py": "32107e5255f1854679aba41b1288b340453ac7624b5ffadf74a903096ea8d1f0",
+      "backend/auth/accounts.py": "b61814491c7cc2f4e076f06f589a5dfb05bd2289ae99ca06e65ab166a5b57bca",
+      "backend/auth/boundary.py": "be2b0a017a456c89165e73c0bf55622434f5936cb935dbd1d1ebf83529200bef",
+      "backend/auth/routes.py": "bad1966cc9bc9c9c1745a46bfe1aa4bd534d4893914bfde96f7fef3731609efb",
+      "backend/auth/settings.py": "4d93e964c1d32aaafc97749fda617d3db1319c66059a3b2c27c7bfb1024acc98",
+      "backend/auth/store.py": "5e28261331a1d030d8957e7cbd27fa4f3b8e8788183fe4d0327eefe28c3ace47",
+      "backend/db/__init__.py": "f5199533ff16df65a364cdf434feff2adbad12e17291715762b16cfaa8285476",
+      "backend/db/connection.py": "207788b20bad108f4722cff8b64c24e3e1aaeee8054d14a8e3d27d31aeb145ae",
+      "backend/db/models.py": "257326f2d86509dbd8e435647d5e57e74af319870ed1898ec29d84cc40f9d646",
+      "backend/db/seed.py": "3c222af1cbca1d6499df84d2ff8918aca97cedac21d1d9eaddafe06dfd535eb7",
+      "backend/documents/__init__.py": "11dd65f9f4471c4c79af0ed65048f7e3f793db44b6d17cf14cabf93cdf777663",
+      "backend/documents/access.py": "3f87e03b56bcba65605948ff23e893f4c3a6daed905c623dd2145938aa867c22",
+      "backend/documents/previews.py": "f9d219804053bc60636d7e8ea9808ad2a6fa5455b40d18f6c2ce3e3dee292ad5",
+      "backend/documents/routes.py": "a783a00276520be53dc473dea52944c7c7eae71c7629f2d8396f1191c295d482",
+      "backend/main.py": "cb2e9ea2fec0138a33fd0081171ff3b27cb511b48d063f0d705646b57f26e0ec",
+      "backend/search/__init__.py": "08d9e3a112704b8b323f13fcef999c801baa47214b5829880e61364a727f0740",
+      "backend/search/indexing.py": "c56d63e6192dee387838bc6c42f5b6448701f11e7855d50e6a8a4e36a0960b6f",
+      "backend/search/qdrant.py": "581fea74146182a2389fd9f6b6c1fa6cb08b812d7a314529e5c4ca212f8d7b14",
+      "backend/search/routes.py": "e5d7fa07741632a8d235ec6547693f53d202c610e15c2b469e6c8b818baad740",
+      "backend/search/scope.py": "2aa7bcc2e85a0ff3c679cebc96e625d3cf495d09846878ae106074cc1ff2d193",
+      "backend/search/settings.py": "6aadf5ba7c44710590e36974d183e4c455dd0f89cdc39ae8aab73657081541d2",
+      "backend/search/worker.py": "0cbafc30a54f103ceecd38404083e561d497932988db8155eeeeacce688cfbd9",
+      "compose.yaml": "45f12a70433c4ba60191760e411617505f288aee22fbeb650a7248a11b0de372",
+      "configs/colpali_local.json": "da132ccca44fd3964eea940881be0f30663f7b48957f09925cce19c5df9b0f99",
+      "configs/development_features.json": "869001cc13b7a8a8f8753862822f555338d1576ff9a1af9880ada4a601b30f3c",
+      "configs/development_ownership.json": "73598412559c7d43dfdf2ea41c9948f8a0bf1ed23b33c5c35a0db2a2281f75ee",
+      "configs/development_queries.json": "749307760fd9c57c4eb75a5df7bf343a1aa1820eb7c604b4833cd1fc91c7e0c4",
+      "docs/checks/r05-document-checks.json": "76c8c4834f134f97ef89cf8ce2710a94070ff80ccaca672e5d2c447caee9b5fa",
+      "docs/checks/r05-provenance.json": "31b0a6f0e51a897ee9d237461924beea6210a0609fc9b6f3f6619eba9d70096b",
+      "docs/checks/r05-stage1b-1-status.json": "18299ca8aff90b77f114150a1f533552d076506e3b5846723e8c2e5e193db77d",
+      "docs/checks/r06-browser-health.png": "a2ab77dc3947fa774720ed2a6e945876c9b1dc770c4f47384fa3e6bc7c0d9903",
+      "docs/checks/r06-document-checks.json": "2198f998c42078bebbec136c74bad551119bbc5f927709b41a4cdad3b3347f40",
+      "docs/checks/r06-qdrant-after-pin.json": "e25cb5ca0989b4a79159f26a34a62f1e9847591c422e9d56b0fc270f49348c89",
+      "docs/checks/r06-qdrant-first-start.json": "e25cb5ca0989b4a79159f26a34a62f1e9847591c422e9d56b0fc270f49348c89",
+      "docs/checks/r06-qdrant-restarted.json": "e25cb5ca0989b4a79159f26a34a62f1e9847591c422e9d56b0fc270f49348c89",
+      "docs/checks/r06-qdrant-stop.json": "05b92eae6d45df00438612bab3d44c0bbe709d65d1d37834d2aeda46ca774e46",
+      "docs/checks/r06-stage1b-1-completion.json": "893a3780ad8093029f3b219604e1420d0a78178f2cd62be0012771f85c0746fc",
+      "docs/checks/r07-code-before.json": "ca99cabf0d2878fe7fce0964d674e1ed9a81e06068818d3fd5cbce3d394c127a",
+      "docs/checks/r07-document-checks.json": "5bdc446ce55bd61fdd1036a700415d73a94330012e29b94b2c7fff77199fc825",
+      "docs/checks/r08-document-checks.json": "6cb344f98d1bca937735cd7b5a1c392cacd3a7ccb68eebe311e96fd7bc1ac869",
+      "docs/checks/r09-document-checks.json": "1c70290f797e965c4e0316ecf5f6f9082e97f2e77164cefefa63d3a628b87727",
+      "docs/checks/r10-document-checks.json": "e92c00eb93aa64baa49a125a388d25614abf9be183df74e938b466bb33cb33ee",
+      "docs/checks/r10-http-first-failure.json": "1be77365c63c433cc661e731febafb267b4eef3e21118e470b7c828f79ba71e0",
+      "docs/checks/r10-http-proxy-timeout.json": "d750eb7ffa0a49f14521b9363c6ef9b6140ccd2003be6c6b00315477ddc7cf7c",
+      "docs/checks/r11-document-checks.json": "61034df039b540957364d03a573744c76f22a0771dbbcde58be9c07e67c5d759",
+      "docs/checks/r12-browser-first-check.json": "27bf859a137014712428d70c462b7c0a1e62d2a2d27aa785613d3943f3afa82b",
+      "docs/checks/r12-document-checks.json": "24e972ecd224cbdae4e90a072a07d05e18a0d0e259b2f2432cb0d772125c208f",
+      "docs/checks/r12-lifecycle-first-failure.json": "d297d1eb85c261afc1b6976db2fe18c998979a879ce2ce5e92bfc722b7186bff",
+      "docs/checks/source-state-after.json": "e118a25e6ddbb341c1674ff62acc55a6749c7ef2decfccdaa9efa0fa51b6d731",
+      "docs/checks/source-state-before.json": "ec3bd620b44562e0abf0a0a122884342ae333771855e743ff2fc3f895ce48fd6",
+      "docs/checks/source-state-r03-after.json": "cc56e217cdace9e6d96c15c4af57e90b184ab1aaea650bd1f0ecdef53421a7b2",
+      "docs/checks/source-state-r03-before.json": "70ac51787b268ed7336eb956ae8ce971ec1f9a273c0480c946d01a853dde7046",
+      "docs/checks/source-state-r05-after.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r05-before.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r06-after.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r06-before.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r08-after.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r08-before.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r09-after.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r09-before.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r10-after.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r10-before.json": "ded505c0220017f0a4a75b01f7c0a9f15d202f85082c72fdf8c0cfc973e110f9",
+      "docs/checks/source-state-r11-after.json": "31b60329ac764a8294070aa60fdf1ad937f0083031ada6ed725cf8a5a3cf6bb1",
+      "docs/checks/source-state-r11-before.json": "31b60329ac764a8294070aa60fdf1ad937f0083031ada6ed725cf8a5a3cf6bb1",
+      "docs/checks/source-state-r12-after.json": "31b60329ac764a8294070aa60fdf1ad937f0083031ada6ed725cf8a5a3cf6bb1",
+      "docs/checks/source-state-r12-before.json": "31b60329ac764a8294070aa60fdf1ad937f0083031ada6ed725cf8a5a3cf6bb1",
+      "docs/checks/stage1a-document-checks.json": "7c027fa72f0e141f43949531efe1941bfa74f5fd44b03242f90b74747596fc23",
+      "docs/checks/stage1a-verification.json": "1c2a4f2ca951fb911b723019f5d389a63e4a4b7182107cdf96edbc5b9a06bd41",
+      "docs/checks/stage1b-1-qdrant.json": "e25cb5ca0989b4a79159f26a34a62f1e9847591c422e9d56b0fc270f49348c89",
+      "docs/checks/stage1b-1-status.json": "8706f77515bc2b7d15ceabc37d2b2df0772f77191d9b3b24959652843f261788",
+      "docs/checks/stage1b-1-web.json": "b94a38066493315124d44963acaabbede250202b8c054b2daf4e30903c53411a",
+      "docs/checks/stage1b-2-verification.json": "a7236622bc3105aa3fdfb6dab862dcbc92855a0612aa91354b2e24295c5a6686",
+      "docs/checks/stage1b-3-formal.json": "b249630029c468af8a3884227a6e8a4c091512c5a3a27da76b1e928bc27f4665",
+      "docs/checks/stage1b-3-http.json": "280eba0fece24214b9a9bf0341cab10f3b9f3cd76725b1e6eed066fa802f15fe",
+      "docs/checks/stage1b-3-tests.json": "865805001b311527275d56e4e136d6fc9d3059fc8e982c354d08b1930ad65316",
+      "docs/checks/stage1b-3-verification.json": "9d2f9c347ce784a27d131d41bce4ae701ef186b4604b8cf4d3150d7904f05671",
+      "docs/checks/stage1b-4-formal.json": "af4bde00265c7662f936ad6d3b706109b4cc476b13985d0ec3e5bd7052b48214",
+      "docs/checks/stage1b-4-http.json": "bfb6dff7c16c7f8b627bc5b88c2f2718ac36102caeb801e5c8799e2b5cebbd52",
+      "docs/checks/stage1b-4-reference.json": "9b84d3020cfe459830a0d111776b96c4ace3f375244510749fccee9dc0a748c5",
+      "docs/checks/stage1b-4-verification.json": "beafa5811ce11af23901ba4cc317a77b0380c5e6c06b4cd7b2ddbb94e5e0ff7c",
+      "docs/checks/stage1b-5-browser.json": "99f497590782abc3254d46d4f1eba91386cb5d2ca30989b04ce10f25c03c8651",
+      "docs/checks/stage1b-5-formal.json": "0876814422568f1b69acca745ac745d33c48d0df053813bcd7681da507b0c06e",
+      "docs/checks/stage1b-5-http.json": "27032f0e9508bfea1a5ae1fcdad5d7536ea529925e01ef136315265ae1784b33",
+      "docs/checks/stage1b-5-login.png": "308f8bbbb66544deb3ac25dd7be9bff8fc45efea557c3b28a11f3df85fc015d5",
+      "docs/checks/stage1b-5-mobile.png": "0862c7f4ccff3e5ca59f0163992b2d8cdf8debf56baabdd34e8a65fe0f44ec16",
+      "docs/checks/stage1b-5-outage.png": "53e83f90ce734e4ec0b9588a5ad7623772d480d4bdf22a5ca3bddf0403774102",
+      "docs/checks/stage1b-5-password-gate.png": "3dc904efd193639313f12ed3f8ec9abd4a7a4f3f90d86bf50901d7ee8cdb3eda",
+      "docs/checks/stage1b-5-results.png": "ff33e76ceb806c72bfdf6764e444f48dce78915b41767a9ffc4c530788607538",
+      "docs/checks/stage1b-5-tests.json": "2d0e5a8223391ac96a8354e961976d906177532089919076514c4019ca39a22d",
+      "docs/checks/stage1b-5-verification.json": "ef74f58f5823d998d392279c6be6e084598e6092d1bdc3331ab1bcb6358ca55d",
+      "docs/checks/stage1b-6-browser.json": "aa9067936848cd3d47681789636260dacc2659866656b1b6768c1a5a751556e0",
+      "docs/checks/stage1b-6-formal-login.png": "53c2edbcec1d56e2463e853cbf0b90974805b221ee8389728b22d0d0d012232b",
+      "docs/checks/stage1b-6-formal.json": "730c764f2585bfea21b93b1477acd60a35f5efaba035a8eba9cbeaec877d6ee5",
+      "docs/checks/stage1b-6-lifecycle.json": "9e9b4d10abf01a1d4dc27eae845c63caa40352bb3ef3d7d0b4cb9ff9f8625bab",
+      "docs/checks/stage1b-6-outage.png": "54cf6ea8f1908f95f0801f27dc2930205cedf7c349d7b4e997bc8f4d000d0a50",
+      "docs/checks/stage1b-6-recovered.png": "27f250bf4a5edae7abd065a56f68ead950e0dc282f6a6b5e718c2516a0040704",
+      "docs/checks/stage1b-6-reference.json": "88e5dcc3486cad0eb5ad6cac6644e9ec98a679fbe6e07b209c04d7379022dbd8",
+      "docs/checks/stage1b-6-tests.json": "c2694a6b860646577a1548f7f25b76406cffa632c2e30bc00f8b43fbb07037fb",
+      "docs/checks/stage1b-6-verification.json": "a41043ee00b4e4199357ea06966f344a13595db0240d26658b948307a65fe37f",
+      "docs/requirements.md": "85287608a54aab700590842a9a6de510613c245898f39300a6231677517665e2",
+      "docs/source-audit.md": "f94533b4bf56478e7c51ce6dbc3e2502ea07e0a3e2ae9a806554646789fa466d",
+      "docs/stage1a-verification.md": "dd3e604f7c81789d50896b4dba48ec52c574d75fe2f0db1b3bf808f19db16945",
+      "docs/stage1b-1-runbook.md": "4ffa32dda60c3aee2b1c523153dac7abdd888696aa581648626820ff66c07241",
+      "docs/stage1b-2-runbook.md": "7b3c793c9c84f4ef600771ddab1d54e0aebb5f8f6afcd7a770d842662e15df65",
+      "docs/stage1b-3-runbook.md": "ef6cc411f4542a13f8da8e8a06a698895aac55a2d43b94abad25645f5617a41f",
+      "docs/stage1b-4-runbook.md": "ea304c187d3aa4e45e35684caba8ed9360f94c4636fd59444929d6bd2422d222",
+      "docs/stage1b-5-runbook.md": "0e93795195e81a20e0e6333b5c395cb7272acf2d293a46aec501250f4ec7a3ce",
+      "docs/stage1b-6-runbook.md": "9a5bcfaf0a77921578eca37a25c091b3f12fdaf258c5974c72e1137193a65009",
+      "docs/过程记录/01_技术操作详解.md": "7f7768f2ce4e29dd85d8614c25a7651a9a97deb7efd154d0bfb1037854b8bd70",
+      "docs/过程记录/02_逐步口述稿.md": "12e39e18b3a894d60a3eff4d8f713b06ed567a9088b33aaeb411feda1e926775",
+      "docs/过程记录/03_1b技术操作详解.md": "6a42a0cc09f43cc7acb94656b47320ec8d9495536c58072910a42a92a85060e5",
+      "docs/过程记录/04_1b逐步口述稿.md": "38b23695a32132068946021a1625df06121e5f23f9456dfe7aa2a062be23565b",
+      "docs\\过程记录\\03_1b技术操作详解.md": "6a42a0cc09f43cc7acb94656b47320ec8d9495536c58072910a42a92a85060e5",
+      "docs\\过程记录\\04_1b逐步口述稿.md": "38b23695a32132068946021a1625df06121e5f23f9456dfe7aa2a062be23565b",
+      "frontend/app/globals.css": "33fa88ba3fa40b580bf778d142735ab5bc1b91fd9e95fd3c1a6a694c1ec335ce",
+      "frontend/app/layout.tsx": "319cf5e4793a78833bc52999bae35dff102f7db4893dd81e391ce31347ae784d",
+      "frontend/app/page.tsx": "398926f2f608e7e0739129963a119fa466a7cfbde72fed3e3477660d27432c0b",
+      "frontend/docs/openapi.json": "bdd17381427fdede7b02e3a43c99edbe6b8d83ec4d8af36356540d198954866d",
+      "frontend/lib/api/client.ts": "d2223f9f451585e6db765713f4f52dc6d94055a1b3abc39867eb8a830f8c934d",
+      "frontend/lib/api/generated/core/ApiError.ts": "75da423e7661a18c818478ffd9e34751452d00dce99fe65980a42e148a34980a",
+      "frontend/lib/api/generated/core/ApiRequestOptions.ts": "3061011138dfcc84a721a94f0405221a90104bdb117a95d0d36609624082d250",
+      "frontend/lib/api/generated/core/ApiResult.ts": "81bf28fb01b05582781a74a318adbec7039dbfc2ef761ffb98a6f5a9e12ebbbf",
+      "frontend/lib/api/generated/core/CancelablePromise.ts": "677625922e1d63b60a05b3229549a8446d894b96fbc88d1d347639045fc00c3c",
+      "frontend/lib/api/generated/core/OpenAPI.ts": "4c70f1c7413eebecb62b25b861d016ae2dfebf934c7f89c1da0aa381ebde7584",
+      "frontend/lib/api/generated/core/request.ts": "136cc49adca9f92f867d4da3f54ae057f68d01af7261f6ecd0e625b82d5cc080",
+      "frontend/lib/api/generated/index.ts": "b3034f0532b2cc9efb4f9837911bef273f645765f20bf55d46766a88e47c70b7",
+      "frontend/lib/api/generated/models/HTTPValidationError.ts": "cf48c691a19b856d49e80f176c66cf39d5e7b4a369b37f8029e40d0ef942d6bf",
+      "frontend/lib/api/generated/models/HealthResponse.ts": "c6b43728ac3111d057c68d13a991793d98e5782478ebdb15cb1ee9ef626de296",
+      "frontend/lib/api/generated/models/LoginInput.ts": "d202b185653acb09dd79d7bd3c44f5f71f899f80e00b35ec6a11db86b7d53f10",
+      "frontend/lib/api/generated/models/MeResponse.ts": "9238a3475b4d83494165ff12d5eeaefcce596d1277a813b9921863bf4f807f63",
+      "frontend/lib/api/generated/models/PasswordInput.ts": "cf3595079e23e9a0967ed6e2bb3a133862faedff77daff18a77f36fffba428fb",
+      "frontend/lib/api/generated/models/ProfileResponse.ts": "ec14f6428cb0335731e06f686d08ea1213ccb4358937796d3c427d193ddbc0d5",
+      "frontend/lib/api/generated/models/SearchHit.ts": "448d85413bd1e022eb9ef8cfa30949b257cd1dbf1cf0a48e2f2a043f350bd4bc",
+      "frontend/lib/api/generated/models/SearchResponse.ts": "bff97b118c93d7d6eef9b83fb41e907f736f216928b26f80bf6cfc34b41d4e6e",
+      "frontend/lib/api/generated/models/ValidationError.ts": "f782e1a48bff3b21ea45e8339c16914be96e04e77fae58936dbfaa5f20ffe127",
+      "frontend/lib/api/generated/services/AdminService.ts": "8444f7dad487531c1c8cf650faea860492ed4c5625b0e0b08967cc5be43af789",
+      "frontend/lib/api/generated/services/AuthService.ts": "0178082aea029885e7e7c0e69bba5753dfa88b18acf85809c23c8b68e6e48af4",
+      "frontend/lib/api/generated/services/PagesService.ts": "befc33ff9db5d993804cbbe647e0298047c527a8caf98f4d9e852ea3a1bbfe0d",
+      "frontend/lib/api/generated/services/SearchService.ts": "bf4a9de60728ba797d18c96c6022d722328d52f19c89887c605ff77e82a40ca5",
+      "frontend/lib/api/generated/services/SystemService.ts": "364e76ff653e292b008d0ce15723a84e286f421abc278e89b2e95e2a9bb8e237",
+      "frontend/lib/workspace-lifecycle.ts": "3d54679873f290ccb34d2471c64ab60675c2f66630e5ed7960cd967c7794691b",
+      "frontend/next-env.d.ts": "7b550dda9686c16f36a17bf9051d5dbf31e98555b30d114ac49fc49a1e712651",
+      "frontend/next.config.ts": "9c26364a3e51e73603cf906c0f9e6b8c86580f9e6ef321956507bc48d8bff77c",
+      "frontend/package.json": "397e4b45d567e42224fae3ef68e93e630c5859fab3af9131e6921bab56c1cd42",
+      "frontend/tests/workspace-lifecycle.test.cjs": "a2618e471136212e9bb7ac8e948011293059d1eb75e60c5e4eeaa8925a2d0c04",
+      "frontend/tsconfig.json": "4ebe9b4631e443097d5f264225fcfd1b28725d37feb43b3a0304f3c7e6f4729c",
+      "frontend/yarn.lock": "6edaec674a082ee9f81a29a797cbf6bc19651d65d2b7774a8fa06852734e084a",
+      "migrations/env.py": "8df62843ff7046ff22b08d31dc450b492e6b5de8ba57faed1fdffb3881fe0ad4",
+      "migrations/versions/0001_metadata.py": "ca9cb13f4094efd6485c4e89e090c09761915ac4ac31bd726ed38bca7a604665",
+      "migrations/versions/0002_auth.py": "8f06e773ce277b3e58790b3053f42c6fd0be35ce4dfb05d3ab366ea462d4644c",
+      "migrations/versions/0003_search_pages.py": "92eaac0c60663c622aa71cfe309e777621ef126a89b6868470a16928c6d3f2a5",
+      "requirements-colpali.in": "4057968195d27eb3e8057cd7e1a35fec8fcff94338a43074ab06bcbb43065841",
+      "requirements-colpali.lock.txt": "43d7e0ff9919f65d5ea18675c95d6b005ed4d81633f75fcc60d517f527f96f43",
+      "requirements-web.in": "a7c0832586b045200cd3ac11bebd02bdad71ecb67364f364b02f790a685883b1",
+      "requirements-web.lock.txt": "0d0667639ce652c6089b2a6c3cd0f9fa6ac7d308f8863ef284f699d4b62d0229",
+      "scripts/activate_development_index.py": "cb0793f56596df80c978b660f7b672f070c4b3d98d608262e8bfe893ef405809",
+      "scripts/check_auth_http.py": "9520d4e8bb728bea64ba6ef6521e57581347756ecd5a67869695b96d050bab4a",
+      "scripts/check_qdrant.py": "0427ccef2c0dc3a192cb8424870e3e6a7df88821d56e6461f3f7f356351ed4a0",
+      "scripts/check_search_http.py": "82bb69a20b1383a820a380d21a91bc39e260bd97e03d6218502aadbf99f9e63d",
+      "scripts/check_search_reference.py": "6f5fc97e6a28858a8b5b2deec11dc0aa881d97534c38dbcb315c510392a7f2f3",
+      "scripts/check_stage1b_acceptance.py": "5a09b5b873aa3161d2b8400856e7ce225cbcf6fc80987a5a7b8deb330fff6d16",
+      "scripts/check_web_skeleton.py": "98ae53e716be086074a36029aaa3f29d00d0289e141f64cb04d12c1496a9ee9f",
+      "scripts/check_workspace_http.py": "8188ea65b85fb415aa1a175f563c8ab8185fc5fcd9ad7f5a82090d92860f657a",
+      "scripts/export_openapi.py": "bc21ff9c3bb4d6bc14472d26492ae8a1750349557b6deb068668fa793f5d77b0",
+      "scripts/import_search_index.py": "cd64f9a3872c0b15292c717febdf81e0dbab839f75da43c75410a71ef5ac8d6c",
+      "scripts/init-local.ps1": "77fe9a252c509fb7131c41f0a6efdc38d51adb5f44657417895753051fa338c1",
+      "scripts/initialize_database.py": "4e9717e9420196eeb21198b3edecdbfbcf90f804fed33824fd26731ed50eac4d",
+      "scripts/inspect_database.py": "2e6a28867e8d6e41654842fcb874638a9d5413d2e5d1aa1f48f94b4d6541f8b9",
+      "scripts/manage_account.py": "621d5009dffa724dcf73a775d9914d8f1485ef8a6bdc82bac8ba1b41679b6b22",
+      "scripts/migrate_database.py": "ff6e1bc0abbd296eaac654b14e2fa10aa94041a45337d385abad67f70e7e9469",
+      "scripts/model_query_worker.py": "0a10fdeba7ff8b890aba0fcb81029a77068e8f0c495e626f53398cc3d34342bc",
+      "scripts/prepare_development_corpus.py": "756bac1abca964bfe20bc47e0337a1d36ab6e12246e08ceea228009521fc5dc4",
+      "scripts/prepare_search_features.py": "c5d51d43fb42fae32515a19d44769f235d2eeda479bef489ee572b9507bee309",
+      "scripts/seed_local_environment.py": "3515de55d47aae3877e0e613b6966a51f7c23c6d609f9588952cb5c2f9f8eb0a",
+      "scripts/snapshot_sources.py": "1d07b4301b756784431bb2951d4e1eac7e513f3d4288b20c2310edad79a5cbdf",
+      "scripts/verify_colpali_local.py": "dc449e298a89959bed30587bcf0d66e1fa3414a20a7de7c796279d7571748288",
+      "tests/test_auth.py": "ea5f080e72d1b933963165ee9d6a09242e5f0d1bbad65a9df06d5176f09b3b71",
+      "tests/test_database_initialization.py": "1ec34b3bfcc1ffab3daaf104e8e359c50b2ae9e1916a567ddc022f92b97832c7",
+      "tests/test_previews.py": "ff96b03c8d131e2cab49ba67e8fd01a6cfe97b1c29322d35809337d2dd9e1620",
+      "tests/test_retrieval_contract.py": "8a8ee59b4c7bc31b01dca278530529e67a6d3e31f488ac97be7f247e18549675",
+      "tests/test_search.py": "748f32560c09185daf255fa51d03f41102b8f6aa750a762e3bb1da4d0dc0079e",
+      "third_party/Snappy/LICENSE": "e082679229190829a417c50d174e065e26352de20960aae78f17c71518669ae4"
+    },
+    "learning_history": [
+      {
+        "file": "docs/过程记录/05_1b技术操作详解.md",
+        "pre_edit_sha256": "1e3d379c7e797cd92147da0b129eee2a54ef38f57e8608c4280bd57313da903e",
+        "prior_content_reconstructs_after_reversing_declared_header_edits": true
+      },
+      {
+        "file": "docs/过程记录/06_1b逐步口述稿.md",
+        "pre_edit_sha256": "5b5eed73238044b3cfdd18199e9071d3321da38b1bc8db059af9589135a7c63b",
+        "prior_content_reconstructs_after_reversing_declared_header_edits": true
+      }
+    ],
+    "gitignored_learning_files": [
+      "docs/过程记录/05_1b技术操作详解.md",
+      "docs/过程记录/06_1b逐步口述稿.md"
+    ],
+    "limits": "Baseline covers 196 inventoried project files including explicit 03/04; ignored runtime, model environments and old repositories were not fully rehashed in R13. No writes targeted those locations."
+  },
+  "git_diff_check": {
+    "exit_code": 0,
+    "output": "warning: in the working copy of 'docs/AI交接.md', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'scripts/check_search_reference.py', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'scripts/inspect_database.py', LF will be replaced by CRLF the next time Git touches it\n"
+  },
+  "application_tests_run": false,
+  "errors": [],
+  "check_attempts": [
+    {
+      "attempt": 1,
+      "status": "failed",
+      "errors": [
+        {
+          "error": "learning_ignore_rule_changed",
+          "result": [
+            "\"docs/\\350\\277\\207\\347\\250\\213\\350\\256\\260\\345\\275\\225/05_1b\\346\\212\\200\\346\\234\\257\\346\\223\\215\\344\\275\\234\\350\\257\\246\\350\\247\\243.md\"",
+            "\"docs/\\350\\277\\207\\347\\250\\213\\350\\256\\260\\345\\275\\225/06_1b\\351\\200\\220\\346\\255\\245\\345\\217\\243\\350\\277\\260\\347\\250\\277.md\""
+          ]
+        }
+      ],
+      "cause": "git check-ignore emitted quoted octal-escaped Chinese paths; naive path comparison falsely reported an ignore-rule change."
+    },
+    {
+      "attempt": 2,
+      "status": "passed",
+      "correction": "Used command-scoped git -c core.quotepath=false check-ignore; no Git config or .gitignore mutation. Rechecked documents, links, step pairs, protected file hashes and diff.",
+      "errors": []
+    }
+  ],
+  "final_document_sha256": {
+    "AGENTS.md": "df4ffac234f98c726c2e903c827e8ae79cf413ec5efacc786503662c1f6213ad",
+    "README.md": "b8a219047b6e9a965c67153b87532a5c03f19281a69cf85ad0f004e864ad467c",
+    "docs/AI交接.md": "0b3946cb720dfa1db923aa280460418fb65aa5b1de5eee2459699750141a3323",
+    "docs/architecture.md": "12850a9bb44885eb8c90a2c44d1a3a3a8ea6a59d2403e739c7faf780eb3e7873",
+    "docs/interfaces.md": "cb4726a6cf6e7e6d0dd5b3d54ee8699e2c0b795a1afe4c9d126d58d665f78736",
+    "docs/progress.md": "c6bb8b2b0b234643787f1866509e69aa0426664bc60fba0df7727f3b3de49c3b",
+    "docs/testing.md": "dd27bb7ad9c3f2990306cb7cf7de241bd424a343d820555b7f655fa8b6a52967",
+    "docs/过程记录/05_1b技术操作详解.md": "0c8cbc2d12d1584daac725d310b77e09167ff8470f578f7f72a2b06ddb916a58",
+    "docs/过程记录/06_1b逐步口述稿.md": "55abc5a43b67323633ce3d7bddd5750fcf92a647ccd3fbba68f88e8acbdc4066",
+    "docs/项目开发阶段规划与任务.md": "cffd94da8446e1664894081c2185c47492a11802cb60e681b6d977fe7a0d53cc"
+  }
+}

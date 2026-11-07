@@ -1,0 +1,102 @@
+{
+  "layoutpatch": {
+    "head": "5dd4e5c98c3cabc1f20e84a3d9cceee2c978301c",
+    "changes": [
+      {
+        "status": " M",
+        "path": ".gitignore",
+        "sha256": "fbd232b09ee1fa68a80e27d560702e431ee518c77ff7d51ab4c5d552d005d7bd"
+      },
+      {
+        "status": "??",
+        "path": ".chart-data-50OwHW/candidate.pptx",
+        "sha256": "0912ed721b402be1cef15d4175f1a2bac946981466b389b48504493b92f61896"
+      },
+      {
+        "status": "??",
+        "path": ".chart-data-50OwHW/chart-data-snapshot.json",
+        "sha256": "24b67810986bb7e61a92d32235a5973bf6cc96f85c7c8545cb5703d4c9157f13"
+      },
+      {
+        "status": "??",
+        "path": ".chart-data-Hwa6DD/candidate.pptx",
+        "sha256": "cfe197f3f062771c937b11367c0820196872a026c7ecf78514546155736daa84"
+      },
+      {
+        "status": "??",
+        "path": ".chart-data-Hwa6DD/chart-data-snapshot.json",
+        "sha256": "135415c77133260d1b82d18e945e0b5273fad1535043a53e661e21c77d0ac38b"
+      },
+      {
+        "status": "??",
+        "path": ".chart-data-hRXosg/candidate.pptx",
+        "sha256": "7099dade8c70d4b89a4e48404412c16b799e7b2ccc25336462d011443682fefb"
+      },
+      {
+        "status": "??",
+        "path": ".chart-data-hRXosg/chart-data-snapshot.json",
+        "sha256": "73203ab9f6328b3c72a775e461413f41ddf5e28b607dcee613a2e5e82ccd96b8"
+      },
+      {
+        "status": "??",
+        "path": ".chart-data-pgJCt8/candidate.pptx",
+        "sha256": "6e2aa242776b7b864e4ed6ed552d1dbc25ff6e62c4917d2b924412b6b467237d"
+      },
+      {
+        "status": "??",
+        "path": ".chart-data-pgJCt8/chart-data-snapshot.json",
+        "sha256": "9c0fa7046d999898c6d6e528fff6189485593e74ea94e7517ded7a438a6d9852"
+      }
+    ],
+    "warning": false
+  },
+  "layoutpatch-evidence": {
+    "head": "4a2c006fb25699a16ca67c33e0bbbad951a24cd0",
+    "changes": [],
+    "warning": false
+  },
+  "Snappy": {
+    "head": "acde4a1fdfd75f31d4ff13a04c03b1f06706b6f1",
+    "changes": [
+      {
+        "status": " M",
+        "path": "backend/Dockerfile",
+        "sha256": "2a0f8260486c2a7ac9200a2a7c84ff69c45f8016bf5e1afc5f3a573eca2e61a1"
+      },
+      {
+        "status": "??",
+        "path": "GitHub-Fork-操作笔记.md",
+        "sha256": "2deaf2ccd26ae91572fdf2f3581e42d458da139255c8889ee5963fe91363c3e7"
+      },
+      {
+        "status": "??",
+        "path": "docker-compose.local.yml",
+        "sha256": "2f4318ccce548bb44825aad9df6c8a1cd67f470e9caed82014a5bcb1fa2a830e"
+      },
+      {
+        "status": "??",
+        "path": "docs/local-ui-notes.md",
+        "sha256": "123d69b1e04d7e60f2b4f12e5bd501d7de099e6dcb7350c5a6818ae405ec7609"
+      },
+      {
+        "status": "??",
+        "path": "docs/local-ui-setup.md",
+        "sha256": "86898d6a74a65ee9e531292378fbfeadfeb55d69d4493cdcb425c0dbf4f8fabc"
+      }
+    ],
+    "warning": false
+  },
+  "protected_files": {
+    "backend/algorithms/colpali_adapter.py": "36a50768dd4a2129bcf4825b7a407066ee1fe9dc27210d438772b78bb40709ee",
+    "backend/algorithms/contracts.py": "f8425d8022e54d10c567d136771d3b7a790bd8a203b7f7c5464805d61b311ca3",
+    "backend/algorithms/__init__.py": "3d1348b93aa946b3cf197575b8429b05f5cbfeff6721fb4e86e2bed8e1553e49",
+    "requirements-colpali.lock.txt": "43d7e0ff9919f65d5ea18675c95d6b005ed4d81633f75fcc60d517f527f96f43",
+    "requirements-colpali.in": "4057968195d27eb3e8057cd7e1a35fec8fcff94338a43074ab06bcbb43065841",
+    "requirements-web.lock.txt": "0d0667639ce652c6089b2a6c3cd0f9fa6ac7d308f8863ef284f699d4b62d0229",
+    "configs/colpali_local.json": "da132ccca44fd3964eea940881be0f30663f7b48957f09925cce19c5df9b0f99",
+    ".gitignore": "46db0ef0454252392c6c37e6dc236d3810afd9e2a08bcd795c8b0628b52b3559",
+    "docs/过程记录/03_1b技术操作详解.md": "6a42a0cc09f43cc7acb94656b47320ec8d9495536c58072910a42a92a85060e5",
+    "docs/过程记录/04_1b逐步口述稿.md": "38b23695a32132068946021a1625df06121e5f23f9456dfe7aa2a062be23565b"
+  },
+  "model_environment": "[[\"Jinja2\", \"3.1.6\"], [\"MarkupSafe\", \"3.0.3\"], [\"PyYAML\", \"6.0.3\"], [\"Pygments\", \"2.21.0\"], [\"accelerate\", \"1.15.0\"], [\"annotated-doc\", \"0.0.5\"], [\"anyio\", \"4.15.1\"], [\"certifi\", \"2026.7.22\"], [\"charset-normalizer\", \"3.5.1\"], [\"click\", \"8.5.0\"], [\"colorama\", \"0.4.6\"], [\"colpali_engine\", \"0.3.18\"], [\"filelock\", \"3.32.6\"], [\"fsspec\", \"2026.6.0\"], [\"h11\", \"0.16.0\"], [\"hf-xet\", \"1.6.0\"], [\"httpcore\", \"1.0.9\"], [\"httpx\", \"0.28.1\"], [\"huggingface_hub\", \"1.31.0\"], [\"idna\", \"3.19\"], [\"iniconfig\", \"2.3.0\"], [\"markdown-it-py\", \"4.2.0\"], [\"mdurl\", \"0.1.2\"], [\"mpmath\", \"1.3.0\"], [\"networkx\", \"3.6.1\"], [\"numpy\", \"2.4.6\"], [\"packaging\", \"26.3\"], [\"peft\", \"0.20.0\"], [\"pillow\", \"12.3.0\"], [\"pluggy\", \"1.6.0\"], [\"psutil\", \"7.2.2\"], [\"pymupdf\", \"1.28.2\"], [\"pytest\", \"9.1.1\"], [\"regex\", \"2026.9.10\"], [\"requests\", \"2.34.2\"], [\"rich\", \"15.0.0\"], [\"safetensors\", \"0.8.0\"], [\"scipy\", \"1.17.1\"], [\"setuptools\", \"84.0.0\"], [\"shellingham\", \"1.5.4\"], [\"sympy\", \"1.14.0\"], [\"tokenizers\", \"0.23.2\"], [\"torch\", \"2.13.0+cu130\"], [\"torchvision\", \"0.28.0+cu130\"], [\"tqdm\", \"4.70.1\"], [\"transformers\", \"5.17.0\"], [\"typer\", \"0.27.2\"], [\"typing_extensions\", \"4.16.0\"], [\"urllib3\", \"2.7.0\"]]"
+}

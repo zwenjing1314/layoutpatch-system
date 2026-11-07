@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 
-def main(input_path):
+def main(input_path, output_path=None, round_id='R10'):
     os.environ['HF_HUB_OFFLINE']=os.environ['TRANSFORMERS_OFFLINE']='1'
     import torch
     from colpali_engine.models import ColPaliProcessor
@@ -47,14 +47,18 @@ def main(input_path):
             raise AssertionError('Non-tied ranking mismatch')
         results.append({'name':case['name'],'authorized_pages':len(ids),'returned':len(returned),
                         'max_abs_diff':max(deltas,default=0),'top_k_matches':True,'non_tied':strict})
-    report={'date':'2026-11-07','round':'R10','atol':1e-4,'rtol':1e-5,'cases':results,
+    report={'date':'2026-11-07','round':round_id,'atol':1e-4,'rtol':1e-5,'cases':results,
             'query_source':'actual live HTTP worker vectors, freshly encoded, not R03 query cache',
             'reference':'official ColPaliProcessor and CPU float32 MaxSim','overall':'passed'}
-    (ROOT/'docs/checks/stage1b-4-reference.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    target=output_path or ROOT/'docs/checks/stage1b-4-reference.json'
+    target.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report,indent=2))
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--input',type=Path,required=True)
-    main(parser.parse_args().input)
+    parser.add_argument('--output',type=Path)
+    parser.add_argument('--round',default='R10')
+    args=parser.parse_args()
+    main(args.input,args.output,args.round)

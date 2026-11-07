@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-07",
+  "round": "R12",
+  "checks": [
+    {
+      "name": "formal_seven_business_tables_exactly_equal",
+      "passed": true
+    },
+    {
+      "name": "formal_qdrant_fingerprint_still_equal",
+      "passed": true
+    },
+    {
+      "name": "formal_sqlite_integrity_ok",
+      "passed": true
+    },
+    {
+      "name": "formal_fk_no_violations",
+      "passed": true
+    },
+    {
+      "name": "formal_existing_sessions_and_login_attempts_preserved",
+      "passed": true
+    },
+    {
+      "name": "owned_test_processes_cleaned",
+      "passed": true
+    },
+    {
+      "name": "formal_frontend200",
+      "passed": true
+    },
+    {
+      "name": "formal_proxy_health200",
+      "passed": true
+    },
+    {
+      "name": "formal_unauth_search401",
+      "passed": true
+    },
+    {
+      "name": "formal_unauth_image401",
+      "passed": true
+    }
+  ],
+  "overall": "passed",
+  "formal_credentials_used_or_changed": false,
+  "scope": "fresh R12 backup comparison, integrity, nonempty index and anonymous formal smoke"
+}
