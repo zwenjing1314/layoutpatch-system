@@ -24,13 +24,15 @@ from backend.documents.uploads import UploadSettings
 from backend.documents.pipeline import IngestionRunner
 from backend.documents.listing import router as listing_router
 from backend.documents.tasks import router as tasks_router
+from backend.parsing.routes import router as parsing_router
+from backend.parsing.runner import ParsingRunner, recover as recover_parsing
 
 
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
 
 
-def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, upload_settings=None, ingestion_enabled=None):
+def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, upload_settings=None, ingestion_enabled=None, parsing_enabled=None):
     settings = settings or AuthSettings.from_environment()
     engine = make_engine(settings.database)
 
@@ -38,10 +40,14 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
     async def lifespan(_):
         try:
             recover_uploads(engine)
+            recover_parsing(engine)
+            if app.state.parsing_enabled:
+                app.state.parsing.start()
             if app.state.ingestion_enabled:
                 app.state.ingestion.start()
             yield
         finally:
+            app.state.parsing.close()
             app.state.ingestion.close()
             app.state.model_worker.close()
             engine.dispose()
@@ -55,6 +61,11 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
         raise ValueError("LAYOUTPATCH_INGEST_ENABLED must be true or false")
     app.state.ingestion_enabled = ingestion_enabled if ingestion_enabled is not None else flag == "true"
     app.state.ingestion = IngestionRunner(engine, app.state.model_worker, app.state.qdrant)
+    parse_flag = os.getenv("LAYOUTPATCH_PARSE_ENABLED", "true")
+    if parse_flag not in ("true", "false"):
+        raise ValueError("LAYOUTPATCH_PARSE_ENABLED must be true or false")
+    app.state.parsing_enabled = parsing_enabled if parsing_enabled is not None else parse_flag == "true"
+    app.state.parsing = ParsingRunner(engine)
     app.state.engine, app.state.settings, app.state.clock = engine, settings, clock
     app.state.store = SQLiteSessionStore(engine, settings, clock)
     app.add_middleware(SessionMiddleware, store=app.state.store, lifetime=settings.absolute_seconds,
@@ -81,6 +92,7 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
     app.include_router(ingest_router)
     app.include_router(listing_router)
     app.include_router(tasks_router)
+    app.include_router(parsing_router)
     return app
 
 

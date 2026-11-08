@@ -90,7 +90,7 @@ def match(row, expected):
 
 
 def require_revision(connection):
-    if connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() not in ("0003_search_pages", "0004_upload_jobs", "0005_ingestion", "0006_document_names", "0007_job_attempts"):
+    if connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() not in ("0003_search_pages", "0004_upload_jobs", "0005_ingestion", "0006_document_names", "0007_job_attempts", "0008_parsing"):
         raise ValueError("Run the database migration first")
 
 

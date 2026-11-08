@@ -7,6 +7,8 @@ import type { DocumentResponse } from '../models/DocumentResponse';
 import type { JobActionInput } from '../models/JobActionInput';
 import type { JobListResponse } from '../models/JobListResponse';
 import type { JobResponse } from '../models/JobResponse';
+import type { ParseRequest } from '../models/ParseRequest';
+import type { ParsingResponse } from '../models/ParsingResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -166,6 +168,50 @@ export class DocumentsService {
             url: '/jobs/{job_id}/cancel',
             path: {
                 'job_id': jobId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Parsing
+     * @param documentId
+     * @returns ParsingResponse Successful Response
+     * @throws ApiError
+     */
+    public static getDocumentParsing(
+        documentId: string,
+    ): CancelablePromise<ParsingResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/documents/{document_id}/parsing',
+            path: {
+                'document_id': documentId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Request Parsing
+     * @param documentId
+     * @param requestBody
+     * @returns ParsingResponse Successful Response
+     * @throws ApiError
+     */
+    public static requestDocumentParsing(
+        documentId: string,
+        requestBody: ParseRequest,
+    ): CancelablePromise<ParsingResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/documents/{document_id}/parsing',
+            path: {
+                'document_id': documentId,
             },
             body: requestBody,
             mediaType: 'application/json',

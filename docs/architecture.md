@@ -1,5 +1,11 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R20 / 2-4当前状态
+
+实际新增ParserProfile/ParsingTask/PageParse三表，候选JSON整集与来源hash存PageParse；独立CPU子进程由单个解析调度线程显式排队。未实现目标Region派生表、D或网页高亮；解析不参与索引激活。
+
+见[本批手册](stage2-4-runbook.md)、[汇总](checks/stage2-4-verification.json)及[保护](checks/stage2-4-protection.json)。正式0008仍原2文档13页，新解析表空，页面底座和完整特征保持；不下载/训练/提交推送。
+
 ## 2026-11-08｜R19 / 2-3C真实实现
 
 0007在jobs追加cancel_requested_at，新增(job_id,attempt)主键的job_attempts保存每次阶段/进度/错误与时间。重试在BEGIN IMMEDIATE下复核本人、当前attempt、源PDF大小/SHA、文档registered且未激活；旧尝试保留、新尝试独立产物目录，仍单持久调度线程、原ColPali ModelWorker及完整特征。

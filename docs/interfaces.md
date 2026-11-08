@@ -180,15 +180,21 @@ SHA256 18b7ce737b781734560439632137b86cb3ecca017e104cbe587b79a446e47f7b
 
 路径相对只读原研究库；运行时通过环境变量连接或受控复制到仓库外。选择依据是预先固定最低 seed 编号，其 epoch 已按 source_val 规则选择；不比较外部表现选择 seed。此部署不等同于历史三 seed 均值，不把 30.7969% 作为该单 checkpoint 的系统成绩。激活前必须通过小规模真实缓存一致性测试。
 
-## 6. 解析器与坐标契约
+## 6. 解析器与坐标契约（R20 / 2-4已实现）
 
-建议使用本机已有 MinerU 4.0.10 / ONNX Runtime 1.30.0 / docvortex 0.5.10、Basic CPU，模型记录 revision `358310b4f64b95f9fefc372ad899356e4111f376`。本轮确认包版本及 8 个 ONNX 文件存在，未运行新 PDF 解析，未重新校验全部模型哈希；属于可用候选，不能称解析路径验收通过。
+实际使用独立.venv-parser的MinerU4.0.10/docvortex0.5.10/ONNX Runtime1.30.0，Basic/auto/CPU；8 ONNX及5 YAML的SHA与本地revision358310b4f64b95f9fefc372ad899356e4111f376下载元数据匹配。配置/依赖锁/环境复制回执/实现SHA共同确定ParserProfile，与检索profile分离。11页真实解析/194候选、叠框与故障证据见[手册](stage2-4-runbook.md)。
 
-沿用 `docvortex.middle 2.0` 顶层 block 导出思路。解析输入不含 query/gold；类型映射不明、ID 重复、框非法、坐标溢出时记录解析失败，不默默裁剪或伪造候选。空页面允许零候选。既有内部候选原解析器追溯不完整，应区分“旧固定候选回放”和“新 PDF 解析”。
+POST /documents/{document_id}/parsing接JSON{}，本人ready当前版本显式排队；同profile重复幂等，retry_task_id仅重试当前failed/partial/interrupted任务，最多10次。GET同路由返回task/profile/version、每页pending/running/ready/no_candidates/failed/timeout/interrupted、数量/candidate_hash/PNG尺寸与hash，不返回正文/路径/候选框。当前权限逐次校验，写入Origin/CSRF/首改必需，shared只读、普通admin无private旁路。SDK已生成。未实现区域HTTP/rank接口或解析网页按钮。
 
-系统统一返回原始渲染图像素 `[x1,y1,x2,y2]`，左上为原点，附 width/height/render_sha256。解析单位框需结合 PDF 尺寸、旋转、裁剪、渲染矩阵映射；不能直接把单位坐标乘 448 当成前端框。首版仅接受已验证几何输入，旋转/CropBox 特例未测试则明确拒绝区域解析并保留页面检索。
+ParserAdapter的实际内部入口backend.parsing.adapter.parse_page只接可信task/version/page/profile，不接query/gold。新三表parser_profiles/parsing_tasks/page_parses保存固定顶层候选及来源，后续D通过内部read_candidates重新授权/核对整集hash/逐项身份，不用旧候选回放冒充新解析。
 
-前端按实际图像内容矩形计算缩放及留白偏移：`display_x=offset_x+x*scale_x`，y 同理。图像、裁剪、候选必须绑定同一渲染版本；验证 50%/100%/150% 缩放、不同长宽比，不能只看一张成功截图。
+docvortex.middle2.0顶层blocks全部导出，类型未知、重复ID、非有限/倒序/越界框失败；不同ID重复框保留，不裁剪或手工造框。省略blocks符合DocVortex默认空列表，真实空白页记no_candidates，显式null仍失败。文本来源native或OCR未区分，不称纯OCR/纯PDF或VLM描述。
+
+返回候选以原PNG像素xyxy左上坐标，附document/version/page/index/number、width/height/render_sha256和parser_profile_sha256；candidate_id=page_id:block:index，canonical整集hash。重渲PDF必须PNG字节SHA与现有Page一致；记录PDF点尺寸/旋转/CropBox/矩阵和pixmap origin。当前仅rotation0、MediaBox起点0且CropBox=MediaBox，points→PNG矩阵[2,0,0,2,-pix.x,-pix.y]；单位框先乘parser页points再变换四角，不能直接乘取整PNG尺寸或448。旋转90/CropBox已实测拒绝，不影响页面检索/原图。
+
+解析失败与页面ready分离，逐页硬子进程上限180秒（渲染复核另180），总900秒为页间检查点。启动running转interrupted且保留完成页；显式新attempt重做全页，旧产物不覆盖。partial/timeout/异常均可查，不把空候选当异常。
+
+前端按实际图像内容矩形计算缩放及留白偏移的设计保持：display_x=offset_x+x*scale_x，y同理。50%/100%/150%、区域/裁剪权限及网页高亮尚待2-6，本轮离线叠框不冒充这些验收。
 
 ## 7. profile 变更的验收要求
 

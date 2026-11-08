@@ -200,6 +200,53 @@ class PageFeature(Base):
     export_sha256: Mapped[str] = mapped_column(String(64))
 
 
+class ParserProfile(Base):
+    __tablename__ = "parser_profiles"
+    __table_args__ = (CheckConstraint("length(config_sha256)=64", name="ck_parser_profile_hash"),)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    config_json: Mapped[str] = mapped_column(Text)
+    config_sha256: Mapped[str] = mapped_column(String(64), unique=True)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class ParsingTask(Base):
+    __tablename__ = "parsing_tasks"
+    __table_args__ = (
+        UniqueConstraint("document_version_id", "parser_profile_id", "attempt", name="uq_parsing_attempt"),
+        CheckConstraint("attempt >= 1 AND attempt <= 10", name="ck_parsing_attempt"),
+        CheckConstraint("status IN ('queued','running','ready','partial','failed','interrupted')", name="ck_parsing_status"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    document_version_id: Mapped[str] = mapped_column(ForeignKey("document_versions.id"), index=True)
+    parser_profile_id: Mapped[str] = mapped_column(ForeignKey("parser_profiles.id"))
+    attempt: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(16), default="queued")
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class PageParse(Base):
+    __tablename__ = "page_parses"
+    __table_args__ = (
+        CheckConstraint("status IN ('pending','running','ready','no_candidates','failed','timeout','interrupted')", name="ck_page_parse_status"),
+        CheckConstraint("candidate_count >= 0 AND width_px > 0 AND height_px > 0", name="ck_page_parse_counts"),
+        CheckConstraint("length(render_sha256)=64", name="ck_page_parse_render"),
+    )
+    task_id: Mapped[str] = mapped_column(ForeignKey("parsing_tasks.id"), primary_key=True)
+    page_id: Mapped[str] = mapped_column(ForeignKey("pages.id"), primary_key=True)
+    render_sha256: Mapped[str] = mapped_column(String(64))
+    width_px: Mapped[int] = mapped_column(Integer)
+    height_px: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(16), default="pending")
+    candidate_count: Mapped[int] = mapped_column(Integer, default=0)
+    candidate_hash: Mapped[str | None] = mapped_column(String(64))
+    candidates_json: Mapped[str | None] = mapped_column(Text)
+    provenance_json: Mapped[str | None] = mapped_column(Text)
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
 class AuthSession(Base):
     __tablename__ = "auth_sessions"
     __table_args__ = (

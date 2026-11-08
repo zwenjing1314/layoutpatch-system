@@ -1,0 +1,5 @@
+# Parser lives in .venv-parser; never merge with Web or ColPali dependencies.
+# The local environment seeder verifies and freezes the complete installed snapshot.
+mineru==4.0.10
+docvortex==0.5.10
+onnxruntime==1.30.0

@@ -1,5 +1,20 @@
 # 分阶段验收与检查记录
 
+## 2026-11-08｜R20 / 2-4实际验收
+
+[手册](stage2-4-runbook.md)、[汇总](checks/stage2-4-verification.json)、[来源坐标61项](checks/stage2-4-output.json)、[故障15项](checks/stage2-4-faults.json)、[HTTP46项](checks/stage2-4-http.json)、[视觉](checks/stage2-4-visual.json)、[特征24份](checks/stage2-4-features.json)、[迁移19项](checks/stage2-4-migration.json)、[匿名HTTP5项](checks/stage2-4-formal-http.json)、[保护42项](checks/stage2-4-protection.json)、[失败](checks/stage2-4-failures.json)与[文档保护](checks/r20-document-checks.json)。
+
+104后端44.447秒、25前端411.3375毫秒、4原算法CPU契约3.95秒、tsc和Next生产build通过。后端须显式列出unittest模块，算法pytest用.venv；首轮Web unittest discover误收pytest模块的失败保留。日志runtime/verification/r20，旧报告不当新证据。
+
+| 适用子项 | 本轮实际覆盖 | 限制 |
+|---|---|---|
+| T07/T08解析与坐标子集 | 真MinerU Basic CPU，完整5/6页、194顶层候选；source/profile/raw/receipt/PNG hash可追溯，有限合法框及页码；11页总览与A4/B5原尺寸叠框 | 只支持零旋转/零MediaBox原点/Crop=Media；不同长宽比内容样本未测，纵横空白fixture已真跑；无召回/区域效果声明 |
+| 空候选/故障 | 真空白no_candidates、旋转90/CropBox明确拒绝，实际子进程0.25秒注入超时、实际坏PDF异常；逐页/持久状态分开 | 故障为明确隔离注入；未等满默认180/900秒，900秒是页间检查点；重启恢复/撤权竞态为SQLite契约测试 |
+| T01/T03/T06授权链 | 实际localhost HTTP46，A/B两模式6次真实query/授权PNG，解析failed注入时仍真搜2次；Origin/CSRF、退出与private无旁路 | shared read-only/停用/首改及候选读取损坏由单元覆盖；无网页高亮或缩放验收 |
+| T09/T14持久/数据 | 0008只新三表，profile冻结/幂等/失败任务ID重试/中断；原表/13页全向量保护；24既有BF16完整特征CPU验证 | 不做自动旧库解析；没有解析cancel网页；复用24集合末尾新算fingerprint，不能当开工快照 |
+
+最终11页168次ONNX run/89.671秒；所有开发重跑、探针和失败记录合计44入口/38回执/552次ONNX run/332.170秒。HTTP首轮3query+最终6共9次、两棵顺序模型树network0，本轮页编码0/D0。6个无worker回执入口的未完成成本不按0推断。完整阶段2/T07/T08剩余D与区域授权/50%-150%缩放仍待2-5/2-6。
+
 ## 2026-11-08｜R19 / 2-3C实际验收
 
 [手册](stage2-3c-runbook.md)、[汇总](checks/stage2-3c-verification.json)、[HTTP39](checks/stage2-3c-http.json)、[网页36](checks/stage2-3c-browser.json)、[运行30](checks/stage2-3c-runtime.json)、[正式29](checks/stage2-3c-formal.json)、[非空旧任务迁移](checks/stage2-3c-migration.json)、[完整特征](checks/stage2-3c-features.json)与[文档保护](checks/r19-document-checks.json)。最终87后端38.671秒、25前端377.422毫秒、4原模型CPU契约2.35秒、tsc和Next生产build通过，原始日志runtime/verification/r19。

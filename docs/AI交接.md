@@ -1,6 +1,34 @@
 # AI交接文档
 
-## 当前交接：R19 / 2-3C完成适用验收（2026-11-08，北京时间）
+## 当前交接：R20 / 2-4完成适用验收（2026-11-08，北京时间）
+
+只完成真实MinerU解析与坐标契约，停止，不进入2-5/D/区域网页。详见[本批手册](stage2-4-runbook.md)、[汇总/修改清单](checks/stage2-4-verification.json)、[来源坐标61项](checks/stage2-4-output.json)、[视觉抽查](checks/stage2-4-visual.json)、[故障15项](checks/stage2-4-faults.json)、[真实HTTP46项](checks/stage2-4-http.json)及[最终保护42项](checks/stage2-4-protection.json)。
+
+本轮新核实0007、原2文档13页、端口/依赖/原模型资源及可见同项目窗口未加载；初始Git干净。[预检](checks/stage2-4-preflight.json)及runtime/verification/r20/metadata-before.sqlite3为新基线。历史报告不冒充新运行，正式凭据未输入、使用或更改。
+
+新建独立.venv-parser：已有112包17208文件按RECORD/SHA复制，无源sys.path/.pth/launchers，无下载。MinerU4.0.10/docvortex0.5.10/ORT1.30.0 Basic ONNX CPU；8个ONNX共855806337字节及5YAML新哈希与本机缓存revision/etag相符，revision358310b4f64b95f9fefc372ad899356e4111f376。模型仍只读原路径，上游锁改到私有attempt/home。Python层禁网/禁额外子进程/attempt外写入，非OS沙箱；精确NUL设备可作空流，3次cmd.exe平台探测仍拦截，不能混称网络。
+
+0008仅新增parser_profiles/parsing_tasks/page_parses，不动原表/检索profile/索引代。候选以固定canonical JSON整集存储，不宣称Region派生表已接D。POST /documents/{id}/parsing为本人ready当前版本显式排队；同profile重复请求幂等，retry_task_id绑定当前失败/partial/interrupted尝试，最多10次，旧产物保留。GET同路由按当前身份/版本授权，只回状态/数量/hash/尺寸，无路径/正文/框。共享只读，普通admin无private旁路；Origin/CSRF/首改保留。没有自动扫描旧13页或新网页按钮。
+
+每页独立真实CPU子进程；重渲同版PDF须PNG字节hash/尺寸一致。DocVortex2.0全部顶层块经points→PNG矩阵映射；首版仅rotation0、零MediaBox原点、CropBox=MediaBox，旋转/裁剪明确拒绝，页检索不受影响。ID重复/未知类型/非法框失败，不裁剪或造候选；真实空白省略blocks按上游默认空列表记no_candidates，null仍失败。文本来源native或OCR未区分，不称VLM文本。内部read_candidates重新授权并核对版本/配置/整集与每项身份。
+
+持久页状态pending/running/ready/no_candidates/failed/timeout/interrupted，部分失败task=partial。启动running→interrupted、保留已完成页；重试新task全页执行。渲染复核/解析各180秒硬子进程上限，900秒总时限在页间检查，不称强中断算子。候选提交前检查当前归属/版本/PDF及页面身份，解析从不修改Document.ready/Index/PageFeature。
+
+隔离复用R19真实上传5/6页完整PDF（不是R20新上传或未见测试），当前profile11页194候选：text152/title31/image5/table5/equation1，168次ONNX run，回执合计89.671秒。61来源/坐标检查和11页总览＋A4/B5原尺寸图表文字叠框通过。两种长宽比空白页真实no_candidates；90度/CropBox拒绝、0.25秒强制子进程超时/损坏PDF异常15项通过，明确夹具且未入索引。前端缩放、区域排序/高亮、检测召回、任意PDF支持均未宣布通过。
+
+104后端44.447秒、25前端411.3375毫秒、4原模型CPU契约3.95秒、tsc/生产build通过。46项真实localhost HTTP：最终6次真实原ColPali query与授权PNG，含解析failed注入后的2次实际检索，状态后恢复；A/B/管理员无越权。首轮漏JSON退出探测失败前另3query仍计成本，共9次、两棵顺序worker、network0。24份旧完整BF16 1031×128/1024patch及精确float32导出CPU新核验；本轮页编码0，D0。未重跑官方评分/准确率/容量。
+
+开发探针/重复解析成本保留：44页请求入口、38worker回执、记录552次ONNX run/332.170秒；6个无worker回执含几何拒绝/异常/超时，未推断未完成成本为0。首版旧guard混计cmd.exe为network的失败已保留，最终11页网络/越界写为0。
+
+正式0008的19迁移检查、5匿名HTTP及42保护检查通过：原各表指纹/2文档13页/完整Qdrant不变，新三表空，integrity ok/FK0/重复迁移不变；原解析源码/13资源及下载元数据、旧项目Git/选定文件/模型环境、R19源库不变。复用24页集合在末尾新算指纹，不能声称有R20开工时的24页指纹。正式仅匿名首页/health/401/no-store及上传Origin403，不用正式身份。
+
+最终8000实际监听PID54984（启动器47100）、3000 PID55840、6333 Docker PID49880；8001/解析/测试模型树已停。按CIM创建时间/命令守卫重启，PID仅快照。运行记录runtime/verification/r20；正式无需重建原13页。SDK已生成；页面SearchHit.region_status仍not_requested。
+
+[失败记录](checks/stage2-4-failures.json)含Windows长路径、NUL/平台探测计数、开发中profile变化拒绝、空blocks默认值、错误unittest discover环境及HTTP退出请求缺JSON；无未解本批阻塞。仅既有baseline-browser-mapping/util._extend提示，无升级。资料同步交接/progress/testing/需求/架构/接口/路线图/指南/source-audit及07/08六步。01—06/旧证据/.gitignore保持，旧库检查不是ignored全盘审计；无下载/训练/换底座/暂存/提交/推送，新docs仍被忽略须另带。
+
+**下一唯一任务：2-5——D-no-text真实推理适配。用户指定后才开始，本轮停止。**
+
+## 以下为R19历史交接 / 2-3C（2026-11-08，北京时间）
 
 本轮只完成上传/任务网页、恢复与重试（含取消检查点）。见[手册](stage2-3c-runbook.md)、[汇总/修改清单](checks/stage2-3c-verification.json)、[网页36项](checks/stage2-3c-browser.json)、[HTTP39项](checks/stage2-3c-http.json)、[运行30项](checks/stage2-3c-runtime.json)、[正式29项](checks/stage2-3c-formal.json)和[文档保护](checks/r19-document-checks.json)。不进入2-4/MinerU/D/高亮/历史/预算方法。
 
