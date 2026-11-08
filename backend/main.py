@@ -13,6 +13,7 @@ from starsessions import SessionMiddleware, get_session_handler
 from backend.auth.boundary import AuthBoundary
 from backend.auth.routes import router
 from backend.auth.admin import router as accounts_router
+from backend.audit.routes import router as audit_router
 from backend.auth.settings import AuthSettings
 from backend.auth.store import SQLiteSessionStore
 from backend.db.connection import make_engine
@@ -109,6 +110,7 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
 
     app.include_router(router)
     app.include_router(accounts_router)
+    app.include_router(audit_router)
     app.include_router(search_router)
     app.include_router(history_router)
     app.include_router(pages_router)

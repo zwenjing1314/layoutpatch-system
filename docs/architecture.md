@@ -1,5 +1,13 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R30 / 3-4C管理查询增量
+
+新增audit.schemas/service/routes，无新表/迁移。SQL UNION ALL明确列投影汇集四事件和四任务，不ORM载入私有内容；两次新事务验证身份及脱敏快照，稳定排序/分页及scope指纹防止中途撤销或列表变更仍返旧成功。原公共写业务/事件事务与执行器不改，管理员内容权限不扩大。
+
+Home接useAudit，Workspace挂管理员入口/AuditPanel与局部audit.css；独立取消代号/15秒等待，身份/离页/首改/新查询清旧管理状态。默认7UTC日/单次31日、筛选/10条分页、空与故障反馈，未知不自动重试。OpenAPI/SDK同步，实际67份一致。最小事件/标记随库保留，无自动过期；任务仅当前状态，历史本人删除/旧ID410保持。
+
+查询两次扫描窗口内全部最小投影，未做大库容量承诺。新208后端/13CPU/101前端、89ASGI/44HTTP/32浏览器及隔离build通过；14新原CPU query/3旧P′命中/D0，详见[手册](stage3-4c-runbook.md)。正式0008/旧GET构建未部署，单worker/未来备份迁0012重启另验，停在3-5之前。
+
 ## 2026-11-08｜R29 / 3-4B历史网页增量
 
 Home接useRecordedSearch、useHistory及history-state；Workspace挂本人HistorySidebar/Menu/Dialog/Banner和独立history.css，复用现有SDK、认证锁定、页面预览与useRegions。新增22前端测试后共93；后端、表、迁移、OpenAPI/产品SDK、算法和依赖均保持。

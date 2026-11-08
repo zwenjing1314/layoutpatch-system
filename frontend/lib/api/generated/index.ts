@@ -14,6 +14,10 @@ export type { AccountMutation } from './models/AccountMutation';
 export type { AccountReset } from './models/AccountReset';
 export type { AccountResponse } from './models/AccountResponse';
 export type { AccountRevoke } from './models/AccountRevoke';
+export type { AuditEventItem } from './models/AuditEventItem';
+export type { AuditEventList } from './models/AuditEventList';
+export type { AuditTaskItem } from './models/AuditTaskItem';
+export type { AuditTaskList } from './models/AuditTaskList';
 export type { CleanupRetryInput } from './models/CleanupRetryInput';
 export type { DeletionDocument } from './models/DeletionDocument';
 export type { DeletionInput } from './models/DeletionInput';
@@ -55,6 +59,7 @@ export type { SharingMutation } from './models/SharingMutation';
 export type { ValidationError } from './models/ValidationError';
 
 export { AdminService } from './services/AdminService';
+export { AuditService } from './services/AuditService';
 export { AuthService } from './services/AuthService';
 export { DeletionService } from './services/DeletionService';
 export { DocumentsService } from './services/DocumentsService';

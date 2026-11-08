@@ -14,6 +14,7 @@ function loadTs(path) {
     if (name === './accounts') return loadTs('components/workspace/accounts.tsx');
     if (name === './deletion') return loadTs('components/workspace/deletion.tsx');
     if (name === './sharing') return loadTs('components/workspace/sharing.tsx');
+    if (name === './audit') return loadTs('components/workspace/audit.tsx');
     if (name === './history') return loadTs('components/workspace/history.tsx');
     if (name === '@/lib/history-state') return loadTs('lib/history-state.ts');
     if (name === '@/lib/account-state') return loadTs('lib/account-state.ts');

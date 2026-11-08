@@ -1,4 +1,4 @@
-"""Account management API. No private-document bypass or audit-query endpoint."""
+"""Account management API. No private-document bypass."""
 from typing import Literal
 from uuid import UUID
 

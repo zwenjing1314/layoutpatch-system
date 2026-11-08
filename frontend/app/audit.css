@@ -1,0 +1,13 @@
+.ws-audit-tabs { display: flex; gap: 10px; margin: 18px 0; }
+.ws-audit button { padding: 9px 14px; border: 1px solid #587363; border-radius: 6px; color: var(--ws-text); background: #23352e; cursor: pointer; }
+.ws-audit button[aria-pressed=true] { border-color: var(--ws-accent); }
+.ws-audit button:focus-visible { outline: 2px solid var(--ws-accent); outline-offset: 2px; }
+.ws-audit-filters { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin: 20px 0; }
+.ws-audit-filters label { font-size: 12px; color: var(--ws-muted); min-width: 0; }
+.ws-audit-filters input,.ws-audit-filters select { display: block; width: 100%; min-width: 0; margin-top: 6px; padding: 9px; border: 1px solid #587363; border-radius: 5px; background: #172124; color: var(--ws-text); }
+.ws-audit-filters > div { display: flex; gap: 10px; flex-wrap: wrap; }
+.ws-audit-policy { margin: 16px 0; font-size: 12px; line-height: 1.8; color: var(--ws-muted); }
+.ws-audit-policy summary { cursor: pointer; }
+.ws-audit .ws-account-card { overflow-wrap: anywhere; }
+.ws-audit .ws-account-card p,.ws-audit .ws-account-card small { font-size: 12px; line-height: 1.8; }
+@media(max-width:480px) { .ws-audit-filters { grid-template-columns: minmax(0,1fr); } }

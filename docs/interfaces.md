@@ -1,5 +1,13 @@
 # 模块与接口契约
 
+## 2026-11-08｜R30 / 3-4C只读管理员查询契约
+
+新增GET /admin/events与GET /admin/tasks（operation_id list_audit_events/list_audit_tasks），有效Cookie/已首改/admin逐次验证，private,no-store。共用since/until整数epoch秒，开始含结束不含、默认近7天/单次最多31天；limit默认10最大50、offset默认0最大1000000，未知/重复/坏UUID/枚举/非十进制整数拒绝422。
+
+事件category、actor_id、target_id、outcome筛选；任务kind、status、owner_id、document_id筛选。返回items/next_offset/scope_version/since/until；仅最小ID/动作/状态/时间/固定码，无正文/名称/路径/URL/manifest/请求键/输入hash；检索document_id固定null，未知码OTHER/阶段other。两个独立Session重查principal和完整脱敏投影，撤销401/降权403/变化409 AUDIT_LIST_CHANGED、依赖503。页间快照变化网页回首页，无写入口或执行器重试。
+
+最小事件/无正文去重标记随库保留无自动清理，31天不是过期天数；本人删历史移除正文，旧请求410；物理清理可移除任务行，本页仅当前状态。SDK AuditService与四响应模型由实际OpenAPI生成，67份再生成一致；见[手册](stage3-4c-runbook.md)。R30隔离通过，正式0008未部署。
+
 ## 2026-11-08｜R29 / 3-4B网页使用契约
 
 沿用R28表/API/事务和62份SDK，产品生成文件及OpenAPI未改。网页每次明确提交调用HistoryService.searchAndRecordHistory，生成新UUID并携带原q/k/document_id；同问题主动重提也是新ID。检索240秒有限等待，网络/503/进行中409保留原输入与同ID、阻止新提交；仅“核对本次提交”显式重发同ID，结束本地核对不表示服务端取消。失败/中断/删除/非法条件按既有状态提示，不自动换ID或重算。
