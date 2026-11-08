@@ -21,6 +21,7 @@ from backend.search.qdrant import SearchUnavailable, validate_vector
 from backend.search.scope import active_index
 from backend.search.worker import SearchBusy
 from backend.documents.task_state import sync_attempt
+from backend.documents.lifecycle import producing
 
 
 class IngestError(Exception):
@@ -115,6 +116,10 @@ class IngestionRunner:
             sync_attempt(db, job)
 
     def run_one(self):
+        with producing(self.engine):
+            return self._run_one()
+
+    def _run_one(self):
         with write_transaction(self.engine) as db:
             job = db.scalar(select(Job).where(Job.status == "queued").order_by(Job.created_at, Job.id).limit(1))
             if job is None:

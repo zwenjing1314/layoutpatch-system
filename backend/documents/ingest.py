@@ -17,6 +17,7 @@ from backend.db.models import Document, DocumentVersion, Job, JobAttempt, new_id
 from backend.db.seed import canonical, sha
 from .uploads import cleanup_pdf, validate_pdf, write_pdf
 from .task_state import retry_available, sync_attempt
+from .lifecycle import producing
 
 router = APIRouter(dependencies=[Depends(load_cookie)])
 
@@ -124,6 +125,11 @@ def recover_uploads(engine):
 
 
 def persist_upload(request, identity, key, data, name, count):
+    with producing(request.app.state.engine):
+        return _persist_upload(request, identity, key, data, name, count)
+
+
+def _persist_upload(request, identity, key, data, name, count):
     settings = request.app.state.upload_settings
     fingerprint = sha(canonical({"name": name, "sha256": sha(data), "bytes": len(data), "pages": count}).encode())
     with transaction(request) as db:

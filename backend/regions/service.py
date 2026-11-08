@@ -6,6 +6,7 @@ from backend.db.models import DocumentVersion, Page, PageFeature, User
 from backend.parsing.store import read_candidates
 from backend.parsing.candidates import ParseError
 from backend.search.scope import allowed_scope
+from backend.documents.lifecycle import producing
 
 
 def prepare_request(db,user,page_id,task_id,expected_encoder):
@@ -32,6 +33,11 @@ def prepare_request(db,user,page_id,task_id,expected_encoder):
 
 
 def rank_regions(db,user,page_id,task_id,question,worker,expected_encoder):
+    with producing(db.get_bind().engine):
+        return _rank_regions(db,user,page_id,task_id,question,worker,expected_encoder)
+
+
+def _rank_regions(db,user,page_id,task_id,question,worker,expected_encoder):
     """Internal caller supplies its current principal; no cookie/session boundary yet.
 
     Stage 2-6 must revalidate its session around this potentially long operation.

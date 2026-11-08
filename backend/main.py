@@ -29,13 +29,15 @@ from backend.documents.tasks import router as tasks_router
 from backend.parsing.routes import router as parsing_router
 from backend.parsing.runner import ParsingRunner, recover as recover_parsing
 from backend.regions.routes import router as regions_router
+from backend.documents.deletion import router as deletion_router
+from backend.documents.cleanup import CleanupRunner, recover_cleanup
 
 
 class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
 
 
-def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, upload_settings=None, ingestion_enabled=None, parsing_enabled=None):
+def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, upload_settings=None, ingestion_enabled=None, parsing_enabled=None, cleanup_enabled=None, cleanup_settings=None):
     settings = settings or AuthSettings.from_environment()
     engine = make_engine(settings.database)
 
@@ -44,12 +46,16 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
         try:
             recover_uploads(engine)
             recover_parsing(engine)
+            recover_cleanup(engine)
+            if app.state.cleanup_enabled:
+                app.state.cleanup.start()
             if app.state.parsing_enabled:
                 app.state.parsing.start()
             if app.state.ingestion_enabled:
                 app.state.ingestion.start()
             yield
         finally:
+            app.state.cleanup.close()
             app.state.parsing.close()
             app.state.ingestion.close()
             app.state.model_worker.close()
@@ -69,6 +75,11 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
         raise ValueError("LAYOUTPATCH_PARSE_ENABLED must be true or false")
     app.state.parsing_enabled = parsing_enabled if parsing_enabled is not None else parse_flag == "true"
     app.state.parsing = ParsingRunner(engine)
+    cleanup_flag = os.getenv('LAYOUTPATCH_CLEANUP_ENABLED', 'true')
+    if cleanup_flag not in ('true', 'false'):
+        raise ValueError('LAYOUTPATCH_CLEANUP_ENABLED must be true or false')
+    app.state.cleanup_enabled = cleanup_enabled if cleanup_enabled is not None else cleanup_flag == 'true'
+    app.state.cleanup = CleanupRunner(engine, app.state.qdrant, cleanup_settings)
     app.state.engine, app.state.settings, app.state.clock = engine, settings, clock
     app.state.store = SQLiteSessionStore(engine, settings, clock)
     app.add_middleware(SessionMiddleware, store=app.state.store, lifetime=settings.absolute_seconds,
@@ -97,6 +108,7 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
     app.include_router(accounts_router)
     app.include_router(search_router)
     app.include_router(pages_router)
+    app.include_router(deletion_router)
     app.include_router(ingest_router)
     app.include_router(listing_router)
     app.include_router(sharing_router)

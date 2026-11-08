@@ -1,5 +1,13 @@
 # 模块与接口契约
 
+## 2026-11-08｜R27 / 3-3本人删除与清理契约
+
+新增GET /documents/deletion（limit默认10、offset、items/next_offset/scope_version）、POST /documents/{id}/delete、GET /documents/{id}/cleanup、POST /documents/{id}/cleanup/retry。仅已首改有效本人会话，管理员/共享接收者无跨owner能力。delete必带document_version_id(UUID或null)、access_version严格整数>=1、confirmed严格true；retry必带attempt严格整数>=1及confirmed=true；拒绝额外/重复参数和字段。写入cookie/Origin/CSRF，匿名401、首改/CSRF403、非本人404、旧版本/尝试409、非法422、数据库503；202只表示撤销访问/重试已接受，不能当物理清理成功。
+
+BEGIN IMMEDIATE锁内重新授权与版本核对，deleted/private/access_version+1、取消意图、document_cleanups和deletion_events原子；事件失败回滚，精确删除重放noop，墓碑不可恢复。failed才增加attempt重试，当前非failed同attempt为noop；完成后仍保留旧输入身份以供幂等。列表包含本人墓碑并复核快照，普通列表/检索/原图/区域/crop/上传解析管理继续拒绝墓碑。响应仅安全文档/清理状态，不返回内部manifest、路径或候选。
+
+0011只增加两表，后台先清所有索引代精确点，再清文件/派生行；失败持久、仍不可读，启动恢复running；单worker租约防止写入与清理交错。生成DeletionService和四模型，实际OpenAPI及53份SDK重新生成一致。网页确认/分页/失败重试、15秒有限等待/未知写不自动重试/离页换号清状态见[手册](stage3-3-runbook.md)。正式仍0008未部署，启用须新备份/0011迁移与重启。
+
 ## 2026-11-08｜R26 / 3-2共享管理契约
 
 新增GET /admin/documents（name/limit/offset，默认10，items/next_offset/scope_version）以及POST /admin/documents/{id}/publish、/unpublish。列表与写入只对已完成首改的当前admin本人非删除文档开放，其他owner统一404；不提供跨private管理或普通搜索旁路。发布须ready/有效当前版本/活动索引全页，撤回不以索引ready阻断。

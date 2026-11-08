@@ -309,3 +309,37 @@ class SharingEvent(Base):
     before_version: Mapped[int] = mapped_column(Integer)
     after_version: Mapped[int] = mapped_column(Integer)
     occurred_at: Mapped[float] = mapped_column(Float)
+
+
+class DocumentCleanup(Base):
+    __tablename__ = "document_cleanups"
+    __table_args__ = (
+        CheckConstraint("status IN ('queued','running','failed','completed')", name="ck_cleanup_status"),
+        CheckConstraint("attempt >= 1", name="ck_cleanup_attempt"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    document_id: Mapped[str] = mapped_column(ForeignKey("documents.id"), unique=True)
+    status: Mapped[str] = mapped_column(String(16), default="queued")
+    attempt: Mapped[int] = mapped_column(Integer, default=1)
+    stage: Mapped[str] = mapped_column(String(16), default="waiting")
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    manifest_json: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class DeletionEvent(Base):
+    __tablename__ = "deletion_events"
+    __table_args__ = (
+        CheckConstraint("action IN ('delete','retry','cleanup')", name="ck_deletion_action"),
+        CheckConstraint("outcome IN ('success','noop','rejected','failed')", name="ck_deletion_outcome"),
+        CheckConstraint("attempt >= 1", name="ck_deletion_attempt"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    actor_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"))
+    document_id: Mapped[str] = mapped_column(ForeignKey("documents.id"), index=True)
+    action: Mapped[str] = mapped_column(String(16))
+    outcome: Mapped[str] = mapped_column(String(8))
+    code: Mapped[str] = mapped_column(String(64))
+    attempt: Mapped[int] = mapped_column(Integer)
+    occurred_at: Mapped[float] = mapped_column(Float)

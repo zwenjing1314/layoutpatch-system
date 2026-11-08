@@ -14,6 +14,10 @@ export type { AccountMutation } from './models/AccountMutation';
 export type { AccountReset } from './models/AccountReset';
 export type { AccountResponse } from './models/AccountResponse';
 export type { AccountRevoke } from './models/AccountRevoke';
+export type { CleanupRetryInput } from './models/CleanupRetryInput';
+export type { DeletionDocument } from './models/DeletionDocument';
+export type { DeletionInput } from './models/DeletionInput';
+export type { DeletionList } from './models/DeletionList';
 export type { DocumentListItem } from './models/DocumentListItem';
 export type { DocumentListResponse } from './models/DocumentListResponse';
 export type { DocumentResponse } from './models/DocumentResponse';
@@ -44,6 +48,7 @@ export type { ValidationError } from './models/ValidationError';
 
 export { AdminService } from './services/AdminService';
 export { AuthService } from './services/AuthService';
+export { DeletionService } from './services/DeletionService';
 export { DocumentsService } from './services/DocumentsService';
 export { PagesService } from './services/PagesService';
 export { SearchService } from './services/SearchService';

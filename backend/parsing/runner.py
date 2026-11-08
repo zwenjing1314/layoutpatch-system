@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from backend.db.models import Document, DocumentVersion, Page, ParserProfile, ParsingTask, PageParse, User, now
 from backend.db.seed import canonical, sha
 from backend.documents.pipeline import write_transaction
+from backend.documents.lifecycle import producing
 from backend.documents.routes import PageFile, read_verified_image
 from .adapter import load_profile, parse_page, verify_resources
 from .candidates import ParseError
@@ -90,6 +91,10 @@ class ParsingRunner:
             self.stop_event.wait(1)
 
     def run_one(self):
+        with producing(self.engine):
+            return self._run_one()
+
+    def _run_one(self):
         with write_transaction(self.engine) as db:
             task = db.scalar(select(ParsingTask).where(ParsingTask.status == "queued").order_by(ParsingTask.created_at,ParsingTask.id).limit(1))
             if task is None:

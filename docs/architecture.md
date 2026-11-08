@@ -1,5 +1,13 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R27 / 3-3删除生命周期增量
+
+新增documents.deletion公共BEGIN IMMEDIATE事务、CleanupRunner及0011的DocumentCleanup/DeletionEvent。墓碑和授权版本先原子提交使全部现有读取/管理入口失效；后台物理清理与外部Qdrant/文件不构成一个分布式事务，使用持久manifest、精确点删除/保留点校验、幂等缺失路径及失败重试协调。清理完成只留通用名墓碑/控制和最小事件，删除原版本/页/候选/特征/解析/任务，不引入恢复入口。
+
+documents.lifecycle以数据库规范路径登记进程内产物租约。upload、ingest、parse、regions生产者在完整产物写入期持有租约，清理等待现有生产者退出再独占，各生产者仍锁内重查墓碑；墓碑本身不等长模型任务。支持每数据库一个后端worker，不能把进程内锁说成多进程互斥。路径/根/reparse/跨文档引用/未知缓存归属和集合前缀保守拒绝，隔离验收只使用复制的专属根/集合。
+
+Home新增useDeletion和本人删除视图，复用现有样式/会话锁定/Blob回收。独立请求代号/同步重复锁、明确确认及未知结果不重发；真实浏览器发现顶层重复面板，修为单工作区main并补SSR断言。SDK新增DeletionService及四模型；原ColPali/D权重/算法/profile及依赖保持。详见[手册与边界](stage3-3-runbook.md)。正式仍0008未部署；后续历史打开必须延续当前授权，不得复活墓碑。
+
 ## 2026-11-08｜R26 / 3-2共享增量
 
 新增documents.sharing路由/公共事务、0010的授权版本列和最小SharingEvent。管理集合明确为当前管理员本人非删除文档；普通own＋active-admin-shared读取规则保留，其他private无管理/搜索旁路。复用accounts BEGIN IMMEDIATE，在锁内重查会话/首改/admin/CSRF及目标版本，visibility/access_version/事件原子提交；拒绝事件与成功/noop区分，插入事件失败回滚全部状态。

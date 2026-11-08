@@ -75,6 +75,10 @@ class Qdrant:
     def upsert(self, collection, points):
         self.request("PUT", self.path(collection) + "/points?wait=true", {"points": points})
 
+    def delete_points(self, collection, point_ids):
+        if point_ids:
+            self.request("POST", self.path(collection) + "/points/delete?wait=true", {"points": point_ids})
+
     def all_points(self, collection):
         result, offset = [], None
         while True:

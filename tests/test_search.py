@@ -59,7 +59,7 @@ class SearchTests(unittest.TestCase):
         self.path = Path(self.temp.name)/"metadata.sqlite3"
         migrate(self.path)
         self.encoder, self.vectorstore = Encoder(), VectorStore()
-        self.app = create_app(AuthSettings(database=self.path), model_worker=self.encoder, qdrant=self.vectorstore)
+        self.app = create_app(AuthSettings(database=self.path), model_worker=self.encoder, qdrant=self.vectorstore, ingestion_enabled=False, parsing_enabled=False, cleanup_enabled=False)
         self.engine = self.app.state.engine
         self.passwords = {name:secrets.token_urlsafe(24) for name in ("A","B","admin")}
         seed(self.engine, self.passwords.__getitem__)
