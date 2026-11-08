@@ -1,5 +1,9 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R21 / 2-5当前实现
+
+新增受控d_core与DNoTextAdapter、regions.service内部授权组装、原ModelWorker的regions分支。无新表，正式保持0008；P′使用私有runtime不可变文件cache，包含完整特征/候选/模型/代码/活动索引身份。query每次在同一worker真实编码，CPU D复用该Q；完整1031行与派生1024行P′分开，预算序列不能送D。推理后重新授权，公开会话边界/区域HTTP/高亮仍待2-6。见[手册](stage2-5-runbook.md)、[实际检查](checks/stage2-5-verification.json)。下文“D未实现”按历史轮次理解。
+
 ## 2026-11-08｜R20 / 2-4当前状态
 
 实际新增ParserProfile/ParsingTask/PageParse三表，候选JSON整集与来源hash存PageParse；独立CPU子进程由单个解析调度线程显式排队。未实现目标Region派生表、D或网页高亮；解析不参与索引激活。

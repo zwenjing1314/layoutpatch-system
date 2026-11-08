@@ -165,20 +165,24 @@ ErrorResponse
 
 ## 5. D-no-text 契约和部署身份
 
-代码入口：`LayoutPatchD`、`InputAblatedD("text")`、`page_layout`、`patch_scores/region_scores`。参数量 273410；三个既有 seed 的 checkpoint 本轮均通过 CPU strict load。
+**2026-11-08 R21 / 2-5已实现内部入口。** regions.service.prepare_request(db,user,page_id,task_id,expected_encoder)复核当前活动版本、范围、索引、完整PageFeature与候选整集；rank_regions另外接question/ModelWorker，在真实query编码后调用CPU D，结束读事务并重查授权/auth_version/输入。仅内部principal接口，不替代cookie/session验证；2-6必须前后重新principal。无新HTTP/SDK，SearchHit仍not_requested。
+
+ModelWorker.rank_regions(question,region_input,expected_profile)复用原私有JSON-lines管道，返回真实Q回执及regions状态/全部候选ID/布局ID/排名/有限分数/D身份/cache键/近并列；region_input由服务端组装，不接受浏览器提供路径或候选。DNoTextAdapter.prepare只生成/读取文档侧P′，rank使用当次Q。私有runtime cache键绑定文档版本/PNG/完整tensor/活动索引embedding/解析整集/模型代码；损坏失败、旧cache不覆盖。见[手册](stage2-5-runbook.md)、[同次Q参考](checks/stage2-5-reference.json)。
+
+代码入口：`LayoutPatchD`、`InputAblatedD("text")`、`page_layout`、`patch_scores/region_scores`。参数量273410；早期三seed加载属于历史，R21仅固定seed0/epoch1重新strict load并实际forward。
 
 `page_layout` 输入按 `layout_id` 升序排列的整页候选，每个含 `bbox/page_size/type/layout_id`；文本槽为 `[M,1024]`。D-no-text 在投影前置零文本槽，保留坐标、类型、邻接与 mask，因此无需为这一部署加载 BGE-M3。若改为带文本 D，则必须另外核验 BGE-M3 与节点文本来源，不能静默切换。
 
 布局坐标映射到 448×448 模型空间；`coords=[x1,y1,x2,y2,width,height]` 归一化，邻接 `[1024,M]`。D 得到 P′ 后，patch 分数是 `max_i <q_i,p′_j>`；候选分数为原实现的 patch-IoU 加权均值，不增加阈值、损失、人工重排或按 gold 过滤。分数相同时保留冻结的候选 ID 顺序；接入时以原排序实现为基准核对。
 
-**[设计] 系统默认固定 seed0 / epoch1**：
+**[R21已验证] 系统固定 seed0 / epoch1**：
 
 ```text
 runs/retrieval/route_v2_exp3_attribution/20261007_135013/D-no-text/seed_0_epoch_01.pt
 SHA256 18b7ce737b781734560439632137b86cb3ecca017e104cbe587b79a446e47f7b
 ```
 
-路径相对只读原研究库；运行时通过环境变量连接或受控复制到仓库外。选择依据是预先固定最低 seed 编号，其 epoch 已按 source_val 规则选择；不比较外部表现选择 seed。此部署不等同于历史三 seed 均值，不把 30.7969% 作为该单 checkpoint 的系统成绩。激活前必须通过小规模真实缓存一致性测试。
+上方路径相对只读原研究库；R21受控复制到本项目runtime/models/d-no-text，配置configs/d_no_text_local.json绑定SHA/代码，运行时不再读旧源码。选择依据是预先固定最低seed编号，其epoch按source_val选择，不比较外部表现。3开发缓存页及12组真实新Q参考通过；该部署不等同历史三seed均值，不把30.7969%作为此checkpoint系统成绩。
 
 ## 6. 解析器与坐标契约（R20 / 2-4已实现）
 

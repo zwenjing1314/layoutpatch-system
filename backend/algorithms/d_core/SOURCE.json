@@ -1,0 +1,67 @@
+{
+  "source": "../layoutpatch-evidence",
+  "origin": "../layoutpatch",
+  "license": "No license supplied by source; local adaptation only; redistribution needs separate review.",
+  "files": {
+    "correspondence.py": {
+      "source": "layout/correspondence.py",
+      "source_sha256": "a9f245ae71ef214393a5e0413a954e67d07b326c0de02419040ae79e92c34d92",
+      "selected": "whole file",
+      "migrated_sha256": "caaf82a702d9aa220dc721d3f38f8df2c9405206ab0482fffa98b5ac6f5557bf"
+    },
+    "nodes.py": {
+      "source": "layout/nodes.py",
+      "source_sha256": "1046dfebdbd0631aa582e4d5b830d0751c1630e70edb0be5035be920f37284be",
+      "selected": "whole file",
+      "migrated_sha256": "2efd3c9bd4a344b6ddab1dcaf24ebde0ec7b6aebfc17a2e18c9c7507e4e157d6"
+    },
+    "schema.py": {
+      "source": "layout/schema.py",
+      "source_sha256": "6364cd08eeb13fdec46b0dc521821a8349c02a62c1ce8a3e98c4f1409b6f4546",
+      "selected": "whole file",
+      "migrated_sha256": "91d671bf4c6fb51fe074e269ddd3ec401e07e9085a1273d1769340bc46681e24"
+    },
+    "colpali_layout.py": {
+      "source": "retrieval/colpali_layout.py",
+      "source_sha256": "d7b731263b4722c6db779e96b8344b49a2b11051c9e8f62563764bff591c6483",
+      "selected": "whole file",
+      "migrated_sha256": "2472557d6858bd996fb28047ceab976c1c0830b2479e92365ac9c6dbcd489736"
+    },
+    "fusion.py": {
+      "source": "retrieval/fusion/sparse_fusion.py",
+      "source_sha256": "fc99c6f0485a7cd056b24c2b23b7337c3af7b3b0165600441f7c5e2a309a380c",
+      "selected": [
+        "SparseLocalFusionV2"
+      ],
+      "migrated_sha256": "4ff07329b877161545d8aba3abb19909585c70585c65363d113fec8143091fe7"
+    },
+    "scoring.py": {
+      "source": "retrieval/route_v2_scoring.py",
+      "source_sha256": "43ce93ef1684d099717c2210f186331cc8403642c68dc1ae29bf0c7170ad4356",
+      "selected": [
+        "valid_query",
+        "patch_scores",
+        "patch_iou_matrix",
+        "region_scores"
+      ],
+      "migrated_sha256": "81170d7893f05f4b0f2ab216e9eb3543775f2437e4a40e12b2fef1214160cd57"
+    },
+    "layout.py": {
+      "source": "retrieval/route_v2_layout.py",
+      "source_sha256": "74e5ac49c3b24a2224843b101b5675a602171beff7a1127b224ea5ac1111fb93",
+      "selected": [
+        "page_layout",
+        "LayoutPatchD"
+      ],
+      "migrated_sha256": "27d64fd14917f58af24bfac841e0f572764ace5e28ec05646321c3be48a54f72"
+    },
+    "ablation.py": {
+      "source": "retrieval/route_v2_attribution.py",
+      "source_sha256": "33ef1b8099d0d4801f08da3bb990cf498c27b333fc20affe8681d7d8a535f944",
+      "selected": [
+        "InputAblatedD"
+      ],
+      "migrated_sha256": "cc4c946c5d33596ef48eb5031a68962394c997c129032e57155a11c622eb8b27"
+    }
+  }
+}

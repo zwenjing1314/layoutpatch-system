@@ -1,5 +1,9 @@
 # 阶段 0：源代码、环境与资源核查
 
+## 2026-11-08｜R21 / 2-5来源新核验
+
+两旧库8份核心D源码SHA逐份一致；最小推理定义受控迁入backend/algorithms/d_core，SOURCE.json逐项记录完整源SHA、迁入SHA和裁剪范围，生产不借旧sys.path/训练CLI。seed0/epoch1 checkpoint与source_val选择文件/weights清单/原config身份一致，本地副本1099555字节、strict load273410参数，真实forward完成。来源22项、3开发缓存及12同次Q参考见[手册](stage2-5-runbook.md)与[来源检查](checks/stage2-5-sources.json)。无BGE模型加载/下载/训练，源库未附许可证的发布前限制保留；不把本地适配称为开源授权或效果复现。
+
 ## 2026-11-08｜R20 / 2-4当前状态
 
 本轮新核验MinerU4.0.10/docvortex0.5.10/ORT1.30.0及8 ONNX+5 YAML，独立复制112包17208文件；模型revision与本机缓存metadata匹配，最终11页真实CPU forward已记录。下面早期资源存在/未运行的叙述是历史，不代表当前状态。

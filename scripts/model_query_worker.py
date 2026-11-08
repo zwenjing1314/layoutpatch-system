@@ -33,6 +33,7 @@ def main():
         from backend.algorithms.colpali_adapter import ColPaliAdapter
         torch.set_num_threads(4)
         torch.manual_seed(0)
+        torch.use_deterministic_algorithms(True)
         cache = Path.home() / ".cache/huggingface/hub"
         profile_path = ROOT / "configs/colpali_local.json"
         profile = json.loads(profile_path.read_text(encoding="utf-8"))
@@ -43,6 +44,7 @@ def main():
         print("Model worker: loading verified offline weights", file=sys.stderr, flush=True)
         adapter.load()
         print("Model worker: ready", file=sys.stderr, flush=True)
+    region_adapter = None
     for line in sys.stdin:
         try:
             request = json.loads(line)
@@ -96,6 +98,13 @@ def main():
                       "load_seconds": adapter.load_seconds,
                       "network_attempts": len(network_attempts),
                       "peak_allocated_bytes": torch.cuda.max_memory_allocated()}
+            if request.get("kind") == "regions":
+                from backend.algorithms.d_adapter import DNoTextAdapter
+                if region_adapter is None:
+                    region_adapter = DNoTextAdapter()
+                if request['region_input']['identity']['encoder_sha256'] != adapter.profile_id:
+                    raise ValueError('Region encoder mismatch')
+                result['regions'] = region_adapter.rank(request['region_input'], vector.cpu())
             pipe.write(json.dumps(result, allow_nan=False) + "\n")
             pipe.flush()
         except Exception:

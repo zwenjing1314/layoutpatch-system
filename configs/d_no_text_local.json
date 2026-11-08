@@ -1,0 +1,25 @@
+{
+  "schema": "d-no-text-local-v1",
+  "variant": "D-no-text",
+  "seed": 0,
+  "epoch": 1,
+  "checkpoint": "runtime/models/d-no-text/seed_0_epoch_01.pt",
+  "checkpoint_sha256": "18b7ce737b781734560439632137b86cb3ecca017e104cbe587b79a446e47f7b",
+  "precision": "cpu-float32",
+  "atol": 1e-06,
+  "rtol": 1e-05,
+  "tie": "score_desc_layout_id_asc",
+  "text": "zeros_before_projection_no_text_model",
+  "code_sha256": {
+    "backend/algorithms/d_adapter.py": "96b22e5bd588262936a7563ee46e311bcfe93748e82ed9e2558bb204c78367ce",
+    "backend/algorithms/d_core/__init__.py": "386db007afd12831afbc44d08c96c0c3375f5ff818f42cc3bec609b805de5a9a",
+    "backend/algorithms/d_core/ablation.py": "cc4c946c5d33596ef48eb5031a68962394c997c129032e57155a11c622eb8b27",
+    "backend/algorithms/d_core/colpali_layout.py": "2472557d6858bd996fb28047ceab976c1c0830b2479e92365ac9c6dbcd489736",
+    "backend/algorithms/d_core/correspondence.py": "caaf82a702d9aa220dc721d3f38f8df2c9405206ab0482fffa98b5ac6f5557bf",
+    "backend/algorithms/d_core/fusion.py": "4ff07329b877161545d8aba3abb19909585c70585c65363d113fec8143091fe7",
+    "backend/algorithms/d_core/layout.py": "27d64fd14917f58af24bfac841e0f572764ace5e28ec05646321c3be48a54f72",
+    "backend/algorithms/d_core/nodes.py": "2efd3c9bd4a344b6ddab1dcaf24ebde0ec7b6aebfc17a2e18c9c7507e4e157d6",
+    "backend/algorithms/d_core/schema.py": "91d671bf4c6fb51fe074e269ddd3ec401e07e9085a1273d1769340bc46681e24",
+    "backend/algorithms/d_core/scoring.py": "81170d7893f05f4b0f2ab216e9eb3543775f2437e4a40e12b2fef1214160cd57"
+  }
+}

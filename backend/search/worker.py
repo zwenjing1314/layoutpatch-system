@@ -52,6 +52,9 @@ class ModelWorker:
         return self._call({"kind": "page", "image_path": str(image_path), "output_stem": str(output_stem),
                            "render_sha256": render_sha256}, expected_profile)
 
+    def rank_regions(self, question, region_input, expected_profile):
+        return self._call({"kind": "regions", "question": question, "region_input": region_input}, expected_profile)
+
     def _call(self, payload, expected_profile):
         if not self.lock.acquire(timeout=self.settings.queue_timeout):
             raise SearchBusy("Model busy")
@@ -79,8 +82,12 @@ class ModelWorker:
                     raise ValueError()
             else:
                 validate_vector(result["vector"])
+                if payload.get("kind") == "regions":
+                    if result["regions"]["status"] not in ("ready", "no_candidates"):
+                        raise ValueError()
             self.last_audit = {k: v for k, v in result.items() if k not in ("vector", "id")}
-            audit_dir = os.getenv("LAYOUTPATCH_PAGE_AUDIT_DIR" if payload.get("kind") == "page" else "LAYOUTPATCH_QUERY_AUDIT_DIR")
+            audit_name = {"page":"LAYOUTPATCH_PAGE_AUDIT_DIR", "regions":"LAYOUTPATCH_REGION_AUDIT_DIR"}.get(payload.get("kind"),"LAYOUTPATCH_QUERY_AUDIT_DIR")
+            audit_dir = os.getenv(audit_name)
             if audit_dir:
                 folder = Path(audit_dir).resolve()
                 if not folder.is_relative_to(ROOT / "runtime"):

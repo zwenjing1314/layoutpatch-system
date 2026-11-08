@@ -1,5 +1,15 @@
 # 分阶段验收与检查记录
 
+## 2026-11-08｜R21 / 2-5实际验收
+
+T12适用项通过：预先固定3个source_dev缓存页，迁入前后候选ID、P′、区域分数/排序一致，最大绝对差0；CPU float32、atol1e-6/rtol1e-5与精确并列layout_id升序规则未变。权重seed0/epoch1 SHA一致、strict load273410参数。参考只执行原定义，不读gold/predictions构造输入。见[开发对照](checks/stage2-5-consistency.json)、[来源](checks/stage2-5-sources.json)。
+
+T07/T08本批子项：R19上传5/6页完整PDF＋R20真实MinerU候选只读复用，11页194候选、11 D forward、12次当次真实Q，原实现同Q参考P′/分数最大差0、排序一致。新问题重编码、P′磁盘cache可复用，跨进程cache命中D0；全特征/模型/候选身份变化、损坏cache、非法框、短序列、非有限值与推理中撤权均有适用检查。不是R21新上传或未见测试，也不等于区域效果通过。
+
+最终112后端53.141秒，9 D/缓存＋4原模型契约2.58秒通过。[32项实际ASGI原链](checks/stage2-5-search.json)含A/B两模式、4次真实query/Qdrant/PNG；合计16真实新query、两个顺序worker/network0，新页面编码0、MinerU0。测试替身明确独立，不当真实D证据。[65项保护](checks/stage2-5-protection.json)确认正式0008/2文档13页/全表/完整Qdrant和旧资源不变；[失败记录](checks/stage2-5-failures.json)保留错误测试环境/公开health缓存断言等，未放宽授权或算法。完整成本与范围见[手册](stage2-5-runbook.md)。
+
+区域HTTP/cookie会话边界、裁剪权限、网页高亮及50%/100%/150%缩放仍属于2-6，未宣布整阶段2或T07/T08全项通过；未新跑前端build/浏览器、区域准确率、容量或官方研究效果评价。
+
 ## 2026-11-08｜R20 / 2-4实际验收
 
 [手册](stage2-4-runbook.md)、[汇总](checks/stage2-4-verification.json)、[来源坐标61项](checks/stage2-4-output.json)、[故障15项](checks/stage2-4-faults.json)、[HTTP46项](checks/stage2-4-http.json)、[视觉](checks/stage2-4-visual.json)、[特征24份](checks/stage2-4-features.json)、[迁移19项](checks/stage2-4-migration.json)、[匿名HTTP5项](checks/stage2-4-formal-http.json)、[保护42项](checks/stage2-4-protection.json)、[失败](checks/stage2-4-failures.json)与[文档保护](checks/r20-document-checks.json)。

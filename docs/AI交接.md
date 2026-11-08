@@ -1,6 +1,30 @@
 # AI交接文档
 
-## 当前交接：R20 / 2-4完成适用验收（2026-11-08，北京时间）
+## 当前交接：R21 / 2-5完成适用验收（2026-11-08，北京时间）
+
+本轮只完成D-no-text真实内部推理适配，停止于2-6之前。见[手册](stage2-5-runbook.md)、[汇总/修改清单](checks/stage2-5-verification.json)、[来源22项](checks/stage2-5-sources.json)、[开发缓存](checks/stage2-5-consistency.json)、[真实输入](checks/stage2-5-real.json)、[同次Q参考](checks/stage2-5-reference.json)、[回归](checks/stage2-5-tests.json)、[原链32项](checks/stage2-5-search.json)、[最终保护65项](checks/stage2-5-protection.json)。
+
+新基线/在线备份在checks/stage2-5-preflight.json、source-state-r21-before.json及runtime/verification/r21/metadata-before.sqlite3；正式0008、2文档13页、解析三表空。初读Git干净，预检脚本创建后的status如实另存；未发现同范围活动修改。8份核心源码两旧库哈希一致，最小推理闭包受控迁入d_core，SOURCE.json记录来源/裁剪/哈希，生产不依赖旧sys.path或实验CLI。源码未附许可证，不宣称分发授权。
+
+固定seed0/epoch1，checkpoint SHA18b7ce737b781734560439632137b86cb3ecca017e104cbe587b79a446e47f7b，本地副本runtime/models/d-no-text/seed_0_epoch_01.pt，1099555字节；严格加载273410参数。source_val选择文件/config/weights清单本轮互相核对，未训练/按外部表现选seed。配置configs/d_no_text_local.json当前SHA3da9cc23feb53c53a3d5a59cecf2d02be1836afe14adfa9ed66495f253c9b437绑定checkpoint及算法代码。
+
+内部regions.service组装授权活动页/版本/索引/完整BF16/真实候选，原持久ModelWorker编码本次新问题后同Q接CPU float32 D。只用前1024视觉patch，1031全序列及原检索底座保持，不用[7:]或预算序列，不加载BGE-M3。rank后结束读事务，重查principal状态/auth_version/授权/输入。该内部入口没有cookie会话边界；2-6必须调用前后复核会话，不能直接当公开API。
+
+不可变P′缓存runtime/regions/d-no-text/{key}，float32[1024,128]，身份含文档/版本/页/活动索引、PNG尺寸/hash、encoder/完整tensor/索引embedding、parser/task/候选整集、D profile/checkpoint/源码。问题不入键，损坏拒绝、不覆盖旧缓存；11页含manifest共5800284字节，完整BF16和导出另存保留。无新表/迁移/公开API/SDK/网页改动，SearchHit.region_status仍not_requested。
+
+预设CPU float32/4线程/确定性/atol1e-6 rtol1e-5，精确并列layout_id升序；近似并列仅记录不改排。冻结开发manifest首3个source_dev页/每页首query_id的候选ID/P′/分数/排序一致，最大绝对差0。原定义仅离线参考命名空间执行，无gold/预测输入。
+
+只读复用R19真实上传5/6页完整PDF及R20真实MinerU候选：11页194候选、11真实D forward、12当次真实query；第12次新问题复用P′。全部12组同Q原定义参考P′/分数最大差0、排序一致；独立进程cache命中D0。不是R21新上传、未见测试集或区域效果达标。区域query编码回执1008.566毫秒，D CPU forward29.963毫秒不含布局/hash/cache/加载；CUDA峰值allocated6006474240字节不是总进程内存。开发对照3轮原9＋迁入9 forward；真实Q参考12原定义forward，合成测试调用另见日志。
+
+最终112后端53.141秒、9 D/缓存＋4原模型契约2.58秒通过。非法候选/短特征/损坏cache/非有限分数/精确并列/空候选/严格加载及推理中撤权有适用检查；替身不冒充真实D。32实际ASGI检查另含A/B双模式4次真实原ColPali检索与PNG；共16真实新query，顺序worker32612/57424、network0，页面编码0/MinerU0/训练0。未新跑浏览器/build/区域HTTP/高亮/缩放/准确率/容量或完整阶段2验收。
+
+65最终保护确认正式全部表/0008、原13与复用24页完整向量/payload/config、R19/R20源库、11份BF16/导出及旧库Git/选定资源/依赖、01—06/.gitignore不变；不是ignored全盘审计。正式仅匿名localhost检查、未用正式身份。8000实际54984（启动器47100）、3000 55840、6333 Docker49880保持，8001空闲、测试模型已停，未启停正式服务；PID启停前重查CIM身份。
+
+[失败记录](checks/stage2-5-failures.json)保留旧环境临时/写入限制、Web discover误加载pytest、测试fixture重复计数、公开health误用private缓存断言及读取/文档补丁错误；均定位，未放宽算法/容差/授权。隔离R21口令和认证行因验收改变，不声称该克隆全表保持。资料及07/08六步同步，01—06保留，docs按原规则忽略须另带；runtime副本/缓存不随Git。无下载/训练/换底座/暂存/提交/推送，无本批未解阻塞。
+
+**下一唯一任务：2-6——授权区域接口、高亮与阶段2整体验收。用户指定后才开始，本轮停止。**
+
+## 以下为R20历史交接 / 2-4（2026-11-08，北京时间）
 
 只完成真实MinerU解析与坐标契约，停止，不进入2-5/D/区域网页。详见[本批手册](stage2-4-runbook.md)、[汇总/修改清单](checks/stage2-4-verification.json)、[来源坐标61项](checks/stage2-4-output.json)、[视觉抽查](checks/stage2-4-visual.json)、[故障15项](checks/stage2-4-faults.json)、[真实HTTP46项](checks/stage2-4-http.json)及[最终保护42项](checks/stage2-4-protection.json)。
 
