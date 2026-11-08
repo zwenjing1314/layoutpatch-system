@@ -18,7 +18,7 @@ from backend.db.models import Document, DocumentVersion, IndexGeneration, IndexP
 from backend.db.seed import canonical, sha
 from backend.search.indexing import feature_digest
 from backend.search.qdrant import SearchUnavailable, validate_vector
-from backend.search.scope import active_index
+from backend.search.scope import active_index, index_epoch
 from backend.search.worker import SearchBusy
 from backend.documents.task_state import sync_attempt
 from backend.documents.lifecycle import producing
@@ -140,6 +140,7 @@ class IngestionRunner:
                 doc = db.get(Document, version.document_id)
                 old, profile = active_index(db)
                 old_id, profile_id = old.id, profile.id
+                old_epoch = index_epoch(db)
                 encoder_sha = sha((ROOT / "configs/colpali_local.json").read_bytes())
                 config = json.loads(profile.config_json)
                 if (sha(profile.config_json.encode()) != profile.config_sha256 or config["encoder"] != json.loads((ROOT / "configs/colpali_local.json").read_text())
@@ -249,7 +250,7 @@ class IngestionRunner:
                     raise IngestError("INGEST_INTERRUPTED")
                 if time.monotonic() >= deadline:
                     raise IngestError("INGEST_DEADLINE_EXCEEDED")
-                if (current.id != old_id or not current_user.active or current_job.status != "running"
+                if (current.id != old_id or index_epoch(db) != old_epoch or not current_user.active or current_job.status != "running"
                         or current_job.attempt != attempt
                         or current_doc.owner_id != job.owner_id or current_doc.status != "registered" or current_doc.deleted_at
                         or current_doc.active_version_id is not None or current_version.pdf_sha256 != version.pdf_sha256):
@@ -273,9 +274,10 @@ class IngestionRunner:
                 sync_attempt(db, current_job)
                 state = db.get(SystemState, 1)
                 if state is None:
-                    db.add(SystemState(id=1, active_index_id=candidate_id))
+                    db.add(SystemState(id=1, active_index_id=candidate_id, index_epoch=old_epoch+1))
                 else:
                     state.active_index_id = candidate_id
+                    state.index_epoch += 1
         except Exception as exc:
             if isinstance(exc, IngestError):
                 code = exc.code

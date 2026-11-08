@@ -209,6 +209,23 @@ class IngestionTests(unittest.TestCase):
         self.assertEqual(self.status(), "interrupted")
         self.assert_unchanged()
 
+    def test_active_index_aba_epoch_during_ingestion_rejects_activation(self):
+        self.prepare(pages=1)
+        def aba():
+            self.q.callback = None
+            with Session(self.engine) as db, db.begin():
+                state = db.get(SystemState, 1)
+                state.active_index_id, state.index_epoch = self.old_id, state.index_epoch + 2
+        self.q.callback = aba
+        self.runner.run_one()
+        self.assertEqual(self.status(), "failed")
+        with Session(self.engine) as db:
+            self.assertEqual(active_index(db)[0].id, self.old_id)
+            self.assertEqual(db.get(SystemState, 1).index_epoch, 3)
+            self.assertEqual(db.get(Job, self.job_id).error_code, "INGEST_AUTHORITY_CHANGED")
+            self.assertEqual(len(db.scalars(select(Page)).all()), 13)
+        self.assertEqual(self.q.collections[self.old_collection], self.old_points)
+
     def test_copied_payload_or_vector_mismatch_refuses_activation(self):
         self.prepare()
         self.q.collections[self.old_collection][0]["payload"]["document_version_id"] = "wrong-version"

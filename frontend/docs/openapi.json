@@ -495,7 +495,8 @@
                     "account",
                     "sharing",
                     "deletion",
-                    "history"
+                    "history",
+                    "index"
                   ],
                   "type": "string"
                 },
@@ -551,7 +552,8 @@
                     "success",
                     "noop",
                     "rejected",
-                    "failed"
+                    "failed",
+                    "started"
                   ],
                   "type": "string"
                 },
@@ -666,7 +668,8 @@
                     "ingest",
                     "parsing",
                     "cleanup",
-                    "search"
+                    "search",
+                    "index"
                   ],
                   "type": "string"
                 },
@@ -747,6 +750,186 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AuditTaskList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/index-management": {
+      "get": {
+        "tags": [
+          "indexes"
+        ],
+        "summary": "State",
+        "operationId": "get_index_management",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "operation_offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Operation Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexManagementState"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/index-management/verify": {
+      "post": {
+        "tags": [
+          "indexes"
+        ],
+        "summary": "Verify",
+        "operationId": "verify_index_profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndexCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexOperationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/index-management/rebuild": {
+      "post": {
+        "tags": [
+          "indexes"
+        ],
+        "summary": "Rebuild",
+        "operationId": "rebuild_index",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndexCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexOperationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/index-management/activate": {
+      "post": {
+        "tags": [
+          "indexes"
+        ],
+        "summary": "Activate",
+        "operationId": "activate_index",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndexCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexOperationResponse"
                 }
               }
             }
@@ -2360,7 +2543,8 @@
               "account",
               "sharing",
               "deletion",
-              "history"
+              "history",
+              "index"
             ],
             "title": "Category"
           },
@@ -2405,7 +2589,8 @@
               "success",
               "noop",
               "rejected",
-              "failed"
+              "failed",
+              "started"
             ],
             "title": "Outcome"
           },
@@ -2487,7 +2672,8 @@
               "ingest",
               "parsing",
               "cleanup",
-              "search"
+              "search",
+              "index"
             ],
             "title": "Kind"
           },
@@ -3395,6 +3581,323 @@
         ],
         "title": "HistoryUpdateInput"
       },
+      "IndexCommand": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          },
+          "index_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Index Id"
+          },
+          "active_index_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Active Index Id"
+          },
+          "index_epoch": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Index Epoch"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "title": "Confirmed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "index_id",
+          "active_index_id",
+          "index_epoch",
+          "confirmed"
+        ],
+        "title": "IndexCommand"
+      },
+      "IndexManagementState": {
+        "properties": {
+          "active_index_id": {
+            "type": "string",
+            "title": "Active Index Id"
+          },
+          "index_epoch": {
+            "type": "integer",
+            "title": "Index Epoch"
+          },
+          "profiles": {
+            "items": {
+              "$ref": "#/components/schemas/ManagedProfile"
+            },
+            "type": "array",
+            "title": "Profiles"
+          },
+          "indexes": {
+            "items": {
+              "$ref": "#/components/schemas/ManagedIndex"
+            },
+            "type": "array",
+            "title": "Indexes"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          },
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/IndexOperationResponse"
+            },
+            "type": "array",
+            "title": "Operations"
+          },
+          "next_operation_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Operation Offset"
+          }
+        },
+        "type": "object",
+        "required": [
+          "active_index_id",
+          "index_epoch",
+          "profiles",
+          "indexes",
+          "next_offset",
+          "operations",
+          "next_operation_offset"
+        ],
+        "title": "IndexManagementState"
+      },
+      "IndexMetrics": {
+        "properties": {
+          "encoder_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encoder Sha256"
+          },
+          "verified_files": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Files"
+          },
+          "implementation_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Implementation Count"
+          },
+          "network_attempts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Network Attempts"
+          },
+          "inference_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inference Count"
+          },
+          "elapsed_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Elapsed Ms"
+          },
+          "page_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Count"
+          },
+          "vector_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vector Count"
+          },
+          "full_bf16_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Bf16 Bytes"
+          },
+          "vector_float32_bytes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vector Float32 Bytes"
+          },
+          "page_encoding_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Encoding Count"
+          },
+          "storage_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storage Basis"
+          }
+        },
+        "type": "object",
+        "title": "IndexMetrics"
+      },
+      "IndexOperationResponse": {
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "title": "Operation Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "verify",
+              "rebuild",
+              "activate"
+            ],
+            "title": "Kind"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "completed",
+              "failed",
+              "interrupted"
+            ],
+            "title": "Status"
+          },
+          "source_id": {
+            "type": "string",
+            "title": "Source Id"
+          },
+          "target_id": {
+            "type": "string",
+            "title": "Target Id"
+          },
+          "expected_epoch": {
+            "type": "integer",
+            "title": "Expected Epoch"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/IndexMetrics"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "operation_id",
+          "kind",
+          "status",
+          "source_id",
+          "target_id",
+          "expected_epoch",
+          "error_code",
+          "metrics",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "IndexOperationResponse"
+      },
       "JobActionInput": {
         "properties": {
           "attempt": {
@@ -3660,6 +4163,119 @@
           "password"
         ],
         "title": "LoginInput"
+      },
+      "ManagedIndex": {
+        "properties": {
+          "index_id": {
+            "type": "string",
+            "title": "Index Id"
+          },
+          "profile_id": {
+            "type": "string",
+            "title": "Profile Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "building",
+              "ready",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "page_count": {
+            "type": "integer",
+            "title": "Page Count"
+          },
+          "vector_count": {
+            "type": "integer",
+            "title": "Vector Count"
+          },
+          "feature_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feature Sha256"
+          },
+          "manifest_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manifest Sha256"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "index_id",
+          "profile_id",
+          "status",
+          "page_count",
+          "vector_count",
+          "feature_sha256",
+          "manifest_sha256",
+          "created_at"
+        ],
+        "title": "ManagedIndex"
+      },
+      "ManagedProfile": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "title": "Profile Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "config_sha256": {
+            "type": "string",
+            "title": "Config Sha256"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "identity_matches": {
+            "type": "boolean",
+            "title": "Identity Matches"
+          },
+          "encoder_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encoder Sha256"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id",
+          "name",
+          "config_sha256",
+          "status",
+          "identity_matches",
+          "encoder_sha256"
+        ],
+        "title": "ManagedProfile"
       },
       "MeResponse": {
         "properties": {

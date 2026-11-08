@@ -39,6 +39,7 @@ class AllowedScope:
     source_manifest_sha256: str
     pages: tuple[ScopedPage, ...]
     target_document_id: str | None = None
+    index_epoch: int = 1
 
     @property
     def fingerprint(self):
@@ -57,6 +58,26 @@ def active_index(db):
     return rows[0]
 
 
+def index_epoch(db):
+    state = db.get(SystemState, 1)
+    return state.index_epoch if state else 1
+
+
+def profile_identity(profile):
+    """One frozen full-vector profile; no user supplied encoder or paths."""
+    try:
+        encoder_bytes = (ROOT / "configs/colpali_local.json").read_bytes()
+        config = json.loads(profile.config_json)
+        if (profile.name != "colpali_full_v1" or sha(profile.config_json.encode()) != profile.config_sha256
+            or config["encoder"] != json.loads(encoder_bytes)
+            or config["qdrant_design"] != {"vector_name": "original", "dimension": 128, "distance": "Dot", "multivector": "MAX_SIM", "exact": True}
+            or any(config["render"].get(k) != v for k, v in {"dpi": 144, "colorspace": "RGB", "format": "PNG"}.items())):
+            raise ValueError()
+        return sha(encoder_bytes)
+    except (ValueError, KeyError, TypeError, OSError):
+        raise SearchUnavailable("Profile provenance mismatch") from None
+
+
 def allowed_scope(db, user, document_id=None):
     if document_id is not None:
         doc = db.scalar(select(Document).join(User, User.id == Document.owner_id)
@@ -66,15 +87,9 @@ def allowed_scope(db, user, document_id=None):
         if doc.status != "ready" or doc.active_version_id is None:
             raise HTTPException(409, "DOCUMENT_NOT_READY")
     index, profile = active_index(db)
-    try:
-        config = json.loads(profile.config_json)
-        encoder_bytes = (ROOT / "configs/colpali_local.json").read_bytes()
-        if (sha(profile.config_json.encode()) != profile.config_sha256 or config["encoder"] != json.loads(encoder_bytes)
-            or config["qdrant_design"] != {"vector_name": "original", "dimension": 128, "distance": "Dot", "multivector": "MAX_SIM", "exact": True}
-            or not index.feature_file_sha256 or not index.source_manifest_sha256):
-            raise ValueError()
-    except (ValueError, KeyError, OSError):
-        raise SearchUnavailable("Profile provenance mismatch") from None
+    encoder_sha = profile_identity(profile)
+    if not index.feature_file_sha256 or not index.source_manifest_sha256:
+        raise SearchUnavailable("Index provenance missing")
     # The owner must be an active administrator for shared documents. Admin's
     # ordinary search gets the same own+shared rule, never a global bypass.
     statement = (select(Document, DocumentVersion).join(User, User.id == Document.owner_id)
@@ -96,5 +111,5 @@ def allowed_scope(db, user, document_id=None):
         pages.extend(ScopedPage(p.id, doc.id, version.id, doc.owner_id, doc.visibility, doc.display_name,
                                 p.page_index, p.width_px, p.height_px, p.render_sha256, ip.embedding_sha256, doc.access_version)
                      for p, ip in entries)
-    return AllowedScope(profile.id, hashlib.sha256(encoder_bytes).hexdigest(), index.id, index.collection_name,
-                        index.page_count, index.feature_file_sha256, index.source_manifest_sha256, tuple(pages), document_id)
+    return AllowedScope(profile.id, encoder_sha, index.id, index.collection_name,
+                        index.page_count, index.feature_file_sha256, index.source_manifest_sha256, tuple(pages), document_id, index_epoch(db))

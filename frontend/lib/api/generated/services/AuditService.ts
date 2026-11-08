@@ -26,10 +26,10 @@ export class AuditService {
         until?: (number | null),
         limit: number = 10,
         offset?: number,
-        category?: ('account' | 'sharing' | 'deletion' | 'history' | null),
+        category?: ('account' | 'sharing' | 'deletion' | 'history' | 'index' | null),
         actorId?: (string | null),
         targetId?: (string | null),
-        outcome?: ('success' | 'noop' | 'rejected' | 'failed' | null),
+        outcome?: ('success' | 'noop' | 'rejected' | 'failed' | 'started' | null),
     ): CancelablePromise<AuditEventList> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -67,7 +67,7 @@ export class AuditService {
         until?: (number | null),
         limit: number = 10,
         offset?: number,
-        kind?: ('ingest' | 'parsing' | 'cleanup' | 'search' | null),
+        kind?: ('ingest' | 'parsing' | 'cleanup' | 'search' | 'index' | null),
         status?: ('receiving' | 'queued' | 'running' | 'completed' | 'cancelled' | 'failed' | 'interrupted' | 'ready' | 'partial' | 'deleted' | null),
         ownerId?: (string | null),
         documentId?: (string | null),

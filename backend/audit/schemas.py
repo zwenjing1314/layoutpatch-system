@@ -2,9 +2,9 @@ from typing import Literal
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
-EventKind = Literal['account', 'sharing', 'deletion', 'history']
-TaskKind = Literal['ingest', 'parsing', 'cleanup', 'search']
-Outcome = Literal['success', 'noop', 'rejected', 'failed']
+EventKind = Literal['account', 'sharing', 'deletion', 'history', 'index']
+TaskKind = Literal['ingest', 'parsing', 'cleanup', 'search', 'index']
+Outcome = Literal['success', 'noop', 'rejected', 'failed', 'started']
 TaskStatus = Literal['receiving', 'queued', 'running', 'completed', 'cancelled', 'failed', 'interrupted', 'ready', 'partial', 'deleted']
 
 class AuditQuery(BaseModel):

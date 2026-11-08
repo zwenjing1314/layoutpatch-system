@@ -37,8 +37,8 @@ export function useAudit(options: { enabled:boolean; userId:string|null; onSessi
       try{
         const {since,until}=auditWindow(filters);
         const data=await boundedTaskRequest<AuditEventList|AuditTaskList>(tab==='events'
-          ?AuditService.listAuditEvents(since,until,10,offset,filters.source as 'account'|'sharing'|'deletion'|'history'||undefined,filters.actor||undefined,filters.target||undefined,filters.state as 'success'|'noop'|'rejected'|'failed'||undefined)
-          :AuditService.listAuditTasks(since,until,10,offset,filters.source as 'ingest'|'parsing'|'cleanup'|'search'||undefined,filters.state as Parameters<typeof AuditService.listAuditTasks>[5]||undefined,filters.actor||undefined,filters.target||undefined),requests.current,15_000);
+          ?AuditService.listAuditEvents(since,until,10,offset,filters.source as 'account'|'sharing'|'deletion'|'history'|'index'||undefined,filters.actor||undefined,filters.target||undefined,filters.state as 'success'|'noop'|'rejected'|'failed'||undefined)
+          :AuditService.listAuditTasks(since,until,10,offset,filters.source as 'ingest'|'parsing'|'cleanup'|'search'|'index'||undefined,filters.state as Parameters<typeof AuditService.listAuditTasks>[5]||undefined,filters.actor||undefined,filters.target||undefined),requests.current,15_000);
         if(!requests.current.accepts(stamp)||!current.current.enabled)return;
         if(offset>0&&(scope.current!==data.scope_version||!data.items.length)){scope.current=null;setOffset(0);setNotice('列表已更新，已返回第一页，请重新核对。');return;}
         scope.current=data.scope_version;setResponse(data);

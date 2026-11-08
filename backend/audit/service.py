@@ -5,7 +5,7 @@ from sqlalchemy import cast, func, Integer, literal, select, union_all
 from sqlalchemy.orm import Session
 from backend.auth.routes import principal
 from backend.db.models import (AccountEvent, SharingEvent, DeletionEvent, HistoryEvent,
-    Job, Document, DocumentVersion, ParsingTask, DocumentCleanup, QueryRequest)
+    Job, Document, DocumentVersion, ParsingTask, DocumentCleanup, QueryRequest, IndexOperation, IndexEvent)
 from backend.db.seed import canonical, sha
 from .schemas import AuditEventItem, AuditTaskItem
 
@@ -14,7 +14,9 @@ DAY = 86400
 EVENT_CODES = frozenset(('OK', 'LAST_ACTIVE_ADMIN', 'ACCOUNT_NOT_FOUND', 'USERNAME_EXISTS',
     'SHARING_INPUT_CHANGED', 'DOCUMENT_NOT_READY', 'DELETION_INPUT_CHANGED', 'CLEANUP_ATTEMPT_CHANGED',
     'CLEANUP_NOT_RETRYABLE', 'CLEANUP_FAILED', 'CLEANUP_STORAGE_FAILED', 'CLEANUP_INDEX_UNAVAILABLE',
-    'CLEANUP_INTERRUPTED', 'CLEANUP_PATH_REJECTED', 'CLEANUP_REFERENCE_CONFLICT', 'CLEANUP_CACHE_REJECTED'))
+    'CLEANUP_INTERRUPTED', 'CLEANUP_PATH_REJECTED', 'CLEANUP_REFERENCE_CONFLICT', 'CLEANUP_CACHE_REJECTED',
+    'INDEX_STATE_CHANGED', 'INDEX_VERIFICATION_FAILED', 'INDEX_REMOTE_MISMATCH', 'INDEX_OPERATION_INTERRUPTED',
+    'INDEX_COVERAGE_MISMATCH', 'INDEX_AUTHORITY_CHANGED', 'INDEX_DEADLINE_EXCEEDED'))
 TASK_CODES = EVENT_CODES | frozenset(('MODEL_BUSY', 'PAGE_ENCODING_FAILED', 'INDEX_UNAVAILABLE',
     'RENDER_FAILED', 'RENDER_TIMEOUT', 'INGEST_STORAGE_FAILED', 'METADATA_UNAVAILABLE', 'INGEST_FAILED',
     'INGEST_INTERRUPTED', 'CANCELLED_BY_OWNER', 'UPLOAD_INTERRUPTED', 'UPLOAD_FAILED',
@@ -46,7 +48,8 @@ def event_query(params, start, end):
         (AccountEvent, 'account', AccountEvent.target_id, AccountEvent.code, AccountEvent.source),
         (SharingEvent, 'sharing', SharingEvent.document_id, SharingEvent.code, literal('user')),
         (DeletionEvent, 'deletion', DeletionEvent.document_id, DeletionEvent.code, literal('user')),
-        (HistoryEvent, 'history', HistoryEvent.history_id, literal('OK'), literal('user'))):
+        (HistoryEvent, 'history', HistoryEvent.history_id, literal('OK'), literal('user')),
+        (IndexEvent, 'index', IndexEvent.operation_id, IndexEvent.code, literal('user'))):
         parts.append(select(model.id.label('event_id'), literal(kind).label('category'), model.actor_id,
             target.label('target_id'), actor_type.label('actor_type'), model.action, model.outcome,
             code.label('code'), model.occurred_at).where(model.occurred_at >= start, model.occurred_at < end))
@@ -71,7 +74,10 @@ def task_query(params, start, end):
             DocumentCleanup.created_at, DocumentCleanup.updated_at).join(Document, DocumentCleanup.document_id == Document.id),
         select(QueryRequest.id, literal('search'), QueryRequest.owner_id, literal(None), QueryRequest.status,
             literal('request'), literal(1), literal(None), QueryRequest.error_code, QueryRequest.created_at,
-            QueryRequest.updated_at)).subquery()
+            QueryRequest.updated_at),
+        select(IndexOperation.id, literal('index'), IndexOperation.actor_id, literal(None), IndexOperation.status,
+            literal('index'), literal(1), literal(None), IndexOperation.error_code, IndexOperation.created_at,
+            IndexOperation.updated_at)).subquery()
     timestamp = cast(func.strftime('%s', rows.c.updated_at), Integer)
     query = select(rows).where(timestamp >= start, timestamp < end)
     for key in ('kind', 'status', 'owner_id', 'document_id'):

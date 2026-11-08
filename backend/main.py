@@ -34,6 +34,8 @@ from backend.documents.deletion import router as deletion_router
 from backend.documents.cleanup import CleanupRunner, recover_cleanup
 from backend.history.routes import router as history_router
 from backend.history.service import recover_history
+from backend.indexes.routes import router as indexes_router
+from backend.indexes.service import recover as recover_indexes
 
 
 class HealthResponse(BaseModel):
@@ -51,6 +53,7 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
             recover_parsing(engine)
             recover_cleanup(engine)
             recover_history(engine)
+            recover_indexes(engine)
             if app.state.cleanup_enabled:
                 app.state.cleanup.start()
             if app.state.parsing_enabled:
@@ -111,6 +114,7 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
     app.include_router(router)
     app.include_router(accounts_router)
     app.include_router(audit_router)
+    app.include_router(indexes_router)
     app.include_router(search_router)
     app.include_router(history_router)
     app.include_router(pages_router)

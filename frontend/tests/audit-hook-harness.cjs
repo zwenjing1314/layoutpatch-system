@@ -26,7 +26,7 @@ function harness(file, exported, initial = {}) {
   const source=ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
   const context={exports:{},crypto:{randomUUID:()=>`00000000-0000-4000-8000-${String(++uuids).padStart(12,'0')}`},
     FormData:class{constructor(form){this.data={...form.data};}get(k){return this.data[k]??null;}},
-    require(name){if(name==='react')return react;if(name==='./api/generated')return{ApiError,AuditService:service};
+    require(name){if(name==='react')return react;if(name==='./api/generated')return{ApiError,AuditService:service,IndexesService:service};
       if(['./workspace-lifecycle','./task-state','./history-state'].includes(name))return loadTs('lib/'+name.slice(2)+'.ts');
       throw new Error('Unexpected hook dependency '+name);}};
   vm.runInNewContext(source,context);

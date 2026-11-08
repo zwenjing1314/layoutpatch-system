@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type AuditTaskItem = {
     task_id: string;
-    kind: 'ingest' | 'parsing' | 'cleanup' | 'search';
+    kind: 'ingest' | 'parsing' | 'cleanup' | 'search' | 'index';
     owner_id: string;
     document_id: (string | null);
     status: 'receiving' | 'queued' | 'running' | 'completed' | 'cancelled' | 'failed' | 'interrupted' | 'ready' | 'partial' | 'deleted';

@@ -188,6 +188,41 @@ class SystemState(Base):
     __table_args__ = (CheckConstraint("id=1", name="ck_system_singleton"),)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     active_index_id: Mapped[str | None] = mapped_column(ForeignKey("index_generations.id"))
+    index_epoch: Mapped[int] = mapped_column(Integer, CheckConstraint("index_epoch >= 1", name="ck_index_epoch"), server_default="1", default=1)
+
+
+class IndexOperation(Base):
+    __tablename__ = "index_operations"
+    __table_args__ = (
+        UniqueConstraint("actor_id", "request_id", name="uq_index_operation_request"),
+        CheckConstraint("kind IN ('verify','rebuild','activate')", name="ck_index_operation_kind"),
+        CheckConstraint("status IN ('running','completed','failed','interrupted')", name="ck_index_operation_status"),
+        CheckConstraint("length(input_sha256)=64 AND expected_epoch >= 1", name="ck_index_operation_input"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    request_id: Mapped[str] = mapped_column(String(36))
+    input_sha256: Mapped[str] = mapped_column(String(64))
+    kind: Mapped[str] = mapped_column(String(16))
+    source_id: Mapped[str] = mapped_column(ForeignKey("index_generations.id"))
+    target_id: Mapped[str] = mapped_column(ForeignKey("index_generations.id"))
+    expected_epoch: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(16))
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    metrics_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class IndexEvent(Base):
+    __tablename__ = "index_events"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    actor_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), index=True)
+    operation_id: Mapped[str] = mapped_column(ForeignKey("index_operations.id"), index=True)
+    action: Mapped[str] = mapped_column(String(16))
+    outcome: Mapped[str] = mapped_column(String(16))
+    code: Mapped[str] = mapped_column(String(64))
+    occurred_at: Mapped[float] = mapped_column(Float)
 
 
 class PageFeature(Base):

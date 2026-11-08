@@ -2,10 +2,10 @@
 import type { AuditProps } from '@/lib/use-audit';
 import type { AuditEventItem, AuditTaskItem } from '@/lib/api/generated';
 
-const labels:Record<string,string>={account:'账号',sharing:'共享',deletion:'删除',history:'历史',ingest:'入库',parsing:'解析',cleanup:'清理',search:'检索',success:'成功',noop:'未变更',rejected:'拒绝',failed:'失败',interrupted:'中断',partial:'部分完成',receiving:'接收中',queued:'排队中',running:'运行中',completed:'完成',ready:'就绪',cancelled:'已取消',deleted:'已删除',create:'创建',update:'更新',delete:'删除',enable:'启用',disable:'停用',reset:'重置',revoke:'撤销会话',publish:'发布',unpublish:'撤回',retry:'重试'};
+const labels:Record<string,string>={index:'索引',started:'开始',verify:'验证',rebuild:'重建',activate:'切换',account:'账号',sharing:'共享',deletion:'删除',history:'历史',ingest:'入库',parsing:'解析',cleanup:'清理',search:'检索',success:'成功',noop:'未变更',rejected:'拒绝',failed:'失败',interrupted:'中断',partial:'部分完成',receiving:'接收中',queued:'排队中',running:'运行中',completed:'完成',ready:'就绪',cancelled:'已取消',deleted:'已删除',create:'创建',update:'更新',delete:'删除',enable:'启用',disable:'停用',reset:'重置',revoke:'撤销会话',publish:'发布',unpublish:'撤回',retry:'重试'};
 export function AuditPanel(props:AuditProps){
-  const events=props.tab==='events',sources=events?['account','sharing','deletion','history']:['ingest','parsing','cleanup','search'];
-  const states=events?['success','noop','rejected','failed']:['receiving','queued','running','completed','ready','partial','failed','interrupted','cancelled','deleted'];
+  const events=props.tab==='events',sources=events?['account','sharing','deletion','history','index']:['ingest','parsing','cleanup','search','index'];
+  const states=events?['success','noop','rejected','failed','started']:['receiving','queued','running','completed','ready','partial','failed','interrupted','cancelled','deleted'];
   return <main className="ws-accounts ws-audit" aria-labelledby="audit-heading"><header className="ws-accounts-heading"><div><p className="ws-eyebrow">管理与运行记录</p><h1 id="audit-heading" tabIndex={-1}>审计与任务</h1><p>仅查询必要操作元数据。私人问题、标题和文档内容不在此展示。</p></div></header>
     <div className="ws-audit-tabs" role="group" aria-label="查询类型"><button type="button" aria-pressed={events} onClick={()=>props.onTab('events')}>操作事件</button><button type="button" aria-pressed={!events} onClick={()=>props.onTab('tasks')}>任务状态</button></div>
     <form key={props.formKey+props.tab} className="ws-audit-filters" aria-label="审计筛选" onSubmit={props.onSubmit}>

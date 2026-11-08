@@ -1,5 +1,15 @@
 # 模块与接口契约
 
+## 2026-11-08｜R31 / 3-5配置与索引契约
+
+新增GET `/admin/index-management`：仅当前已首改管理员，offset/operation_offset独立0—1000000，每页10；返回不可变profile安全身份、当前active_index_id/index_epoch、索引代及操作安全成本。两个独立Session复核身份/快照，变动409、依赖503。无任意配置编辑/路径/集合名/凭据/向量或private文档内容。
+
+POST同前缀`/verify`、`/rebuild`、`/activate`接受严格request_id/index_id/active_index_id UUID、index_epoch>=1整数、confirmed=true；拒绝额外/重复query、未确认、外Origin或缺CSRF。普通user403、匿名401，首改/撤销/降权逐次检查。verify实际离线核13文件/2实现及完整远端，不推理；rebuild只从当前代复制完整向量建独立候选；activate也用于完整覆盖当前语料的旧代回退。没有自动激活/清理/重试。
+
+同actor/request_id同输入精确重放running/completed/failed/interrupted原状态，异输入409；终态失败重放HTTP200不表示成功，必须读status。完成激活重放不再切换，显式新操作用新ID；全库running互斥409。预约/完成短事务内重查权限和活动epoch/语料，远端在锁外，写失败活动代保持。原入库/搜索也复查epoch防ABA。新表index_operations/index_events，事件started/success/failed、任务index纳入审计。最小记录随库保留，无自动清除。
+
+SDK IndexesService及6模型由实际OpenAPI生成，共74份重生成逐字节一致。成本full_bf16_bytes/vector_float32_bytes仅向量逻辑大小、elapsed_ms实测管理操作，排除封装/payload/引擎，非磁盘实耗。详见[手册](stage3-5-runbook.md)。R31隔离通过，正式0008未部署，需另备份/迁0013/单worker重启另验。
+
 ## 2026-11-08｜R30 / 3-4C只读管理员查询契约
 
 新增GET /admin/events与GET /admin/tasks（operation_id list_audit_events/list_audit_tasks），有效Cookie/已首改/admin逐次验证，private,no-store。共用since/until整数epoch秒，开始含结束不含、默认近7天/单次最多31天；limit默认10最大50、offset默认0最大1000000，未知/重复/坏UUID/枚举/非十进制整数拒绝422。
