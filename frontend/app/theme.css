@@ -1,0 +1,43 @@
+/* Theme values live here. Document pixels and highlight geometry are independent. */
+:root {
+  color-scheme: dark;
+  --surface-page:#181e21; --surface-panel:#1d2529; --surface-sidebar:#13191c;
+  --surface-input:#172124; --surface-raised:#202b27; --surface-subtle:#25332f;
+  --surface-hover:#293b33; --surface-selected:#304b40;
+  --text:#e4eeec; --text-muted:#b1c5bf; --text-accent:#b9edda;
+  --border:#40564b; --border-strong:#718b80;
+  --accent:#8bd8c4; --accent-hover:#b4efd9; --on-accent:#12352a; --focus:#8bd8c4;
+  --warning-bg:#453b28; --warning-border:#a89159; --warning-text:#f5dfb1;
+  --danger-bg:#623a33; --danger-border:#c28c7b; --danger-text:#ffe2d8;
+  --canvas:#cad4ce; --document-paper:#fff; --image-status:#254c39;
+  --brand-bg:#236e67; --brand-text:#fff; --brand-detail:#b9edda;
+  --shadow:#0003; --shadow-deep:#0009; --backdrop:#101816c9;
+  --highlight-fill:#fbbf242b; --highlight-stroke:#dc6b00;
+  --ink:var(--text); --muted:var(--text-muted); --teal:var(--accent);
+  --line:var(--border); --paper:var(--surface-panel); --bg:var(--surface-page);
+  --ws-bg:var(--surface-page); --ws-panel:var(--surface-panel); --ws-text:var(--text);
+  --ws-muted:var(--text-muted); --ws-line:var(--border); --ws-accent:var(--accent);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --surface-page:#f5f8f6; --surface-panel:#fff; --surface-sidebar:#edf3ef;
+  --surface-input:#fff; --surface-raised:#f5f8f5; --surface-subtle:#e8f1eb;
+  --surface-hover:#e1eee5; --surface-selected:#d6ebdf;
+  --text:#19372b; --text-muted:#486357; --text-accent:#145f48;
+  --border:#b8cec0; --border-strong:#648573;
+  --accent:#14664f; --accent-hover:#0e513e; --on-accent:#fff; --focus:#12644c;
+  --warning-bg:#fff4dc; --warning-border:#9b762b; --warning-text:#6b480b;
+  --danger-bg:#ffede8; --danger-border:#b25947; --danger-text:#8d2b22;
+  --canvas:#e8eeea; --image-status:#244e3b;
+  --shadow:#183e2714; --shadow-deep:#183e2738; --backdrop:#13291e91;
+}
+.theme-toggle { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; gap:7px; padding:8px 11px; border:1px solid var(--border-strong); border-radius:7px; background:var(--surface-panel); color:var(--text); font-size:12px; font-weight:500; white-space:nowrap; }
+.theme-toggle:hover { background:var(--surface-hover); }
+.theme-toggle:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+.theme-toggle>span:first-child { font-size:17px; line-height:1; }
+.full:hover,.reconnect button:hover,.ws-accounts-heading>button:hover,.ws-account-dialog-actions button[type=submit]:hover,.ws-task-controls button[type=submit]:hover { background:var(--accent-hover); color:var(--on-accent); }
+.ws-account-dialog-actions button.ws-account-danger:hover { background:var(--danger-bg); color:var(--danger-text); }
+.ws-image-status,.preview-canvas>p { color:var(--image-status); }
+.topbar-actions,.ws-topbar-actions { display:flex; align-items:center; gap:14px; min-width:0; }
+@media(max-width:760px) { .ws-topbar-actions .ws-private-indicator { display:none; } .ws-topbar-actions { gap:0; } .theme-toggle { padding:7px 8px; font-size:11px; gap:5px; } }
+@media(max-width:650px) { .topbar-actions { gap:8px; } .topbar .account>span:not(.avatar) { display:none; } .topbar .brand { font-size:17px; gap:7px; } }

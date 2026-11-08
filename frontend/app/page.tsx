@@ -22,6 +22,7 @@ import './audit.css';
 import './indexes.css';
 import { useIndexes } from '@/lib/use-indexes';
 import { useAudit } from '@/lib/use-audit';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type Mode = "checking" | "login" | "password" | "workspace" | "unavailable";
 type Cancelable<T> = PromiseLike<T> & { cancel(): void };
@@ -395,7 +396,7 @@ export default function Home() {
 
   return <div className="app-shell">
     <header className="topbar"><a className="brand" href="/" aria-label="LayoutPatch 首页"><span className="brand-mark" aria-hidden="true">L<span>·</span></span>LayoutPatch<span className="brand-caption">视觉文档检索</span></a>
-      {me && <div className="account"><span className="avatar" aria-hidden="true">{me.username.slice(0, 1).toUpperCase()}</span><span>{me.username}<small>{me.role === "admin" ? "管理员" : "个人空间"}</small></span><button className="button-quiet" onClick={() => void logout()} disabled={busy && mode !== "workspace"}>退出 / 换号</button></div>}
+      <div className="topbar-actions"><ThemeToggle/>{me && <div className="account"><span className="avatar" aria-hidden="true">{me.username.slice(0, 1).toUpperCase()}</span><span>{me.username}<small>{me.role === "admin" ? "管理员" : "个人空间"}</small></span><button className="button-quiet" onClick={() => void logout()} disabled={busy && mode !== "workspace"}>退出 / 换号</button></div>}</div>
     </header><main>
       {mode === "checking" && <div className="center-state" role="status"><span className="spinner"/>正在确认登录状态…</div>}
       {mode === "unavailable" && <section className="reconnect"><p className="eyebrow">连接状态</p><h1>暂时无法连接</h1><p role="alert">{notice}</p><button onClick={() => void restore()}>重新连接</button></section>}

@@ -7,18 +7,22 @@ import sqlite3
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
+import asyncio
 
 from fastapi.testclient import TestClient
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from backend.auth.accounts import change_account
+from backend.auth.boundary import AuthBoundary
 from backend.auth.settings import AuthSettings
 from backend.auth.store import digest
 from backend.db.connection import ROOT
 from backend.db.models import AuthSession, User
 from backend.db.seed import seed
 from backend.main import create_app
+from sqlalchemy.exc import OperationalError
 from scripts.migrate_database import migrate
 
 ORIGIN = "http://127.0.0.1:3000"
@@ -283,6 +287,58 @@ class AuthTests(unittest.TestCase):
         response = self.client.get("/auth/me")
         self.status(response, 503)
         self.assertEqual(response.json(), {"detail": "SERVICE_UNAVAILABLE"})
+
+    def test_session_heartbeat_real_write_lock_returns_503_without_renewal(self):
+        self.login()
+        token = self.token()
+        with Session(self.app.state.engine) as db:
+            original_seen = db.get(AuthSession, digest(token)).last_seen
+        self.timestamp += 10
+        with closing(sqlite3.connect(self.path)) as writer:
+            writer.execute("BEGIN IMMEDIATE")
+            try:
+                response = self.client.get("/auth/me")
+                self.status(response, 503)
+                self.assertEqual(response.json(), {"detail": "SERVICE_UNAVAILABLE"})
+                self.assertNotIn("set-cookie", response.headers)
+            finally:
+                writer.rollback()
+        with Session(self.app.state.engine) as db:
+            self.assertEqual(db.get(AuthSession, digest(token)).last_seen, original_seen)
+        self.status(self.client.get("/auth/me"), 200)
+        change_account(self.app.state.engine, "A", "revoke", self.timestamp)
+        self.status(self.client.get("/auth/me"), 401)
+
+    def test_committed_login_heartbeat_failure_is_redacted_unknown_503(self):
+        # Login commits its session before starsessions saves the heartbeat.
+        # A transport failure here must not emit either a success or a cookie.
+        error = OperationalError("private SQL", {}, sqlite3.OperationalError("private storage"))
+        with patch.object(self.app.state.store, "write_sync", side_effect=error):
+            response = self.post("/auth/login", {"username": "A", "password": self.passwords["A"]})
+        self.status(response, 503)
+        self.assertEqual(response.json(), {"detail": "SERVICE_UNAVAILABLE"})
+        self.assertNotIn("set-cookie", response.headers)
+        with Session(self.app.state.engine) as db:
+            self.assertEqual(len(list(db.scalars(select(AuthSession)))), 1)
+        self.login()
+
+    def test_database_boundary_never_rewrites_started_response_or_other_runtime_error(self):
+        messages = []
+        async def send(message):
+            messages.append(message)
+        async def receive():
+            return {"type": "http.request", "body": b""}
+        async def started(scope, receive, send):
+            await send({"type": "http.response.start", "status": 200, "headers": []})
+            raise OperationalError("private SQL", {}, sqlite3.OperationalError("private storage"))
+        scope = {"type": "http", "method": "GET", "path": "/auth/me"}
+        with self.assertRaises(OperationalError):
+            asyncio.run(AuthBoundary(started, ORIGIN)(scope, receive, send))
+        self.assertEqual([m["status"] for m in messages if m["type"] == "http.response.start"], [200])
+        async def unrelated(scope, receive, send):
+            raise RuntimeError("unrelated implementation failure")
+        with self.assertRaisesRegex(RuntimeError, "unrelated"):
+            asyncio.run(AuthBoundary(unrelated, ORIGIN)(scope, receive, send))
 
 
 if __name__ == "__main__":

@@ -17,6 +17,8 @@ function loadTs(path) {
     if (name === './indexes') return loadTs('components/workspace/indexes.tsx');
     if (name === './audit') return loadTs('components/workspace/audit.tsx');
     if (name === './history') return loadTs('components/workspace/history.tsx');
+    if (name === '../theme-toggle') return loadTs('components/theme-toggle.tsx');
+    if (name === '@/lib/theme') return loadTs('lib/theme.ts');
     if (name === '@/lib/history-state') return loadTs('lib/history-state.ts');
     if (name === '@/lib/account-state') return loadTs('lib/account-state.ts');
     if (name === '@/lib/task-state') return loadTs('lib/task-state.ts');

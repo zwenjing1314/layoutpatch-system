@@ -28,6 +28,12 @@ class AuthBoundary:
         async def reject(code, detail):
             await JSONResponse({"detail": detail}, status_code=code)(scope, receive, no_store)
 
+        def database_failure(error):
+            # Starlette marks its inner response started before starsessions
+            # saves the heartbeat. That save may fail before ANY header reaches
+            # this boundary; Starlette then wraps the DB error in RuntimeError.
+            return isinstance(error, SQLAlchemyError) or isinstance(error.__cause__, SQLAlchemyError)
+
         if scope["method"] not in ("GET", "HEAD", "OPTIONS"):
             headers = Headers(scope=scope)
             if headers.getlist("origin") != [self.origin] or headers.get("sec-fetch-site") == "cross-site":
@@ -61,14 +67,14 @@ class AuthBoundary:
 
             try:
                 await self.app(scope, replay, no_store)
-            except SQLAlchemyError:
-                if started:
+            except (SQLAlchemyError, RuntimeError) as error:
+                if started or not database_failure(error):
                     raise
                 await reject(503, "SERVICE_UNAVAILABLE")
         else:
             try:
                 await self.app(scope, receive, no_store)
-            except SQLAlchemyError:
-                if started:
+            except (SQLAlchemyError, RuntimeError) as error:
+                if started or not database_failure(error):
                     raise
                 await reject(503, "SERVICE_UNAVAILABLE")

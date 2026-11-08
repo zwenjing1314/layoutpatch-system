@@ -1,5 +1,14 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R32 / 3-6主题独立状态
+
+新增lib/theme.ts（纯偏好store与预绘制脚本）、ThemeToggle和theme.css。RootLayout加载统一语义变量，默认根dark；Home和Workspace只挂按钮，不把theme放入Home认证/请求状态。useSyncExternalStore独立订阅与storage同步，SSR固定dark，首绘前恢复偏好，存储故障不阻断当前页。只存light/dark，不缓存身份、问题、结果、签名或Blob。
+
+六份现有CSS使用角色变量，文档paper与区域几何保持；另修窄屏时打开history dialog的祖先display和深色canvas缩放文字。后端/迁移/原模型/SDK/业务hooks及region组件不变。新227后端含1既有跳过、13CPU/115前端/tsc/隔离build/73网页通过；真实两模式和区域共3新CPU Q、1旧P′/D0，不在切换时推理。详见[手册](stage3-6-runbook.md)。
+
+正式0008/旧GET/旧前端保持未部署，隔离服务结束后按身份停止。阶段3各小批的适用证据不能相加当作整体出口；下一步只建议联动复核并等待明确指令，不自动进行预算适配、部署或阶段4。
+
+
 ## 2026-11-08｜R31 / 3-5配置与索引增量
 
 保留不可变colpali_full_v1；profile_identity集中校验冻结配置，离线子进程核13本地文件/2实现，不加载模型、不允许网络。0013新增操作/事件和system_state.index_epoch>=1，旧空活动指针在预约锁内固定原唯一ready代。仅管理员状态/verify/rebuild/activate及网页，无任意配置编辑或预算profile。

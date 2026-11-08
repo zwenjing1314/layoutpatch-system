@@ -1,5 +1,14 @@
 # 模块与接口契约
 
+## 2026-11-08｜R32 / 3-6前端主题偏好契约
+
+没有新表/API/事务/SDK。`html[data-theme]`仅dark/light，默认dark；head同步脚本在body前严格恢复localStorage键`layoutpatch-theme`，缺失/非法/读失败回dark。ThemeToggle使用独立useSyncExternalStore，server snapshot固定dark，当前snapshot取根属性；仅html抑制预绘制属性差异，未全站忽略水合错误。
+
+切换先改当前根属性/通知订阅，再尝试写非敏感偏好；写失败本页仍可切换，但不承诺刷新持久化。storage仅响应该键的合法值或clear，清除回dark，无系统主题自动跟随。登录/首改/连接状态和所有工作台页面统一入口，可Enter/Space操作；主题不清身份/查询/结果/Blob、不发业务请求或推理。
+
+PNG/crop像素与高亮几何不参与主题，paper保持白、无全页反色或图像filter；语义表面/文字/边框/警告/危险/焦点两套值见theme.css。仅前端偏好存浏览器，业务历史仍服务端授权。新73网页检查与74份SDK相同见[手册](stage3-6-runbook.md)，正式旧构建未部署。
+
+
 ## 2026-11-08｜R31 / 3-5配置与索引契约
 
 新增GET `/admin/index-management`：仅当前已首改管理员，offset/operation_offset独立0—1000000，每页10；返回不可变profile安全身份、当前active_index_id/index_epoch、索引代及操作安全成本。两个独立Session复核身份/快照，变动409、依赖503。无任意配置编辑/路径/集合名/凭据/向量或private文档内容。
