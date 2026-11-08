@@ -1,5 +1,13 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R29 / 3-4B历史网页增量
+
+Home接useRecordedSearch、useHistory及history-state；Workspace挂本人HistorySidebar/Menu/Dialog/Banner和独立history.css，复用现有SDK、认证锁定、页面预览与useRegions。新增22前端测试后共93；后端、表、迁移、OpenAPI/产品SDK、算法和依赖均保持。
+
+提交、列表、详情和写入各自RequestGeneration；提交/写入同步ref防同帧重复，迟到响应须代号和身份有效才应用。未知POST保留原body与request_id，240秒等待/本地取消均不承诺模型取消；显式同ID核对才重发。其他请求15秒；元数据原version、无乐观更新/写入重试。对外反馈明确未知与本地清理，不误称已删除。
+
+历史结果复用SearchResponse呈现，保留原rank-score和失效缺口，当前会话新签PNG及显式区域定位。恢复单文档只保存已核对标量目标，不伪造授权列表对象；失效禁止自动切库。清结果统一取消详情/提交、回收Blob、清区域，退出/换号/401另清列表/草稿，原生命周期守卫保持。实际新原链/浏览器与限制见[手册](stage3-4b-runbook.md)。正式仍0008及旧运行构建，新源码已POST，未部署；不自动进入3-4C、主题或预算。
+
 ## 2026-11-08｜R28 / 3-4A查询历史增量
 
 新增history.schemas/service/routes及0012的QueryRequest/QueryHistory/QueryHistoryHit/HistoryEvent四表。POST /search和旧GET共用execute_search，沿用原算法/过滤/命中校验/排序和scope复核；预约/最终保存为短BEGIN IMMEDIATE，锁后当前身份/CSRF/版本/范围复核，模型在锁外。成功或合法空范围才原子落正文/命中/事件/completed；持久request marker实现并发一次推理及删除后去重，失败/启动中断不会自动推理。

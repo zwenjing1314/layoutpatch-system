@@ -1,10 +1,10 @@
 "use client";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { setCsrfToken } from "@/lib/api/client";
-import { ApiError, AuthService, DocumentsService, SearchService } from "@/lib/api/generated";
-import type { DocumentListItem, DocumentListResponse, MeResponse, SearchHit, SearchResponse } from "@/lib/api/generated";
+import { ApiError, AuthService, DocumentsService } from "@/lib/api/generated";
+import type { DocumentListItem, DocumentListResponse, HistoryDetail, MeResponse, SearchHit, SearchResponse } from "@/lib/api/generated";
 import { RequestGeneration, privatePreviewPath } from "@/lib/workspace-lifecycle";
-import { matchesSearchTarget, searchDocumentId } from "@/lib/document-selection";
+import { searchDocumentId } from "@/lib/document-selection";
 import type { SearchMode } from "@/lib/document-selection";
 import { WorkspaceShell } from "@/components/workspace/workspace";
 import "./workspace.css";
@@ -14,6 +14,10 @@ import { useRegions } from '@/lib/use-regions';
 import { useAccounts } from '@/lib/use-accounts';
 import { useSharing } from '@/lib/use-sharing';
 import { useDeletion } from '@/lib/use-deletion';
+import { useHistory } from '@/lib/use-history';
+import { useRecordedSearch } from '@/lib/use-recorded-search';
+import { canRepeatHistory, historyResult } from '@/lib/history-state';
+import './history.css';
 
 type Mode = "checking" | "login" | "password" | "workspace" | "unavailable";
 type Cancelable<T> = PromiseLike<T> & { cancel(): void };
@@ -25,6 +29,9 @@ export default function Home() {
   const [busy, setBusy] = useState(false);
   const [question, setQuestion] = useState("");
   const [submittedQuestion, setSubmittedQuestion] = useState("");
+  const [queryK, setQueryK] = useState(3);
+  const [historyDetail, setHistoryDetail] = useState<HistoryDetail | null>(null);
+  const [restoredTarget, setRestoredTarget] = useState<{id:string|null;available:boolean}|null>(null);
   const [result, setResult] = useState<SearchResponse | null>(null);
   const [selected, setSelected] = useState<SearchHit | null>(null);
   const [image, setImage] = useState<string | null>(null);
@@ -93,6 +100,29 @@ export default function Home() {
     onChanged: () => { clearResults(); clearDocuments(); resetTasks(); taskWorkspace.panel.onRefresh(); resetSharing(); },
   });
   const resetDeletion = deletionWorkspace.reset;
+  const recordedSearch = useRecordedSearch({
+    enabled: mode === 'workspace' && !leavingWorkspace, userId: me?.user_id ?? null,
+    onStart: body => {
+      clearResults(); resetAccounts(); resetSharing(); resetDeletion(); setWorkspaceView('search');
+      setQuestion(body.q); setSubmittedQuestion(body.q); setQueryK(body.k ?? 3);
+      setSearchMode(body.document_id ? 'document' : 'library'); setNotice('');
+    },
+    onResult: (detail, replayed) => { applyHistory(detail); historyWorkspace.reload(); setNotice(replayed ? '已按同一请求编号取回保存结果，没有重新推理。' : '本次真实检索已保存到本人历史。'); },
+    onSessionError: historySessionError,
+  });
+  const resetRecordedSearch = recordedSearch.reset, cancelRecordedSearch = recordedSearch.cancel;
+  const historyWorkspace = useHistory({
+    enabled: mode === 'workspace' && !leavingWorkspace, userId: me?.user_id ?? null, selectedId: historyDetail?.entry.history_id ?? null,
+    onSessionError: historySessionError,
+    onOpening: () => {
+      clearResults(); clearDocuments(); resetAccounts(); resetSharing(); resetDeletion();
+      setWorkspaceView('search'); setQuestion(''); setNotice('');
+    },
+    onOpened: detail => { applyHistory(detail); setNotice('已打开历史，未执行新检索。'); },
+    onUpdated: entry => setHistoryDetail(old => old?.entry.history_id === entry.history_id ? {...old,entry} : old),
+    onUnavailable: id => { if (historyDetail?.entry.history_id === id) { clearResults(); clearDocuments(); setQuestion(''); setNotice('已清理当前历史的页面与区域，请从列表重新核对记录。'); } },
+  });
+  const resetHistory = historyWorkspace.reset, cancelHistoryOpen = historyWorkspace.cancelOpen;
 
   const clearImage = useCallback(() => {
     imageSequence.current += 1; imageRequest.current?.abort(); imageRequest.current = null;
@@ -100,17 +130,18 @@ export default function Home() {
     imageObject.current = null; setImage(null); setImageBusy(false); setImageError("");
   }, []);
   const clearResults = useCallback(() => {
-    generation.current.reset(); resetRegions(); clearImage(); setResult(null); setSelected(null); setSubmittedQuestion(""); setBusy(false);
-  }, [clearImage,resetRegions]);
+    generation.current.reset(); cancelHistoryOpen(); cancelRecordedSearch(); resetRegions(); clearImage();
+    setResult(null); setHistoryDetail(null); setRestoredTarget(null); setSelected(null); setSubmittedQuestion(""); setBusy(false);
+  }, [clearImage, resetRegions, cancelHistoryOpen, cancelRecordedSearch]);
   const clearDocuments = useCallback(() => {
     listGeneration.current.reset(); listScope.current = null; targetRef.current = null;
     setSearchMode("library"); setTargetDocument(null); setDocumentName(""); setDocumentList(null);
     setListBusy(false); setListError(""); setListCursors([null]);
   }, []);
   const lock = useCallback((next: Mode = "login", message = "") => {
-    clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); resetDeletion(); setWorkspaceView("search"); setLeavingWorkspace(false); setCsrfToken(); identity.current = null;
+    clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); resetDeletion(); resetHistory(); resetRecordedSearch(); setQueryK(3); setWorkspaceView("search"); setLeavingWorkspace(false); setCsrfToken(); identity.current = null;
     setMe(null); setQuestion(""); setMode(next); setNotice(message); form.current?.reset();
-  }, [clearResults, clearDocuments, resetTasks, resetAccounts, resetSharing, resetDeletion]);
+  }, [clearResults, clearDocuments, resetTasks, resetAccounts, resetSharing, resetDeletion, resetHistory, resetRecordedSearch]);
   const announce = useCallback(() => { channel.current?.postMessage("session-changed"); }, []);
   async function tracked<T>(request: Cancelable<T>) {
     const release = generation.current.track(() => request.cancel());
@@ -169,13 +200,23 @@ export default function Home() {
       const detail = (error.body as { detail?: string } | undefined)?.detail;
       if (error.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
       if (error.status === 403 && detail === "PASSWORD_CHANGE_REQUIRED") {
-        clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); resetDeletion(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
+        clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); resetDeletion(); resetHistory(); resetRecordedSearch(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
       }
       if (error.status === 404 || error.status === 409) { invalidateDocumentScope(); return; }
       if (error.status === 503) { setNotice(detail === "MODEL_BUSY" ? "检索服务繁忙，请稍后重试。" : "检索服务暂时不可用，请稍后重试。"); return; }
       if (error.status === 422) { setNotice("请检查问题长度和返回页数。"); return; }
     }
     setNotice("连接暂时中断，请稍后重试。");
+  }
+  function historySessionError(error: unknown) {
+    if (error instanceof ApiError && error.status === 403 && (error.body as {detail?:string})?.detail !== 'PASSWORD_CHANGE_REQUIRED') void restore();
+    else businessError(error);
+  }
+  function applyHistory(detail: HistoryDetail) {
+    clearDocuments(); setHistoryDetail(detail); setQuestion(detail.q); setSubmittedQuestion(detail.q); setQueryK(detail.k);
+    setSearchMode(detail.search_mode); setRestoredTarget(detail.search_mode === 'document' ? {id:detail.document_id,available:detail.target_available === true} : null);
+    setResult(historyResult(detail)); setWorkspaceView('search');
+    if (detail.items[0]) void preview(detail.items[0]);
   }
   function invalidateDocumentScope(message = searchMode === "document" ? "文档或访问范围已变化，请重新选择文档后检索。" : "可访问的文档已变化，请重新检索。") {
     clearResults(); targetRef.current = null; setTargetDocument(null);
@@ -265,7 +306,7 @@ export default function Home() {
   }
   async function logout() {
     const csrf = me?.csrf_token;
-    setLeavingWorkspace(true); clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); resetDeletion(); setQuestion(""); setNotice(""); setBusy(true);
+    setLeavingWorkspace(true); clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); resetDeletion(); resetHistory(); resetRecordedSearch(); setQuestion(""); setNotice(""); setBusy(true);
     const stamp = generation.current.current();
     try {
       setCsrfToken(csrf); await tracked(AuthService.logout());
@@ -285,7 +326,7 @@ export default function Home() {
       });
       if (!generation.current.accepts(stamp) || sequence !== imageSequence.current) return;
       if (response.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
-      if (response.status === 403) { clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); resetDeletion(); setMode("password"); setNotice("请先设置新密码。"); return; }
+      if (response.status === 403) { clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); resetDeletion(); resetHistory(); resetRecordedSearch(); setMode("password"); setNotice("请先设置新密码。"); return; }
       if (response.status === 404) { invalidateDocumentScope("页面访问权限已变化，请重新检索。"); return; }
       if (!response.ok || response.headers.get("content-type")?.split(";", 1)[0] !== "image/png") throw new Error("Preview unavailable");
       const blob = await response.blob();
@@ -301,16 +342,9 @@ export default function Home() {
     if (!q || q.length > 2000 || !Number.isInteger(k) || k < 1 || k > 50) { setNotice("请检查问题长度和返回页数。"); return; }
     const target = targetRef.current;
     let documentId: string | undefined;
-    try { documentId = searchDocumentId(searchMode, target); }
+    try { documentId = searchMode === 'document' && !target && restoredTarget?.available && restoredTarget.id ? restoredTarget.id : searchDocumentId(searchMode, target); }
     catch { setNotice("请先选择一份已就绪的文档，再检索内容。"); return; }
-    clearResults(); setSubmittedQuestion(q); setNotice(""); setBusy(true); const stamp = generation.current.current();
-    try {
-      const response = await tracked(SearchService.searchPages(q, k, documentId));
-      if (!generation.current.accepts(stamp)) return;
-      if (!matchesSearchTarget(response, searchMode, target)) { clearResults(); setNotice("返回的检索范围不一致，请重新选择后检索。"); return; }
-      setResult(response); if (response.items[0]) void preview(response.items[0], stamp);
-    } catch (error) { if (generation.current.accepts(stamp)) businessError(error); }
-    finally { if (generation.current.accepts(stamp)) setBusy(false); }
+    await recordedSearch.submit(q, k, documentId);
   }
 
   if (mode === "workspace" && me) return <WorkspaceShell
@@ -319,10 +353,15 @@ export default function Home() {
       if (workspaceView === "accounts" && next !== "accounts") resetAccounts();
       if (workspaceView === "sharing" && next !== "sharing") resetSharing();
       if (workspaceView === "deletion" && next !== "deletion") resetDeletion();
+      if (next !== workspaceView) clearResults();
       setWorkspaceView(next);
-    }} taskPanel={taskWorkspace.panel} accountPanel={accountWorkspace.panel} sharingPanel={sharingWorkspace.panel} deletionPanel={deletionWorkspace.panel}
+    }} taskPanel={taskWorkspace.panel} accountPanel={accountWorkspace.panel} sharingPanel={sharingWorkspace.panel} deletionPanel={deletionWorkspace.panel} historyPanel={historyWorkspace.panel}
     username={me.username} role={me.role} question={question} submittedQuestion={submittedQuestion}
-    busy={busy} notice={notice} result={result} selected={selected}
+    busy={busy || recordedSearch.busy || historyWorkspace.panel.opening !== null} notice={notice} result={result} selected={selected}
+    queryK={queryK} onKChange={setQueryK} historyDetail={historyDetail} restoredTarget={restoredTarget}
+    searchPending={recordedSearch.pending} searchNotice={recordedSearch.notice}
+    onVerifySearch={() => void recordedSearch.verify()} onDismissSearch={recordedSearch.dismiss}
+    onRepeatHistory={() => { if (historyDetail && canRepeatHistory(historyDetail)) void recordedSearch.submit(historyDetail.q,historyDetail.k,historyDetail.document_id); }}
     image={image} imageBusy={imageBusy} imageError={imageError} regions={regionWorkspace.panel}
     searchMode={searchMode} targetDocument={targetDocument} onModeChange={changeSearchMode}
     documentPicker={{ name: documentName, response: documentList, busy: listBusy, error: listError, selected: targetDocument, page: listCursors.length,
@@ -332,7 +371,7 @@ export default function Home() {
       onRefresh: () => { listGeneration.current.reset(); setNotice(current => current === listError ? "" : current); setListCursors([null]); setListRefresh(value => value + 1); },
     }}
     onQuestionChange={setQuestion} onSearch={search} onSelect={hit => void preview(hit)}
-    onNewSearch={() => { resetAccounts(); resetSharing(); resetDeletion(); clearResults(); setWorkspaceView("search"); setQuestion(""); setNotice(""); }}
+    onNewSearch={() => { resetAccounts(); resetSharing(); resetDeletion(); clearResults(); setWorkspaceView("search"); setQuestion(""); setQueryK(3); setNotice(""); }}
     onLogout={() => void logout()}
   />;
 
