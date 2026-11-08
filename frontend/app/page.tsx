@@ -12,6 +12,7 @@ import "./accounts.css";
 import { useUploadTasks } from "@/lib/use-upload-tasks";
 import { useRegions } from '@/lib/use-regions';
 import { useAccounts } from '@/lib/use-accounts';
+import { useSharing } from '@/lib/use-sharing';
 
 type Mode = "checking" | "login" | "password" | "workspace" | "unavailable";
 type Cancelable<T> = PromiseLike<T> & { cancel(): void };
@@ -46,7 +47,7 @@ export default function Home() {
   const identity = useRef<string | null>(null);
   const channel = useRef<BroadcastChannel | null>(null);
   const form = useRef<HTMLFormElement | null>(null);
-  const [workspaceView, setWorkspaceView] = useState<"search" | "tasks" | "accounts">("search");
+  const [workspaceView, setWorkspaceView] = useState<"search" | "tasks" | "accounts" | "sharing">("search");
   const [leavingWorkspace, setLeavingWorkspace] = useState(false);
   const regionWorkspace=useRegions({enabled:mode==='workspace'&&!leavingWorkspace,selected,index:result?.index_generation,
     question:submittedQuestion,onError:error=>businessError(error)});
@@ -74,6 +75,16 @@ export default function Home() {
     },
   });
   const resetAccounts = accountWorkspace.reset;
+  const sharingWorkspace = useSharing({
+    enabled: mode === "workspace" && !leavingWorkspace && me?.role === "admin" && workspaceView === "sharing",
+    userId: me?.user_id ?? null, csrfToken: me?.csrf_token,
+    onSessionError: error => {
+      if (error instanceof ApiError && error.status === 403) void restore();
+      else businessError(error);
+    },
+    onChanged: () => { clearResults(); clearDocuments(); },
+  });
+  const resetSharing = sharingWorkspace.reset;
 
   const clearImage = useCallback(() => {
     imageSequence.current += 1; imageRequest.current?.abort(); imageRequest.current = null;
@@ -89,9 +100,9 @@ export default function Home() {
     setListBusy(false); setListError(""); setListCursors([null]);
   }, []);
   const lock = useCallback((next: Mode = "login", message = "") => {
-    clearResults(); clearDocuments(); resetTasks(); resetAccounts(); setWorkspaceView("search"); setLeavingWorkspace(false); setCsrfToken(); identity.current = null;
+    clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); setWorkspaceView("search"); setLeavingWorkspace(false); setCsrfToken(); identity.current = null;
     setMe(null); setQuestion(""); setMode(next); setNotice(message); form.current?.reset();
-  }, [clearResults, clearDocuments, resetTasks, resetAccounts]);
+  }, [clearResults, clearDocuments, resetTasks, resetAccounts, resetSharing]);
   const announce = useCallback(() => { channel.current?.postMessage("session-changed"); }, []);
   async function tracked<T>(request: Cancelable<T>) {
     const release = generation.current.track(() => request.cancel());
@@ -122,11 +133,11 @@ export default function Home() {
     window.addEventListener("pagehide", pagehide); window.addEventListener("pageshow", pageshow);
     void restore();
     return () => {
-      generation.current.reset(); listGeneration.current.reset(); resetAccounts(); clearImage(); setCsrfToken(); channel.current?.close(); channel.current = null;
+      generation.current.reset(); listGeneration.current.reset(); resetAccounts(); resetSharing(); clearImage(); setCsrfToken(); channel.current?.close(); channel.current = null;
       document.removeEventListener("visibilitychange", visibility);
       window.removeEventListener("pagehide", pagehide); window.removeEventListener("pageshow", pageshow);
     };
-  }, [restore, lock, clearImage, resetAccounts]);
+  }, [restore, lock, clearImage, resetAccounts, resetSharing]);
 
   useEffect(() => {
     if (!me || mode === "checking") return;
@@ -150,7 +161,7 @@ export default function Home() {
       const detail = (error.body as { detail?: string } | undefined)?.detail;
       if (error.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
       if (error.status === 403 && detail === "PASSWORD_CHANGE_REQUIRED") {
-        clearResults(); clearDocuments(); resetTasks(); resetAccounts(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
+        clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); setMode("password"); setNotice("请先设置新密码，再继续检索。"); return;
       }
       if (error.status === 404 || error.status === 409) { invalidateDocumentScope(); return; }
       if (error.status === 503) { setNotice(detail === "MODEL_BUSY" ? "检索服务繁忙，请稍后重试。" : "检索服务暂时不可用，请稍后重试。"); return; }
@@ -246,7 +257,7 @@ export default function Home() {
   }
   async function logout() {
     const csrf = me?.csrf_token;
-    setLeavingWorkspace(true); clearResults(); clearDocuments(); resetTasks(); resetAccounts(); setQuestion(""); setNotice(""); setBusy(true);
+    setLeavingWorkspace(true); clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); setQuestion(""); setNotice(""); setBusy(true);
     const stamp = generation.current.current();
     try {
       setCsrfToken(csrf); await tracked(AuthService.logout());
@@ -266,7 +277,7 @@ export default function Home() {
       });
       if (!generation.current.accepts(stamp) || sequence !== imageSequence.current) return;
       if (response.status === 401) { lock("login", "登录已失效，请重新登录。"); announce(); return; }
-      if (response.status === 403) { clearResults(); clearDocuments(); resetTasks(); resetAccounts(); setMode("password"); setNotice("请先设置新密码。"); return; }
+      if (response.status === 403) { clearResults(); clearDocuments(); resetTasks(); resetAccounts(); resetSharing(); setMode("password"); setNotice("请先设置新密码。"); return; }
       if (response.status === 404) { invalidateDocumentScope("页面访问权限已变化，请重新检索。"); return; }
       if (!response.ok || response.headers.get("content-type")?.split(";", 1)[0] !== "image/png") throw new Error("Preview unavailable");
       const blob = await response.blob();
@@ -298,8 +309,9 @@ export default function Home() {
     view={workspaceView} onViewChange={next => {
       if (next === "accounts" && me.role !== "admin") return;
       if (workspaceView === "accounts" && next !== "accounts") resetAccounts();
+      if (workspaceView === "sharing" && next !== "sharing") resetSharing();
       setWorkspaceView(next);
-    }} taskPanel={taskWorkspace.panel} accountPanel={accountWorkspace.panel}
+    }} taskPanel={taskWorkspace.panel} accountPanel={accountWorkspace.panel} sharingPanel={sharingWorkspace.panel}
     username={me.username} role={me.role} question={question} submittedQuestion={submittedQuestion}
     busy={busy} notice={notice} result={result} selected={selected}
     image={image} imageBusy={imageBusy} imageError={imageError} regions={regionWorkspace.panel}
@@ -311,7 +323,7 @@ export default function Home() {
       onRefresh: () => { listGeneration.current.reset(); setNotice(current => current === listError ? "" : current); setListCursors([null]); setListRefresh(value => value + 1); },
     }}
     onQuestionChange={setQuestion} onSearch={search} onSelect={hit => void preview(hit)}
-    onNewSearch={() => { resetAccounts(); clearResults(); setWorkspaceView("search"); setQuestion(""); setNotice(""); }}
+    onNewSearch={() => { resetAccounts(); resetSharing(); clearResults(); setWorkspaceView("search"); setQuestion(""); setNotice(""); }}
     onLogout={() => void logout()}
   />;
 

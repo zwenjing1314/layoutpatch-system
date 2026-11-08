@@ -1,5 +1,13 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R26 / 3-2共享增量
+
+新增documents.sharing路由/公共事务、0010的授权版本列和最小SharingEvent。管理集合明确为当前管理员本人非删除文档；普通own＋active-admin-shared读取规则保留，其他private无管理/搜索旁路。复用accounts BEGIN IMMEDIATE，在锁内重查会话/首改/admin/CSRF及目标版本，visibility/access_version/事件原子提交；拒绝事件与成功/noop区分，插入事件失败回滚全部状态。
+
+授权版本作为访问代次进入scope/列表指纹/PageFile和v2预览/裁剪签名，推理/读取后的新事务能发现shared→private→shared ABA。regions.service只比较目标文档授权scope，不将授权状态送入D或P′算法缓存，合法旧P′仍可复用；完整BF16、原ColPali/D代码、权重/profile和候选不变。
+
+Home接useSharing、共享管理视图与现有身份锁定/Blob回收；SharingPanel/Dialog只展示对象/影响/确认，hook负责独立请求代号、同步重复锁、有限等待与未知写不重试。SDK新增SharingService四模型。实际后端/SDK/网页及隔离真实原链证据见[手册](stage3-2-runbook.md)，正式0008/原服务保持，未部署。下方旧“未实现共享”只描述其历史时点；删除/历史/主题/预算仍未实施。
+
 ## 2026-11-08｜R25 / 3-1B前端增量
 
 新增AccountsPanel/AccountActionDialog、account-state和useAccounts；原工作台增加管理员专属accounts视图，复用既有AdminService与内存CSRF。列表和写入各用RequestGeneration，ref即时防重复；表单密码在本次DOM/请求中，提交即清空，不进入React状态或应用存储。固定安全提示，不回显后端任意错误文本。

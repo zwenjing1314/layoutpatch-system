@@ -40,12 +40,14 @@ def rank_regions(db,user,page_id,task_id,question,worker,expected_encoder):
         raise ValueError('Invalid question')
     principal_identity=(user.id,user.role,user.auth_version)
     request=prepare_request(db,user,page_id,task_id,expected_encoder)
+    access_scope=allowed_scope(db,user,request['identity']['document_id']).fingerprint
     result=worker.rank_regions(question,request,expected_encoder)
     # End the read transaction so a concurrent revocation/version replacement
     # cannot be hidden by the ORM identity map or a SQLite read snapshot.
     db.rollback()
     if (principal_identity!=(user.id,user.role,user.auth_version)
-            or prepare_request(db,user,page_id,task_id,expected_encoder)!=request):
+            or prepare_request(db,user,page_id,task_id,expected_encoder)!=request
+            or allowed_scope(db,user,request['identity']['document_id']).fingerprint!=access_scope):
         raise ParseError('REGION_INPUT_CHANGED')
     rankings=result['regions']['rankings']
     ids={c['candidate_id']:c['layout_id'] for c in request['candidates']}

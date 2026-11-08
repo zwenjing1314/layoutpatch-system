@@ -107,7 +107,7 @@ def search(request: Request, params: Annotated[SearchInput, Query()]):
         items = [SearchHit(document_id=p.document_id, document_version_id=p.version_id, page_id=p.id,
                            page_index=p.page_index, page_number=p.page_index+1, document_name=p.document_name,
                            page_rank=rank+1, page_score=score, width_px=p.width_px, height_px=p.height_px,
-                           render_sha256=p.render_sha256, preview_url=preview_url(row, p.id, p.render_sha256))
+                           render_sha256=p.render_sha256, preview_url=preview_url(row, p.id, p.render_sha256, p.access_version))
                  for rank, (p, score) in enumerate(result)]
         return SearchResponse(status="ok", search_mode=mode, document_id=document_id, profile_id=scope.profile_id, index_generation=scope.index_id,
                               scope_version=scope.fingerprint, timings_ms={"query_encode_including_queue": encode_ms,

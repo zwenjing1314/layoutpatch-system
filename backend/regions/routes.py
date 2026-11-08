@@ -112,8 +112,8 @@ def bound(state,action):
         raise HTTPException(409,'REGION_INPUT_CHANGED')
 
 
-def crop_token(row,page_id,task_id,candidate_hash,model,layout_id,render):
-    data=f'region-crop-v1:{page_id}:{task_id}:{candidate_hash}:{model}:{layout_id}:{render}'.encode()
+def crop_token(row,page_id,task_id,candidate_hash,model,layout_id,render,access_version=1):
+    data=f'region-crop-v2:{page_id}:{task_id}:{candidate_hash}:{model}:{layout_id}:{render}:{access_version}'.encode()
     return hmac.new(row.csrf_token.encode(),data,hashlib.sha256).hexdigest()
 
 
@@ -159,7 +159,8 @@ def rank_page(page_id:str,action:RegionInput,request:Request):
             items=[]
             for r in ranked['rankings']:
                 c=candidates[r['candidate_id']]
-                token=crop_token(row,page_id,state.task_id,state.candidate_hash,state.model_profile_sha256,r['layout_id'],state.render_sha256)
+                token=crop_token(row,page_id,state.task_id,state.candidate_hash,state.model_profile_sha256,r['layout_id'],state.render_sha256,
+                                 next(p.access_version for p in current_scope.pages if p.id==page_id))
                 url=f'/pages/{page_id}/regions/{r["layout_id"]}/crop?task={state.task_id}&candidate_hash={state.candidate_hash}&model={state.model_profile_sha256}&token={token}'
                 items.append(RegionItem(**r,type=c['type'],bbox=c['bbox'],crop_url=url))
             return RegionResponse(**state.model_dump(),query_sha256=ranked['query_sha256'],items=items)
@@ -185,7 +186,7 @@ def get_crop(page_id:str,layout_id:int,request:Request,task:str='',candidate_has
         if inputs['identity']['candidate_hash']!=candidate_hash:
             raise HTTPException(404,'REGION_NOT_FOUND')
         candidate=next((c for c in inputs['candidates'] if c['layout_id']==layout_id),None)
-        actual=crop_token(row,page_id,task,candidate_hash,model,layout_id,page.render_sha256)
+        actual=crop_token(row,page_id,task,candidate_hash,model,layout_id,page.render_sha256,page.access_version)
         if not candidate or not hmac.compare_digest(actual.encode(),token.encode()):
             raise HTTPException(404,'REGION_NOT_FOUND')
         return session_identity(row,user),page,inputs,candidate

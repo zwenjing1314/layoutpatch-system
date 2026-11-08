@@ -89,7 +89,8 @@ def list_snapshot(db, user, name_key):
             error_code=job.error_code if own and job else None, created_at=doc.created_at,
             searchable=reason is None, unsearchable_reason=reason))
     identity = (user.id, user.role, user.auth_version)
-    fingerprint = sha(canonical({"identity": identity, "index": index_id, "items": [i.model_dump() for i in items]}).encode())
+    fingerprint = sha(canonical({"identity": identity, "index": index_id, "items": [i.model_dump() for i in items],
+                                "access_versions": [(doc.id,doc.access_version) for doc,_,_ in rows]}).encode())
     return items, fingerprint
 
 

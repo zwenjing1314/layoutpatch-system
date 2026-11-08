@@ -1,5 +1,15 @@
 # 模块与接口契约
 
+## 2026-11-08｜R26 / 3-2共享管理契约
+
+新增GET /admin/documents（name/limit/offset，默认10，items/next_offset/scope_version）以及POST /admin/documents/{id}/publish、/unpublish。列表与写入只对已完成首改的当前admin本人非删除文档开放，其他owner统一404；不提供跨private管理或普通搜索旁路。发布须ready/有效当前版本/活动索引全页，撤回不以索引ready阻断。
+
+写入必带document_version_id（UUID或null）、严格整数access_version>=1及confirmed=true，拒绝多余字段/参数；cookie/Origin/CSRF/首改/角色仍逐次检查。BEGIN IMMEDIATE锁后重查权限和版本：旧输入409 SHARING_INPUT_CHANGED，未就绪发布409 DOCUMENT_NOT_READY，当前同状态noop不增加版本，真实visibility变化递增版本；状态/版本/事件原子，事件失败回滚503。返回SharingMutation(document,changed)。安全/schema/未知对象拒绝不造业务事件；已授权业务拒绝记录固定最小事件。
+
+0010增加documents.access_version默认1和sharing_events。授权版本进入普通列表指纹、AllowedScope及PageFile、v2 PNG/crop签名；推理/读取后新事务复查，包括撤回再发布ABA。旧链接404，新检索/定位取新链接。D输入及P′缓存键不增加授权字段；算法不变。SharingService及四模型已生成，48份SDK重新隔离生成一致；详见[手册](stage3-2-runbook.md)。
+
+网页管理员专属入口、每页10份、两个明确确认弹窗；独立列表/写入代号、同步重复锁和15秒等待上限。离页/身份变动清管理，写入成功或结果未知清检索/目标/Blob/区域并刷新；不自动重试写。正式仍0008，未部署本批；未来需另行备份/0010迁移和重启。
+
 ## 2026-11-08｜R25 / 3-1B管理网页接入
 
 无新API/表/SDK契约；实际OpenAPI和隔离重新生成43个SDK文件与R24冻结文件相同。用户管理入口只对当前admin显示，列表limit10与next_offset；五类操作均弹出对象、影响及明确确认。本人输入初始/临时新密码两次，非受控表单提交即清空，不获取或显示已有密码/哈希，不落应用持久存储。

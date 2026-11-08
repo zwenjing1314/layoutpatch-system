@@ -25,6 +25,7 @@ class ScopedPage:
     height_px: int
     render_sha256: str
     embedding_sha256: str
+    access_version: int = 1
 
 
 @dataclass(frozen=True)
@@ -93,7 +94,7 @@ def allowed_scope(db, user, document_id=None):
         if [p.page_index for p, _ in entries] != list(range(version.page_count)):
             raise SearchUnavailable("Incomplete indexed document")
         pages.extend(ScopedPage(p.id, doc.id, version.id, doc.owner_id, doc.visibility, doc.display_name,
-                                p.page_index, p.width_px, p.height_px, p.render_sha256, ip.embedding_sha256)
+                                p.page_index, p.width_px, p.height_px, p.render_sha256, ip.embedding_sha256, doc.access_version)
                      for p, ip in entries)
     return AllowedScope(profile.id, hashlib.sha256(encoder_bytes).hexdigest(), index.id, index.collection_name,
                         index.page_count, index.feature_file_sha256, index.source_manifest_sha256, tuple(pages), document_id)

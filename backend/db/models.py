@@ -57,6 +57,7 @@ class Document(Base):
         self.display_name_key = normalize_name(value)
         return value
     visibility: Mapped[str] = mapped_column(String, default="private")
+    access_version: Mapped[int] = mapped_column(Integer, CheckConstraint("access_version >= 1", name="ck_document_access_version"), server_default="1", default=1)
     status: Mapped[str] = mapped_column(String, default="registered")
     active_version_id: Mapped[str | None] = mapped_column(String(36))
     deleted_at: Mapped[str | None] = mapped_column(String)
@@ -288,4 +289,23 @@ class AccountEvent(Base):
     action: Mapped[str] = mapped_column(String(8))
     outcome: Mapped[str] = mapped_column(String(8))
     code: Mapped[str] = mapped_column(String(64))
+    occurred_at: Mapped[float] = mapped_column(Float)
+
+
+class SharingEvent(Base):
+    """Atomic sharing decisions. No names, content, credentials or signed URLs."""
+    __tablename__ = "sharing_events"
+    __table_args__ = (
+        CheckConstraint("action IN ('publish','unpublish')", name="ck_sharing_action"),
+        CheckConstraint("outcome IN ('success','noop','rejected')", name="ck_sharing_outcome"),
+        CheckConstraint("before_version >= 1 AND after_version >= before_version", name="ck_sharing_versions"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    document_id: Mapped[str] = mapped_column(ForeignKey("documents.id"), index=True)
+    action: Mapped[str] = mapped_column(String(16))
+    outcome: Mapped[str] = mapped_column(String(8))
+    code: Mapped[str] = mapped_column(String(64))
+    before_version: Mapped[int] = mapped_column(Integer)
+    after_version: Mapped[int] = mapped_column(Integer)
     occurred_at: Mapped[float] = mapped_column(Float)

@@ -30,6 +30,7 @@ class PageFile:
     width: int
     height: int
     page_index: int
+    access_version: int = 1
 
 
 def authorized_page(db, user, page_id):
@@ -42,7 +43,7 @@ def authorized_page(db, user, page_id):
         raise HTTPException(404, "PAGE_NOT_FOUND")
     page, doc = result
     return PageFile(page.id, doc.id, page.document_version_id, doc.owner_id, doc.visibility,
-                    page.image_path, page.render_sha256, page.width_px, page.height_px, page.page_index)
+                    page.image_path, page.render_sha256, page.width_px, page.height_px, page.page_index, doc.access_version)
 
 
 def read_verified_image(page):
@@ -78,7 +79,7 @@ def page_image(page_id: str, request: Request, preview: str | None = None):
         page = authorized_page(db, user, page_id)
         values = request.query_params.getlist("preview")
         if (set(request.query_params) != {"preview"} or len(values) != 1 or len(values[0]) != 64
-                or not hmac.compare_digest(values[0].encode(), preview_token(row, page.page_id, page.render_sha256).encode())):
+                or not hmac.compare_digest(values[0].encode(), preview_token(row, page.page_id, page.render_sha256, page.access_version).encode())):
             raise HTTPException(404, "PAGE_NOT_FOUND")
     data = read_verified_image(page)
     with Session(request.app.state.engine) as db:

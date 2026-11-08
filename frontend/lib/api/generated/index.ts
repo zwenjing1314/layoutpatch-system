@@ -36,6 +36,10 @@ export type { RegionResponse } from './models/RegionResponse';
 export type { RegionState } from './models/RegionState';
 export type { SearchHit } from './models/SearchHit';
 export type { SearchResponse } from './models/SearchResponse';
+export type { SharingDocument } from './models/SharingDocument';
+export type { SharingInput } from './models/SharingInput';
+export type { SharingList } from './models/SharingList';
+export type { SharingMutation } from './models/SharingMutation';
 export type { ValidationError } from './models/ValidationError';
 
 export { AdminService } from './services/AdminService';
@@ -43,4 +47,5 @@ export { AuthService } from './services/AuthService';
 export { DocumentsService } from './services/DocumentsService';
 export { PagesService } from './services/PagesService';
 export { SearchService } from './services/SearchService';
+export { SharingService } from './services/SharingService';
 export { SystemService } from './services/SystemService';
