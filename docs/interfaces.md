@@ -1,5 +1,15 @@
 # 模块与接口契约
 
+## 2026-11-08｜R28 / 3-4A本人历史契约
+
+新增POST /search与GET /history、GET/PATCH/DELETE /history/{history_id}。POST仅q（去两端空白1—2000合法文本）/k（严格整数1—50默认3）/document_id（UUID|null）及必填request_id UUID，服务端真实检索并保存；既有GET /search只读不保存。同问题新ID新编码，同本人同ID同输入完成后只重放本人历史/新签当前有效链接；并发running/失败/中断409、异输入409、删历史后旧ID410，不自动再推理。每人1000条（含运行预约），显式删除释放，无静默淘汰。
+
+列表limit默认10/offset默认0，置顶优先再创建时间/ID稳定排序，返回items/next_offset/scope_version/limit_per_user。详情含本人原q/条件/原profile/index/scope/耗时和原rank/score，仅返回当前授权/身份一致的命中，historical=true、不重新编码；失效项只计unavailable_count，不返旧名称/页ID/URL，目标失效document_id=null。当前依赖不可核对则503，不能用旧快照冒充可读。无保存区域/crop/Blob，显式定位仍走现有逐次授权。
+
+PATCH必带严格version及title/pinned至少一项，title单行纯文本去两端空白1—100、pinned严格bool，拒绝显式null；真实变化version+1、同状态noop，旧版本409。DELETE严格version/confirmed=true，删除本人问题/标题及命中，返回history_id/deleted=true；重复404，旧请求键410不复活，不删PDF。所有写Cookie/首改/可信Origin/JSON/CSRF，读取逐次本人；普通admin无私人旁路，unknown/extras/重复分页拒绝，private,no-store/Vary Cookie。
+
+0012仅四张新表；预约、最终保存和元数据写均锁后重新授权，正文/命中/标记/最小事件原子，推理锁外，事件失败回滚。启动遗留running转interrupted，不自动运行。HistoryService及八模型，实际OpenAPI/62份SDK一致；完整失败/保留及响应字段见[手册](stage3-4a-runbook.md)。当前网页仍GET，侧栏3-4B未接；正式0008未部署，未来需新备份/0012迁移/重启。
+
 ## 2026-11-08｜R27 / 3-3本人删除与清理契约
 
 新增GET /documents/deletion（limit默认10、offset、items/next_offset/scope_version）、POST /documents/{id}/delete、GET /documents/{id}/cleanup、POST /documents/{id}/cleanup/retry。仅已首改有效本人会话，管理员/共享接收者无跨owner能力。delete必带document_version_id(UUID或null)、access_version严格整数>=1、confirmed严格true；retry必带attempt严格整数>=1及confirmed=true；拒绝额外/重复参数和字段。写入cookie/Origin/CSRF，匿名401、首改/CSRF403、非本人404、旧版本/尝试409、非法422、数据库503；202只表示撤销访问/重试已接受，不能当物理清理成功。

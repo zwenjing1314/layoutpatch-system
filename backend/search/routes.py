@@ -53,6 +53,24 @@ class SearchResponse(BaseModel):
 @router.get("/search", response_model=SearchResponse, operation_id="search_pages", tags=["search"],
             dependencies=[Depends(load_cookie)])
 def search(request: Request, params: Annotated[SearchInput, Query()]):
+    return execute_search(request, params)
+
+
+def revalidate_search(request, db, identity, scope, document_id):
+    row, user = principal(request, db, require_changed=True)
+    try:
+        current = allowed_scope(db, user, document_id)
+    except HTTPException as exc:
+        if exc.status_code in (404, 409):
+            raise HTTPException(409, "SEARCH_SCOPE_CHANGED") from None
+        raise
+    if identity != (user.id, user.role, user.auth_version) or current != scope:
+        raise HTTPException(409, "SEARCH_SCOPE_CHANGED")
+    return row, user
+
+
+def execute_search(request, params, finalize=None):
+    """One retrieval implementation. Optional finalization never supplies hits."""
     start = time.perf_counter()
     document_id = str(params.document_id) if params.document_id is not None else None
     mode = "document" if document_id is not None else "library"
@@ -65,8 +83,9 @@ def search(request: Request, params: Annotated[SearchInput, Query()]):
             scope = allowed_scope(db, user, document_id)
         if not scope.pages:
             # No model startup and no Qdrant call for empty authorized scope.
-            return SearchResponse(status="empty", search_mode=mode, document_id=document_id, profile_id=scope.profile_id, index_generation=scope.index_id,
-                                  scope_version=scope.fingerprint, timings_ms={"total": (time.perf_counter()-start)*1000}, items=[])
+            response = SearchResponse(status="empty", search_mode=mode, document_id=document_id, profile_id=scope.profile_id, index_generation=scope.index_id,
+                                      scope_version=scope.fingerprint, timings_ms={"total": (time.perf_counter()-start)*1000}, items=[])
+            return finalize(identity, scope, response) if finalize else response
         tick = time.perf_counter()
         vector = request.app.state.model_worker.encode(params.q, scope.encoder_sha256)
         encode_ms = (time.perf_counter()-tick)*1000
@@ -94,24 +113,17 @@ def search(request: Request, params: Annotated[SearchInput, Query()]):
         # Release the earlier read transaction before inference, then reread all
         # authority, including scope changes that could have affected Top-k.
         with Session(request.app.state.engine) as db:
-            row, user = principal(request, db, require_changed=True)
-            try:
-                current = allowed_scope(db, user, document_id)
-            except HTTPException as exc:
-                if exc.status_code in (404, 409):
-                    raise HTTPException(409, "SEARCH_SCOPE_CHANGED") from None
-                raise
-            if identity != (user.id, user.role, user.auth_version) or current != scope:
-                raise HTTPException(409, "SEARCH_SCOPE_CHANGED")
+            row, _ = revalidate_search(request, db, identity, scope, document_id)
         result.sort(key=lambda item: (-item[1], item[0].id))
         items = [SearchHit(document_id=p.document_id, document_version_id=p.version_id, page_id=p.id,
                            page_index=p.page_index, page_number=p.page_index+1, document_name=p.document_name,
                            page_rank=rank+1, page_score=score, width_px=p.width_px, height_px=p.height_px,
                            render_sha256=p.render_sha256, preview_url=preview_url(row, p.id, p.render_sha256, p.access_version))
                  for rank, (p, score) in enumerate(result)]
-        return SearchResponse(status="ok", search_mode=mode, document_id=document_id, profile_id=scope.profile_id, index_generation=scope.index_id,
-                              scope_version=scope.fingerprint, timings_ms={"query_encode_including_queue": encode_ms,
-                              "page_search": search_ms, "total": (time.perf_counter()-start)*1000}, items=items)
+        response = SearchResponse(status="ok", search_mode=mode, document_id=document_id, profile_id=scope.profile_id, index_generation=scope.index_id,
+                                  scope_version=scope.fingerprint, timings_ms={"query_encode_including_queue": encode_ms,
+                                  "page_search": search_ms, "total": (time.perf_counter()-start)*1000}, items=items)
+        return finalize(identity, scope, response) if finalize else response
     except SearchBusy:
         raise HTTPException(503, "MODEL_BUSY", headers={"Retry-After": "5"}) from None
     except SearchUnavailable:

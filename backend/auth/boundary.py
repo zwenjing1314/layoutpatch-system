@@ -10,7 +10,7 @@ class AuthBoundary:
         self.upload_max_bytes = upload_max_bytes
 
     async def __call__(self, scope, receive, send):
-        if scope["type"] != "http" or not (scope["path"] in ("/search", "/index", "/documents", "/jobs") or scope["path"].startswith(("/auth/", "/admin/", "/pages/", "/documents/", "/jobs/"))):
+        if scope["type"] != "http" or not (scope["path"] in ("/search", "/history", "/index", "/documents", "/jobs") or scope["path"].startswith(("/auth/", "/admin/", "/pages/", "/history/", "/documents/", "/jobs/"))):
             await self.app(scope, receive, send)
             return
 

@@ -343,3 +343,88 @@ class DeletionEvent(Base):
     code: Mapped[str] = mapped_column(String(64))
     attempt: Mapped[int] = mapped_column(Integer)
     occurred_at: Mapped[float] = mapped_column(Float)
+
+
+class QueryRequest(Base):
+    """Durable deduplication marker, including after explicit history deletion."""
+    __tablename__ = "query_requests"
+    __table_args__ = (
+        UniqueConstraint("owner_id", "request_key", name="uq_query_request_owner_key"),
+        CheckConstraint("status IN ('running','completed','failed','interrupted','deleted')", name="ck_query_request_status"),
+        CheckConstraint("length(input_sha256)=64", name="ck_query_request_hash"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    request_key: Mapped[str] = mapped_column(String(36))
+    input_sha256: Mapped[str] = mapped_column(String(64))
+    history_id: Mapped[str] = mapped_column(String(36), unique=True, default=new_id)
+    status: Mapped[str] = mapped_column(String(16), default="running")
+    error_code: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class QueryHistory(Base):
+    __tablename__ = "query_histories"
+    __table_args__ = (
+        CheckConstraint("k >= 1 AND k <= 50 AND hit_count >= 0 AND hit_count <= k", name="ck_query_history_counts"),
+        CheckConstraint("version >= 1", name="ck_query_history_version"),
+        CheckConstraint("search_mode IN ('library','document') AND result_status IN ('ok','empty')", name="ck_query_history_states"),
+        CheckConstraint("length(q) BETWEEN 1 AND 2000 AND length(title) BETWEEN 1 AND 100 AND length(original_title) BETWEEN 1 AND 100", name="ck_query_history_text"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    owner_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    request_row_id: Mapped[str] = mapped_column(ForeignKey("query_requests.id"), unique=True)
+    original_title: Mapped[str] = mapped_column(String(100))
+    title: Mapped[str] = mapped_column(String(100))
+    q: Mapped[str] = mapped_column(Text)
+    k: Mapped[int] = mapped_column(Integer)
+    search_mode: Mapped[str] = mapped_column(String(16))
+    target_document_id: Mapped[str | None] = mapped_column(String(36))
+    target_version_id: Mapped[str | None] = mapped_column(String(36))
+    target_access_version: Mapped[int | None] = mapped_column(Integer)
+    profile_id: Mapped[str] = mapped_column(String(36))
+    encoder_sha256: Mapped[str] = mapped_column(String(64))
+    index_generation: Mapped[str] = mapped_column(String(36))
+    scope_version: Mapped[str] = mapped_column(String(64))
+    result_status: Mapped[str] = mapped_column(String(8))
+    hit_count: Mapped[int] = mapped_column(Integer)
+    timings_json: Mapped[str] = mapped_column(Text)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    pinned_at: Mapped[str | None] = mapped_column(String)
+    created_at: Mapped[str] = mapped_column(String, default=now)
+    updated_at: Mapped[str] = mapped_column(String, default=now)
+
+
+class QueryHistoryHit(Base):
+    """Scalar references deliberately survive physical document/version/page deletion."""
+    __tablename__ = "query_history_hits"
+    __table_args__ = (
+        UniqueConstraint("history_id", "page_id", name="uq_query_history_page"),
+        CheckConstraint("page_rank >= 1 AND page_rank <= 50 AND access_version >= 1", name="ck_query_history_hit_counts"),
+    )
+    history_id: Mapped[str] = mapped_column(ForeignKey("query_histories.id"), primary_key=True)
+    page_rank: Mapped[int] = mapped_column(Integer, primary_key=True)
+    page_id: Mapped[str] = mapped_column(String(36))
+    document_id: Mapped[str] = mapped_column(String(36))
+    document_version_id: Mapped[str] = mapped_column(String(36))
+    render_sha256: Mapped[str] = mapped_column(String(64))
+    embedding_sha256: Mapped[str] = mapped_column(String(64))
+    access_version: Mapped[int] = mapped_column(Integer)
+    page_score: Mapped[float] = mapped_column(Float)
+
+
+class HistoryEvent(Base):
+    """Action metadata only. No query, title, result body, paths or signed URLs."""
+    __tablename__ = "history_events"
+    __table_args__ = (
+        CheckConstraint("action IN ('create','update','delete')", name="ck_history_event_action"),
+        CheckConstraint("outcome IN ('success','noop') AND version >= 1", name="ck_history_event_result"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    actor_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
+    history_id: Mapped[str] = mapped_column(String(36), index=True)
+    action: Mapped[str] = mapped_column(String(8))
+    outcome: Mapped[str] = mapped_column(String(8))
+    version: Mapped[int] = mapped_column(Integer)
+    occurred_at: Mapped[float] = mapped_column(Float)

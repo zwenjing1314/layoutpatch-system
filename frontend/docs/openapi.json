@@ -487,6 +487,247 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "history"
+        ],
+        "summary": "Recorded Search",
+        "operationId": "search_and_record_history",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistorySearchInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/history": {
+      "get": {
+        "tags": [
+          "history"
+        ],
+        "summary": "Listing",
+        "operationId": "list_query_history",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryList"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/history/{history_id}": {
+      "get": {
+        "tags": [
+          "history"
+        ],
+        "summary": "Get Detail",
+        "operationId": "get_query_history",
+        "parameters": [
+          {
+            "name": "history_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "History Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "history"
+        ],
+        "summary": "Update",
+        "operationId": "update_query_history",
+        "parameters": [
+          {
+            "name": "history_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "History Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistoryUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorySummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "history"
+        ],
+        "summary": "Remove",
+        "operationId": "delete_query_history",
+        "parameters": [
+          {
+            "name": "history_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "History Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HistoryDeleteInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoryDeleteResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/pages/{page_id}/image": {
@@ -2179,6 +2420,346 @@
         },
         "type": "object",
         "title": "HealthResponse"
+      },
+      "HistoryDeleteInput": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "title": "Confirmed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version",
+          "confirmed"
+        ],
+        "title": "HistoryDeleteInput"
+      },
+      "HistoryDeleteResponse": {
+        "properties": {
+          "history_id": {
+            "type": "string",
+            "title": "History Id"
+          },
+          "deleted": {
+            "type": "boolean",
+            "const": true,
+            "title": "Deleted",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "history_id"
+        ],
+        "title": "HistoryDeleteResponse"
+      },
+      "HistoryDetail": {
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/HistorySummary"
+          },
+          "historical": {
+            "type": "boolean",
+            "const": true,
+            "title": "Historical",
+            "default": true
+          },
+          "q": {
+            "type": "string",
+            "title": "Q"
+          },
+          "k": {
+            "type": "integer",
+            "title": "K"
+          },
+          "search_mode": {
+            "type": "string",
+            "enum": [
+              "library",
+              "document"
+            ],
+            "title": "Search Mode"
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "target_available": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Available"
+          },
+          "profile_id": {
+            "type": "string",
+            "title": "Profile Id"
+          },
+          "index_generation": {
+            "type": "string",
+            "title": "Index Generation"
+          },
+          "scope_version": {
+            "type": "string",
+            "title": "Scope Version"
+          },
+          "current_scope_version": {
+            "type": "string",
+            "title": "Current Scope Version"
+          },
+          "timings_ms": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Timings Ms"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SearchHit"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "unavailable_count": {
+            "type": "integer",
+            "title": "Unavailable Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "entry",
+          "q",
+          "k",
+          "search_mode",
+          "document_id",
+          "target_available",
+          "profile_id",
+          "index_generation",
+          "scope_version",
+          "current_scope_version",
+          "timings_ms",
+          "items",
+          "unavailable_count"
+        ],
+        "title": "HistoryDetail"
+      },
+      "HistoryList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/HistorySummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_offset": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Offset"
+          },
+          "scope_version": {
+            "type": "string",
+            "title": "Scope Version"
+          },
+          "limit_per_user": {
+            "type": "integer",
+            "title": "Limit Per User"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_offset",
+          "scope_version",
+          "limit_per_user"
+        ],
+        "title": "HistoryList"
+      },
+      "HistorySearchInput": {
+        "properties": {
+          "q": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Q"
+          },
+          "k": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "K",
+            "default": 3
+          },
+          "document_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Id"
+          },
+          "request_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Request Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "q",
+          "request_id"
+        ],
+        "title": "HistorySearchInput"
+      },
+      "HistorySearchResponse": {
+        "properties": {
+          "replayed": {
+            "type": "boolean",
+            "title": "Replayed"
+          },
+          "history": {
+            "$ref": "#/components/schemas/HistoryDetail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "replayed",
+          "history"
+        ],
+        "title": "HistorySearchResponse"
+      },
+      "HistorySummary": {
+        "properties": {
+          "history_id": {
+            "type": "string",
+            "title": "History Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "original_title": {
+            "type": "string",
+            "title": "Original Title"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "title": "Updated At"
+          },
+          "pinned_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pinned At"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "result_status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "empty"
+            ],
+            "title": "Result Status"
+          },
+          "hit_count": {
+            "type": "integer",
+            "title": "Hit Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "history_id",
+          "title",
+          "original_title",
+          "created_at",
+          "updated_at",
+          "pinned_at",
+          "version",
+          "result_status",
+          "hit_count"
+        ],
+        "title": "HistorySummary"
+      },
+      "HistoryUpdateInput": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Version"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "pinned": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pinned"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "HistoryUpdateInput"
       },
       "JobActionInput": {
         "properties": {

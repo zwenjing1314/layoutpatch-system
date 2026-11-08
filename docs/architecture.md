@@ -1,5 +1,13 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R28 / 3-4A查询历史增量
+
+新增history.schemas/service/routes及0012的QueryRequest/QueryHistory/QueryHistoryHit/HistoryEvent四表。POST /search和旧GET共用execute_search，沿用原算法/过滤/命中校验/排序和scope复核；预约/最终保存为短BEGIN IMMEDIATE，锁后当前身份/CSRF/版本/范围复核，模型在锁外。成功或合法空范围才原子落正文/命中/事件/completed；持久request marker实现并发一次推理及删除后去重，失败/启动中断不会自动推理。
+
+历史命中只存标量ID/hash/授权代次和原rank/score，特意不对document/version/page建FK、不保存名称/路径/签名/Blob/区域，避免历史阻挡3-3物理清理或复活撤回。详情从当前allowed_scope筛选身份一致的旧引用，再用当前会话新签PNG，失效只计数，打开/重放不执行query或D。本人元数据版本/删除和最小事件原子，title/置顶不改变原问题；私有历史无admin跨owner旁路。
+
+历史quota1000含运行预约，显式删除释放，不自动过期；问题/标题/命中删除后仅留无正文的请求摘要/状态及最小事件，保留政策后续3-4C制定。前端只新增生成SDK/线路契约测试，没有工作台/侧栏/主题变更，现有GET不落历史。正式仍0008未部署；[本轮证据与限制](stage3-4a-runbook.md)不扩大成完整阶段3完成。
+
 ## 2026-11-08｜R27 / 3-3删除生命周期增量
 
 新增documents.deletion公共BEGIN IMMEDIATE事务、CleanupRunner及0011的DocumentCleanup/DeletionEvent。墓碑和授权版本先原子提交使全部现有读取/管理入口失效；后台物理清理与外部Qdrant/文件不构成一个分布式事务，使用持久manifest、精确点删除/保留点校验、幂等缺失路径及失败重试协调。清理完成只留通用名墓碑/控制和最小事件，删除原版本/页/候选/特征/解析/任务，不引入恢复入口。

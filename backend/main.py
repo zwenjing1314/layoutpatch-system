@@ -31,6 +31,8 @@ from backend.parsing.runner import ParsingRunner, recover as recover_parsing
 from backend.regions.routes import router as regions_router
 from backend.documents.deletion import router as deletion_router
 from backend.documents.cleanup import CleanupRunner, recover_cleanup
+from backend.history.routes import router as history_router
+from backend.history.service import recover_history
 
 
 class HealthResponse(BaseModel):
@@ -47,6 +49,7 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
             recover_uploads(engine)
             recover_parsing(engine)
             recover_cleanup(engine)
+            recover_history(engine)
             if app.state.cleanup_enabled:
                 app.state.cleanup.start()
             if app.state.parsing_enabled:
@@ -107,6 +110,7 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
     app.include_router(router)
     app.include_router(accounts_router)
     app.include_router(search_router)
+    app.include_router(history_router)
     app.include_router(pages_router)
     app.include_router(deletion_router)
     app.include_router(ingest_router)
