@@ -11,6 +11,8 @@ function loadTs(path) {
     if (name === './document-picker') return loadTs('components/workspace/document-picker.tsx');
     if (name === './upload-tasks') return loadTs('components/workspace/upload-tasks.tsx');
     if (name === './region-evidence') return loadTs('components/workspace/region-evidence.tsx');
+    if (name === './accounts') return loadTs('components/workspace/accounts.tsx');
+    if (name === '@/lib/account-state') return loadTs('lib/account-state.ts');
     if (name === '@/lib/task-state') return loadTs('lib/task-state.ts');
     if (name === '@/lib/region-state') return loadTs('lib/region-state.ts');
     return require(name);
