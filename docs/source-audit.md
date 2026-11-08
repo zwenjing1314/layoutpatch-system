@@ -1,5 +1,11 @@
 # 阶段 0：源代码、环境与资源核查
 
+## 2026-11-08｜R22 / 2-6来源与保护新核验
+
+本轮新增两份完整12/11页PDF，按archive文件名/页数选样并排除旧样本，未读gold构造输入；PDF SHA、23份完整BF16/float32导出与23页真实MinerU回执见[特征证据](checks/stage2-6-artifacts.json)。真实模型共23页编码、24次问题编码（含重复）、7次D forward/7缓存命中；294次ONNX run，network0。原ColPali、D seed0/epoch1、273410参数、源码/config/权重和模型环境身份保持，无下载/训练/底座替换。
+
+四组页面官方参考使用同次Q与精确授权范围；14组新PDF D同Q原定义参考P′/分数最大差0，容差预先固定。原定义通过只读AST参考命名空间执行，非训练/实验CLI在线依赖；R21三开发样本对照仅历史引用。86项[保护](checks/stage2-6-protection.json)覆盖正式全表/原13页、复用24页、R19—R21源库/11份旧特征、旧项目Git及选定资源/依赖、01—06与.gitignore，不代表ignored全盘审计。源码未附许可证的分发前限制仍保留；本机适配不构成分发许可或研究效果结论。见[汇总](checks/stage2-6-verification.json)。
+
 ## 2026-11-08｜R21 / 2-5来源新核验
 
 两旧库8份核心D源码SHA逐份一致；最小推理定义受控迁入backend/algorithms/d_core，SOURCE.json逐项记录完整源SHA、迁入SHA和裁剪范围，生产不借旧sys.path/训练CLI。seed0/epoch1 checkpoint与source_val选择文件/weights清单/原config身份一致，本地副本1099555字节、strict load273410参数，真实forward完成。来源22项、3开发缓存及12同次Q参考见[手册](stage2-5-runbook.md)与[来源检查](checks/stage2-5-sources.json)。无BGE模型加载/下载/训练，源库未附许可证的发布前限制保留；不把本地适配称为开源授权或效果复现。

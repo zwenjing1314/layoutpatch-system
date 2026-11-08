@@ -1,5 +1,21 @@
 # 模块与接口契约
 
+## 2026-11-08｜R24 / 3-1A用户管理契约
+
+新增GET/POST `/admin/users`、PATCH `/admin/users/{user_id}`、POST `/{user_id}/password`及`/{user_id}/sessions/revoke`（均在/admin/users下）；当前已首改启用管理员，写入Origin/JSON/CSRF。分页limit1—100/offset0—1000000，用户名NOCASE/ID顺序，返回安全账号字段和next_offset；不冻结跨请求分页快照。建号201且必须首改，大小写重名409；启停严格bool、同状态noop，最后启用管理员409；重置密码/撤销提升auth_version并撤销所有旧会话，新启用不复活旧会话。UUID目标、额外字段/参数及重复参数拒绝。无角色修改、用户删除或private文档旁路。
+
+五类操作和错误/幂等细节见[冻结API手册](stage3-1a-runbook.md#api冻结)，以新生成OpenAPI/Account类型/AdminService为准。CLI和HTTP公共BEGIN IMMEDIATE事务先锁再查身份和管理员计数，账号/会话/最小事件原子提交；已授权业务拒绝记rejected，DB错误全回滚。合法匿名401、普通用户/首改/CSRF403、对象404、冲突409、非法输入422、数据库503，private,no-store/Vary Cookie。正式本轮未迁移或部署管理API。
+
+## 2026-11-08｜R22 / 2-6授权区域契约
+
+- GET `/pages/{page_id}/regions/status`：已首改cookie会话，检查当前可读ready页面/活动版本及索引；返回页面/PNG尺寸与SHA、解析状态、task/候选/parser/D身份和本人can_parse，不返回路径、正文或框。缺完整PageFeature为unavailable；共享只读，普通admin无private旁路。
+- POST `/pages/{page_id}/regions`：同源Origin、JSON、X-CSRF-Token及已首改会话；body仅q（1—2000）、document_version_id、render_sha256、index_generation。非ready返回空items，不隐式执行D；ready返回当次query hash、所有候选candidate_id/layout_id/rank/有限score/type、原PNG像素xyxy及crop_url，网页只展示Top5且不改排。推理后新事务重查会话及全部输入。
+- GET `/pages/{page_id}/regions/{layout_id}/crop?task=&candidate_hash=&model=&token=`：严格参数集、拒绝重复，HMAC绑定当前会话和page/task/candidate/model/layout/render。检查当前ready尝试、完整输入及PNG，floor左上/ceil右下裁剪，读PNG后再次授权；新会话不能重放旧签名。
+- 合法匿名/撤销请求401，首改/Origin/CSRF403，越权/撤回404，输入变化409，非法body/参数422，依赖/校验503。畸形body可能在路由principal前收到422，不声明全部匿名畸形请求401。模型失败状态failed并附REGION_INFERENCE_FAILED或MODEL_BUSY，网页仅重试定位；解析失败才走文档解析重试。
+- 业务响应private,no-store/Vary Cookie，上传Origin/CSRF不变。RegionState/Input/Item/Response及PagesService由实际OpenAPI生成，items为required。SearchHit.region_status=not_requested只描述search未运行区域定位；网页独立请求regions/status。完整特征与原search/PNG契约不变。
+
+实际109项HTTP、26项网页及会话重启/原链检查见[本批手册](stage2-6-runbook.md)、[汇总](checks/stage2-6-verification.json)。状态字段、可选项及错误结构以[导出OpenAPI](../frontend/docs/openapi.json)为准，下文旧轮次保留为历史。
+
 ## 2026-11-08｜R19 / 2-3C已实现任务契约
 
 - GET /jobs?limit=10&cursor=：本人非删除文档的任务；limit1—50，cursor≤2048，未知/重复参数422。按created_at/id倒序；签名游标绑定当前会话和limit，非法/跨会话422 INVALID_JOB_CURSOR，进度更新不使分页失效。不是全库管理员接口。

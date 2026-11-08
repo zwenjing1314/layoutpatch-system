@@ -16,7 +16,8 @@ if __name__ == "__main__":
     password = initial_password(args.username) if args.action == "reset" else None
     engine = make_engine(args.database)
     try:
-        change_account(engine, args.username, args.action, time.time(), password)
-        print("Account action completed; existing sessions revoked.")
+        result = change_account(engine, args.username, args.action, time.time(), password)
+        print("Account action completed; existing sessions revoked." if result["changed"]
+              else "Account already in requested state; sessions unchanged.")
     finally:
         engine.dispose()

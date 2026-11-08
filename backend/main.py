@@ -9,9 +9,10 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from sqlalchemy.exc import SQLAlchemyError
-from starsessions import SessionMiddleware
+from starsessions import SessionMiddleware, get_session_handler
 from backend.auth.boundary import AuthBoundary
 from backend.auth.routes import router
+from backend.auth.admin import router as accounts_router
 from backend.auth.settings import AuthSettings
 from backend.auth.store import SQLiteSessionStore
 from backend.db.connection import make_engine
@@ -26,6 +27,7 @@ from backend.documents.listing import router as listing_router
 from backend.documents.tasks import router as tasks_router
 from backend.parsing.routes import router as parsing_router
 from backend.parsing.runner import ParsingRunner, recover as recover_parsing
+from backend.regions.routes import router as regions_router
 
 
 class HealthResponse(BaseModel):
@@ -79,6 +81,10 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
 
     @app.exception_handler(SQLAlchemyError)
     async def database_error(request: Request, exc):
+        # Do not retry a session heartbeat while returning a DB failure (e.g.
+        # BEGIN IMMEDIATE timeout). A second failed write would mask this 503.
+        if "session_handler" in request.scope:
+            get_session_handler(request).is_loaded = False
         return JSONResponse({"detail": "SERVICE_UNAVAILABLE"}, status_code=503)
 
     @app.get("/health", response_model=HealthResponse, operation_id="get_health", tags=["system"])
@@ -87,12 +93,14 @@ def create_app(settings=None, clock=time.time, model_worker=None, qdrant=None, u
         return HealthResponse()
 
     app.include_router(router)
+    app.include_router(accounts_router)
     app.include_router(search_router)
     app.include_router(pages_router)
     app.include_router(ingest_router)
     app.include_router(listing_router)
     app.include_router(tasks_router)
     app.include_router(parsing_router)
+    app.include_router(regions_router)
     return app
 
 

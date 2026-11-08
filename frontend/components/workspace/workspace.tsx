@@ -8,6 +8,8 @@ import { DocumentPicker, ScopeSwitch } from "./document-picker";
 import type { DocumentPickerProps } from "./document-picker";
 import { UploadTasksPanel } from "./upload-tasks";
 import type { UploadTasksProps } from "./upload-tasks";
+import { RegionCanvas, RegionControls } from './region-evidence';
+import type { RegionsProps } from '@/lib/use-regions';
 
 type WorkspaceProps = {
   view: "search" | "tasks";
@@ -24,6 +26,7 @@ type WorkspaceProps = {
   image: string | null;
   imageBusy: boolean;
   imageError: string;
+  regions?: RegionsProps;
   searchMode: SearchMode;
   targetDocument: DocumentListItem | null;
   documentPicker: DocumentPickerProps;
@@ -75,15 +78,17 @@ export function RetrievalResults({ result, selected, onSelect }: {
     </button>)}</div></section>;
 }
 
-export function EvidencePanel({ selected, image, imageBusy, imageError, headingRef, onRetry }: {
+export function EvidencePanel({ selected, image, imageBusy, imageError, headingRef, onRetry, regions }: {
   selected: SearchHit | null; image: string | null; imageBusy: boolean; imageError: string;
   headingRef: RefObject<HTMLHeadingElement | null>; onRetry: () => void;
+  regions?: RegionsProps;
 }) {
   return <aside className="ws-evidence" aria-labelledby="evidence-heading"><header className="ws-evidence-header"><div><p className="ws-eyebrow">回到原文</p><h2 id="evidence-heading" ref={headingRef} tabIndex={-1}>页面预览</h2></div><span className="ws-original-label">授权原图</span></header>
     {selected ? <><div className="ws-document-heading"><h3>{selected.document_name}</h3><span>第 {selected.page_number} 页</span></div><div className="ws-canvas" aria-busy={imageBusy}>
       {imageBusy && <p className="ws-image-status" role="status"><span className="spinner"/>正在加载页面…</p>}
       {imageError && <div className="ws-image-status" role="alert"><p>{imageError}</p><button type="button" onClick={onRetry}>重试预览</button></div>}
-      {image && <img src={image} alt={`${selected.document_name}，第 ${selected.page_number} 页原文`} width={selected.width_px} height={selected.height_px}/>}
+      {image && <RegionCanvas key={selected.page_id} selected={selected} image={image} regions={regions}/>}
+      {regions && <RegionControls regions={regions}/>}
     </div></> : <div className="ws-preview-empty"><span aria-hidden="true">▧</span><h3>让证据回到眼前</h3><p>检索后，选择相关页面，<br/>在这里阅读页面原文。</p></div>}
   </aside>;
 }
@@ -158,7 +163,7 @@ export function WorkspaceShell(props: WorkspaceProps) {
       </div>
       <div className="ws-composer-area">{props.busy && !props.submittedQuestion && <p className="ws-search-status" role="status">正在退出登录…</p>}{props.notice && <p className="ws-notice" role="alert">{props.notice}</p>}<QueryComposer question={props.question} busy={props.busy} searchMode={props.searchMode} targetDocument={props.targetDocument} inputRef={inputRef} onQuestionChange={props.onQuestionChange} onSearch={event => { setPanel("search"); props.onSearch(event); }}/><p className="ws-composer-note">每次独立检索 · 相关分数用于排序，请结合原文核对</p></div>
     </main>
-    <div className="ws-preview-slot" id="workspace-preview"><EvidencePanel selected={props.selected} image={props.image} imageBusy={props.imageBusy} imageError={props.imageError} headingRef={headingRef} onRetry={() => props.selected && props.onSelect(props.selected)}/></div>
+    <div className="ws-preview-slot" id="workspace-preview"><EvidencePanel selected={props.selected} image={props.image} imageBusy={props.imageBusy} imageError={props.imageError} headingRef={headingRef} regions={props.regions} onRetry={() => props.selected && props.onSelect(props.selected)}/></div>
     </>}
   </div>;
 }

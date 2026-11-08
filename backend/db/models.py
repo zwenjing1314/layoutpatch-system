@@ -269,3 +269,23 @@ class LoginAttempt(Base):
     subject_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
     window_start: Mapped[float] = mapped_column(Float)
     failures: Mapped[int] = mapped_column(Integer)
+
+
+class AccountEvent(Base):
+    """Minimal account administration metadata; never credentials or request bodies."""
+    __tablename__ = "account_events"
+    __table_args__ = (
+        CheckConstraint("source IN ('http','cli')", name="ck_account_event_source"),
+        CheckConstraint("action IN ('create','enable','disable','reset','revoke')", name="ck_account_event_action"),
+        CheckConstraint("outcome IN ('success','noop','rejected')", name="ck_account_event_outcome"),
+        CheckConstraint("source='cli' OR actor_id IS NOT NULL", name="ck_account_event_actor"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    actor_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), index=True)
+    target_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), index=True)
+    target_ref: Mapped[str] = mapped_column(String(64))
+    source: Mapped[str] = mapped_column(String(8))
+    action: Mapped[str] = mapped_column(String(8))
+    outcome: Mapped[str] = mapped_column(String(8))
+    code: Mapped[str] = mapped_column(String(64))
+    occurred_at: Mapped[float] = mapped_column(Float)

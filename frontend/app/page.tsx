@@ -9,6 +9,7 @@ import type { SearchMode } from "@/lib/document-selection";
 import { WorkspaceShell } from "@/components/workspace/workspace";
 import "./workspace.css";
 import { useUploadTasks } from "@/lib/use-upload-tasks";
+import { useRegions } from '@/lib/use-regions';
 
 type Mode = "checking" | "login" | "password" | "workspace" | "unavailable";
 type Cancelable<T> = PromiseLike<T> & { cancel(): void };
@@ -45,6 +46,9 @@ export default function Home() {
   const form = useRef<HTMLFormElement | null>(null);
   const [workspaceView, setWorkspaceView] = useState<"search" | "tasks">("search");
   const [leavingWorkspace, setLeavingWorkspace] = useState(false);
+  const regionWorkspace=useRegions({enabled:mode==='workspace'&&!leavingWorkspace,selected,index:result?.index_generation,
+    question:submittedQuestion,onError:error=>businessError(error)});
+  const resetRegions=regionWorkspace.reset;
   const taskWorkspace = useUploadTasks({
     enabled: mode === "workspace" && !leavingWorkspace, userId: me?.user_id ?? null, csrfToken: me?.csrf_token,
     onSessionError: error => businessError(error),
@@ -62,8 +66,8 @@ export default function Home() {
     imageObject.current = null; setImage(null); setImageBusy(false); setImageError("");
   }, []);
   const clearResults = useCallback(() => {
-    generation.current.reset(); clearImage(); setResult(null); setSelected(null); setSubmittedQuestion(""); setBusy(false);
-  }, [clearImage]);
+    generation.current.reset(); resetRegions(); clearImage(); setResult(null); setSelected(null); setSubmittedQuestion(""); setBusy(false);
+  }, [clearImage,resetRegions]);
   const clearDocuments = useCallback(() => {
     listGeneration.current.reset(); listScope.current = null; targetRef.current = null;
     setSearchMode("library"); setTargetDocument(null); setDocumentName(""); setDocumentList(null);
@@ -279,7 +283,7 @@ export default function Home() {
     view={workspaceView} onViewChange={setWorkspaceView} taskPanel={taskWorkspace.panel}
     username={me.username} role={me.role} question={question} submittedQuestion={submittedQuestion}
     busy={busy} notice={notice} result={result} selected={selected}
-    image={image} imageBusy={imageBusy} imageError={imageError}
+    image={image} imageBusy={imageBusy} imageError={imageError} regions={regionWorkspace.panel}
     searchMode={searchMode} targetDocument={targetDocument} onModeChange={changeSearchMode}
     documentPicker={{ name: documentName, response: documentList, busy: listBusy, error: listError, selected: targetDocument, page: listCursors.length,
       onNameChange: changeDocumentName, onSelect: chooseDocument,

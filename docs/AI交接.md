@@ -1,6 +1,54 @@
 # AI交接文档
 
-## 当前交接：R21 / 2-5完成适用验收（2026-11-08，北京时间）
+## 当前交接：R24 / 3-1A用户管理后端与SDK完成（2026-11-08，北京时间）
+
+仅完成用户指定3-1A，停止于3-1B之前。见[本批手册](stage3-1a-runbook.md)、[新运行/保护汇总](checks/stage3-1a-verification.json)。新增0009_account_events仅一张最小事件表，五类管理API及生成SDK；原账号/会话表和算法配置不变。建号强制首改；启停同状态noop、真实变更/重置/撤销提升auth_version并撤销所有旧会话。API和CLI共用BEGIN IMMEDIATE，锁内重查操作者/CSRF和最后启用管理员；业务拒绝记固定事件，账号/撤销/成功事件同事务，事件失败全回滚。修复R23的F01，覆盖双管理员自停/交叉停用及锁前已加载cookie后撤销的竞争；不只是前端按钮保护。
+
+本轮新运行：139后端（含17新增）、13模型CPU契约、33前端、tsc；非空0008克隆→0009旧表不变及重复迁移；33真实localhost管理HTTP、4实际CLI；46真实ASGI原检索/区域回归。A/B两模式、原13页PNG与unavailable、新完整特征页D/crop、管理撤销后search/PNG/status/rank/crop401及新会话旧签名404通过。6次新问题由原ColPali冻结权重/实现BF16在CPU编码，1次D前向23.895ms/1次既有缓存命中；network0、页面编码0/MinerU0。只读复用R22产物，不冒充新PDF/GPU/浏览器/准确率/容量或官方评分验收。正式GPU驻留树未停。
+
+新基线`runtime/verification/r24/before.json`确认正式0008_parsing/2文档13页、integrity ok/FK0及Qdrant13点13403向量，开工42行未提交状态已保存并保留。正式全表/schema/PNG/完整Qdrant与本轮基线一致，3000/8000/6333监听身份保持、8001验收后已停；正式凭据未用。**正式仍运行原0008服务，未部署管理API；正式启用新代码前需备份、迁移0009和单worker重启，本轮不执行。** 进程身份见R24汇总，未来操作仍须重查CIM创建时间/命令，不能只复用PID。
+
+失败如实保留：首次seed修订白名单漏0009，setup失败留下16个已知临时库，逐文件/空目录清理完成；第二次Cookie重放jar冲突改测试，锁超时发现错误响应又写心跳掩盖503，修产品错误处理后复验通过。未放宽权限/事务/模型约束。日志及隔离口令/向量仅在忽略runtime，不打印公开。09/10六步配对，01—08/旧报告/.gitignore及旧库可见Git/选定资源、模型依赖保护；不是ignored全盘审计。新docs/学习文件仍被忽略，交接须单独携带。无下载、训练、换底座、暂存、提交、推送。
+
+**下一唯一任务：3-1B用户管理网页，等待用户明确指定。本轮停止；共享/删除/个人历史/主题/预算均未实施。** 下方旧轮次计划不覆盖本段。
+
+## R23历史交接：阶段2复核与阶段3规划（2026-11-08，北京时间）
+
+本轮仅核查/规划，不开发阶段3。阶段2仍为R22完成适用应用出口；[R23复核与问题](stage2-review-r23.md)、[本轮证据](checks/r23-stage2-review.json)、[最新路线图](项目开发阶段规划与任务.md#stage3)。重新通过122后端/13 CPU契约/32前端/tsc；未重跑GPU/MinerU、浏览器/build或服务重启。历史R22检查不冒充本轮运行。
+
+只读核实正式0008_parsing/2文档13页、integrity ok/FK0，Qdrant13点13403向量与DB身份一致；R22隔离36页中的新增23页特征/导出/PNG/候选哈希、450候选保持。原13页PageFeature仍空，区域unavailable符合旧页约定；正式未新增23页。3000/8000/6333已新查监听/身份，8001无监听；匿名保护正常，health不代表模型就绪。开工已有42行Git改动状态，全部保留；未用正式用户凭据，未启停正式服务。
+
+**明确缺口F01：**本地`auth/accounts.change_account`可停用最后启用管理员，临时库实测1→0；尚无管理HTTP，不是普通用户远程越权证据。必须在3-1A公共业务事务中修复、覆盖CLI/API与并发；本轮未修产品代码。几何/准确率/容量/外部部署/方法二等原限制保持。核查脚本一次SQLite临时清理失败及执行策略拒绝已如实记入复核，修正探针后复现成功。
+
+用户新增的查询历史重命名/置顶/删除安排3-4A后端、3-4B侧栏，审计查询另3-4C；主题切换独立3-6，不重做阶段2。原3-1细拆A后端/SDK、B网页。建议阶段3开工创建09/10并同步AGENTS规则；本轮收尾在07/08续写，01—06及旧报告保留，新docs仍忽略须单独带。
+
+收尾：正式全表/schema/原13页PNG及完整Qdrant、本轮基线中应用代码、01—06/旧报告、HEAD/空暂存保持；386本地链接有效，07/08四步口稿92/88/93/93字。核查探针连接清理已修正，策略拒绝后改为核对过的明确单文件/空目录清理成功；未残留该临时库。服务前后身份另留runtime/verification/r23。没有暂存、提交、推送。
+
+**下一唯一任务：3-1A——用户管理后端/SDK。等待用户明确指定。本轮停止，不实现历史、主题或其它阶段3代码。** 下方均为各自日期的历史记录，旧“下一步”不覆盖本段。
+
+## R22历史交接 / 2-6完成阶段2适用出口（2026-11-08，北京时间）
+
+用户授权的下一唯一2-6已完成，停止于阶段3之前。见[手册](stage2-6-runbook.md)、[汇总/修改文件](checks/stage2-6-verification.json)、[HTTP109项](checks/stage2-6-http.json)、[网页26项](checks/stage2-6-browser.json)、[重启前6项](checks/stage2-6-recovery-before.json)/[重启后21项](checks/stage2-6-recovery-after.json)、[原13页18项](checks/stage2-6-legacy.json)、[86项保护](checks/stage2-6-protection.json)、[实际成本](checks/stage2-6-cost.json)。开工Git干净，旧同范围窗口未活动；中断增量接续，未重复2-5。新基线在stage2-6-preflight.json、source-state-r22-before.json及runtime/verification/r22/metadata-before.sqlite3，历史报告未冒充新运行。
+
+实现GET /pages/{id}/regions/status、POST /pages/{id}/regions及签名crop GET；复核cookie/首改/Origin/CSRF、当前document/version/page/render/index/parser/task/候选整集/D身份，推理或读PNG后新事务重查会话和全部输入。裁剪按原PNG像素向外取整，绑定当前会话，不公开路径/正文/静态目录；admin普通接口无private旁路。无表/迁移/算法/config/权重/依赖变更，正式仍0008。原13页未自动编码/解析，缺PageFeature显式unavailable，原检索/PNG仍可用。
+
+隔离随机账号A/B同名两份此前未选完整新PDF12/11页，真实上传→23页原ColPali编码→36页活动库→23页真实MinerU→450候选（文字301/标题42/公式96/图8/表3）→新Q/Top-k→真实D/授权crop。均private/版本1；23份完整BF16[1031,128]/1024视觉行及精确float32导出新核验。[特征/解析回执](checks/stage2-6-artifacts.json)、[四类视觉抽查](checks/stage2-6-visual.json)可追溯，无gold或预测表构造输入。state/recovery-private含隔离凭据禁止打印；正式凭据未使用。
+
+网页独立区域/crop代号与Blob回收、显式解析/定位、Top5类型/编号/分数、同frame SVG及50/100/150%缩放。实际1920/1366/390/320无body横向溢出，三档原像素框误差<0.003px；A/B真实问题/PNG/crop对应，选页/新检索/退出/换号/过期清旧证据。未提交草稿不会替换已提交Q。显式失败/6秒延迟/过期夹具与正常推理分开；第二次精确延迟验证0.523秒清空，实际D继续完成但不回填。真实重启时auth/me碰到断连先隐藏工作区，重连再见撤销；不冒称浏览器区域请求直接401，区域HTTP撤销另有证据。解析/模型失败原图保留，模型失败只重试定位。
+
+最终122后端57.472秒、13模型CPU契约2.76秒、32前端415.3864毫秒、tsc/生产build通过。[4组页面官方参考](checks/stage2-6-page-reference.json)最大差3.7001953110404884e-6；[14组同Q原定义D参考](checks/stage2-6-D-reference.json)P′/分数最大差0、排序一致。容差与严格273410参数/seed0/epoch1/checkpoint/profile保持。固定3开发样本一致性是R21历史，未冒充本轮复跑；本轮不是区域准确率评价。
+
+实际23页面forward、10检索Q＋14区域Q共24次query编码（含重复/两次清空后仍完成）、7 D forward/7缓存命中，3棵先后worker，network0。MinerU294次ONNX/回执374.123秒，D CPU forward24.359毫秒不含输入/hash/cache/加载；两轮原定义参考6+14共20 forward另计。CUDA peak allocated8696922624字节不是进程总内存。解析几何仍限制零旋转/零MediaBox原点/CropBox=MediaBox；物理页序与论文印刷页码区分。不宣布T01—T15整表、研究效果、并发容量或任意PDF通过。
+
+86保护确认正式全表/schema/原2文档13页及完整Qdrant、复用24页、R19/R20/R21源库、11份旧BF16/导出、旧项目Git/选定资源/模型环境、锁与01—06/.gitignore不变；非ignored全盘审计。正式已恢复新backend.main:app（监听59748/启动器55848）、生产前端3340，6333 Docker49880保持；8001/隔离模型树已停，浏览器回正式登录页/视口复原。PID仅快照，启停前重查CIM命令/创建时间。
+
+[失败记录](checks/stage2-6-failures.json)保留SDK可选items、旧白名单、UI选中即卸载、首次延迟时序未定、过期夹具触发约束及匿名空JSON422等；分别修正/复测，未放宽安全/算法/数据库约束。仅既有构建/换行提示，无本批未解阻塞。资料及07/08六步已同步，01—06保留；新docs受原忽略规则影响须另带。无下载/训练/换底座/暂存/提交/推送。
+
+**下一唯一任务：3-1——用户管理。等待用户明确指定；本轮停止，不自动进入阶段3。**
+
+R22收尾新检查：[69项资料一致性](checks/r22-document-checks.json)通过，07/08六步同日期/轮次/标题，口稿86/90/88/94/91/98字，链接存在、01—06/.gitignore哈希、HEAD及空暂存保持。Qdrant网络body审计仅后6次真实检索，Top-k前完整目标白名单12/5/8/12/11/12及版本/profile/index、exact/limit和返回子集已复核；早先8001的4次无该wrapper日志，不扩大证据范围。页面参考0次编码明确是参考进程自身复用输入，R22全轮实际23次另列，原分数/容差未改。收尾只改资料/验收脚本，未重复推理或进入3-1。
+
+## 以下为R21历史交接 / 2-5（2026-11-08，北京时间）
 
 本轮只完成D-no-text真实内部推理适配，停止于2-6之前。见[手册](stage2-5-runbook.md)、[汇总/修改清单](checks/stage2-5-verification.json)、[来源22项](checks/stage2-5-sources.json)、[开发缓存](checks/stage2-5-consistency.json)、[真实输入](checks/stage2-5-real.json)、[同次Q参考](checks/stage2-5-reference.json)、[回归](checks/stage2-5-tests.json)、[原链32项](checks/stage2-5-search.json)、[最终保护65项](checks/stage2-5-protection.json)。
 

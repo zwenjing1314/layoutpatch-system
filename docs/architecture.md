@@ -1,5 +1,17 @@
 # 架构、数据实体与部署设计
 
+## 2026-11-08｜R24 / 3-1A增量
+
+用户管理后端/SDK完成，最小AccountEvent通过0009独立表接入。公共accounts业务层在BEGIN IMMEDIATE锁内重新校验HTTP管理员会话/CSRF，读取目标与启用管理员计数，原子提交账号/旧会话撤销/事件；CLI共享最后管理员保护。成功/noop/已授权业务拒绝记录最小元数据，无凭据和私人查询正文；未提供事件查询或保留策略，留3-4C。
+
+新增管理路由不改变documents/search/regions普通授权边界；数据库异常响应跳过再次心跳写入以确保锁超时503可送达。正式保持0008及原服务，本轮只迁移隔离克隆到0009；正式启用需另行备份/迁移/重启。实际权限、并发、原模型CPU新Q与区域回归见[手册](stage3-1a-runbook.md)。下方架构中未落地实体/流程仍按设计理解，不由本批扩大为已实现。
+
+## 2026-11-08｜R22 / 2-6当前实现
+
+在R21内部regions.service外新增status/rank/crop三条会话路由；复用既有Document/Version/Page/PageFeature、解析三表及活动索引，无新表/迁移，正式保持0008。推理或PNG读取不占用旧读事务，完成后新事务复核会话、当前归属/活动版本/索引、渲染、解析task/profile/候选整集和D身份。签名crop绑定当前会话及全部输入，不提供静态产物目录或跨private旁路。
+
+Home传入submittedQuestion，useRegions分开管理区域与crop请求代号/取消及Blob；RegionControls负责状态、显式解析/定位和Top5列表，RegionCanvas将原PNG与SVG放入同一frame，以原尺寸viewBox共同缩放。身份失效、换页/范围/问题、隐藏及退出清理旧区域；局部失败保留原图，模型重试与解析重试分开。SearchHit.region_status仍not_requested表示search自身未执行定位，实际状态来自独立regions/status。见[手册](stage2-6-runbook.md)、[真实验收](checks/stage2-6-verification.json)。原ColPali完整特征及D代码/config/权重未改，预算序列不能送D；下文旧状态不授权重复开发。
+
 ## 2026-11-08｜R21 / 2-5当前实现
 
 新增受控d_core与DNoTextAdapter、regions.service内部授权组装、原ModelWorker的regions分支。无新表，正式保持0008；P′使用私有runtime不可变文件cache，包含完整特征/候选/模型/代码/活动索引身份。query每次在同一worker真实编码，CPU D复用该Q；完整1031行与派生1024行P′分开，预算序列不能送D。推理后重新授权，公开会话边界/区域HTTP/高亮仍待2-6。见[手册](stage2-5-runbook.md)、[实际检查](checks/stage2-5-verification.json)。下文“D未实现”按历史轮次理解。
