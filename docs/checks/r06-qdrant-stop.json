@@ -1,8 +1,0 @@
-{
-  "port_6333_unreachable": true,
-  "status": "exited",
-  "exit_code": 143,
-  "running": false,
-  "oom_killed": false,
-  "error": ""
-}

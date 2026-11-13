@@ -22,5 +22,5 @@ checkpoints/
 *.sqlite*
 *.log
 
-docs/过程记录
-docs
+# Project notes and verification evidence stay local; do not force-add this tree.
+/docs/

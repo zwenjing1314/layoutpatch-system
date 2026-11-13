@@ -1,9 +1,0 @@
-{
-  "date": "2026-11-06",
-  "batch": "1B-1",
-  "overall": "passed",
-  "current_evidence": "r06-stage1b-1-completion.json",
-  "web_evidence": "stage1b-1-web.json",
-  "historical_blocked_status": "r05-stage1b-1-status.json",
-  "business_features": "not implemented"
-}

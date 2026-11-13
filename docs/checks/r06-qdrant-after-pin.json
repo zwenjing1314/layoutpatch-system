@@ -1,7 +1,0 @@
-{
-  "ready": 200,
-  "authorized": 200,
-  "anonymous": 401,
-  "wrong_key": 401,
-  "collections": []
-}
