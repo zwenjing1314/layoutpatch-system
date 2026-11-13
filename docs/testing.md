@@ -1,5 +1,95 @@
 # 分阶段验收与检查记录
 
+
+**R38最终收尾：38/38项通过，12项经验CDF分位数独立核对一致，121个采样登记进程身份全部退出。** 正式0008/2文档13页、28原集合完整向量/payload/config及既有文件/Git保护通过；[核查](checks/stage4-2b-verification.json)、[交付SHA清单](evaluation/4-2b-r38/delivery-manifest.json)。冷竞争1次MODEL_BUSY作为真实失败保留，未通过重试抹去；不是SLA/容量通过。下一唯一4-2C，等待用户明确指定。
+
+## 2026-11-14｜R38 / 4-2B真实性能与有限竞争（无SLA/容量通过声明）
+
+用户只指定4-2B。[性能报告](stage4-2b-performance-report.md)、[冻结协议](evaluation/4-2b-r38/protocol.json)、[汇总](evaluation/4-2b-r38/performance.json)、[逐请求指标](evaluation/4-2b-r38/request-metrics.json)、[收尾核查](checks/stage4-2b-verification.json)已形成；数值全部来自R38新运行，R37效果/R33功能只作历史，未重算效果或重跑应用套件/build/SDK。新0013普通owner库、4份完整PDF/36页新编码和新解析、独占根/P′及5新代；原ColPali BF16 cuda0、CPU D/MinerU身份不变。先完整入库/小样本，再成功关闭A并按预先计划启动B，恰好2次模型加载，无失败重启/CPU回退/人工延迟。OS/Qdrant缓存未清，冷仅指模型进程冷。
+
+20次各组成功HTTP p50/p95/max（ms）：页面k3=88.11/107.09/189.57；区域P′ miss=111.30/124.23/224.45、hit=106.20/117.84/124.77；检索后实际top1页定位整链=196.04/231.78/239.53；同一历史20次无推理读取=12.06/13.78/14.53。冷并发2次状态{'200': 1, '503': 1}，热并发10波/20次状态{'200': 20}；全部失败保留，不自动retry，最后预先安排的恢复查询成功。
+
+应用树RSS采样峰值4.202GiB；GPU allocated/reserved峰值8.100/8.322GiB；1秒采样可漏短峰。NTFS逐文件分配和本轮5集合Docker du实测，含旧代：0/5/13/25/36页共79点拷贝，36页新编码、43旧点再复制；不把共享VHDX增长归因给本轮。主机/整卡/Qdrant整体观察另列，不能与应用独占值混同。
+
+全程787.45秒≤10800；新Q=131（页面70、区域61）、D新forward27、P′ hit34；36页解析/ONNX 467次。网络尝试0、越界写0。108次cmd.exe尝试由既有解析护栏阻止，未放行；原回执没有具体参数/调用栈，不臆测原因。没有预设SLA，20小样本/两客户端不能证明容量或长期并发达标；本轮不重验网页busy提示。
+
+开工HEAD c08f729、5项既有修改/空暂存、3147选定文件、28原集合全向量/payload与41资源SHA登记；正式只读0008/2文档13页、仅6333监听，3000/8000开工未运行，不恢复。最终逐文件/库/集合/服务/进程保护以收尾核查为准，不是ignored或旧三项目整盘审计。11/12追加六步、原字节前缀保留；AGENTS已有规则适用，01—10及旧证据不改。docs/runtime仍ignored，原始响应签名/随机凭据仅本机，显式另带，不整包公开。
+
+许可缺口仍保留：SciEGQA通用许可/tuGEMM额外依据未补齐，本任务不是版权授权。未训练/下载/换底座、修改产品功能/算法、迁移部署/启停正式服务、暂存/提交/推送。
+
+**本轮4-2B完成后停止。下一唯一任务：4-2C最终功能与故障缺口回归，等待用户明确指定。** 依据4-1A逐T矩阵及4-2A/B新证据补候选功能/故障与本人网页首改；不能把API成功代记本人操作。4-3A/4-3B/预算方法/新功能不自动推进。
+
+命令与助手：r38/prepare.py → launch.py（冻结driver/web_server/gpu_worker/sample_resources，两阶段同一全程预算）→ analyze.py（离线最近秩统计）→ write_report.py / sync_docs.py → finalize.py（只读保护与经验CDF独立核分位数）。保留原始请求503/超时/未执行分母；本轮没有故障注入。T14.01/.03/.04有有限队列/串行进程新证据，T14.05/.06补性能/实际分配占用；详见报告，不能将其扩为整T表或完整恢复通过。
+
+
+
+**R37最终收尾：40/40项通过；独立穷举算分451/451项一致；本轮四个登记PID均已退出。** 正式0008/2文档13页、23原集合完整向量/payload和1925选定文件保护通过。首轮38/39的辅助断言失败与108次已拦截cmd.exe尝试保留，不改解析护栏/算法/评分、不重跑推理。最新结论见[最终核查](checks/stage4-2a-verification-final.json)。
+
+
+R37收尾首轮38/39通过，原报告保存在docs/checks/stage4-2a-verification.json及runtime/verification/r37/verification.json。唯一失败为助手额外断言blocked_process_attempts必须空；实际36份解析回执各有3次cmd.exe Popen尝试，共108次，被冻结脚本的审计钩子记录后立即PermissionError拦截。全部36解析completed、467次ONNX CPU前向、network_attempts0/blocked_writes0；未放行子进程。原产品准入检查网络/越界写入和实际CPU provider，不要求已被阻止的Popen尝试为零；因此修正辅助检查与冻结规则的对应关系，保留原失败，不改算法/沙箱/协议/分母、不重跑模型。确切cmd参数/调用栈未被原回执记录，来源原因未核实，不冒作已知。新收尾写入独立final-check-v2及stage4-2a-verification-final.json，原产物不覆盖。
+
+
+## 2026-11-14｜R37 / 4-2A真实隔离效果运行
+
+用户最新明确指定“人工核查没有问题，完成接下来4-2A相关任务。”，本轮按仅本机隔离评价任务执行；不是额外版权许可。SciEGQA通用许可/tuGEMM额外依据仍缺，R36的BLOCKED_LICENSE_ONLY与v1/v2原件保留，结果和材料不公开/再分发。人工AI辅助意见及AllAnnotated解释已确认，不重复索取。
+
+4份完整PDF/36页/24道已见固定题/28题页/32框；新编码36P、全36页新MinerU、24次页面Q＋120次区域Q，原BF16 GPU/CPU D和MinerU；D新forward32、P′命中88。页面Hit@3=95.83%；端到端主k3/m3 Any=15/24（62.50%），AllAnnotated=11/24（45.83%）。见[效果报告](stage4-2a-effectiveness-report.md)、[汇总](evaluation/4-2a-r37/metrics.json)、[24题详情](evaluation/4-2a-r37/per-query-scores.json)、[收尾核查](checks/stage4-2a-verification-final.json)。
+
+命令为r37/prepare.py（只读新基线）、launch.py（新库迁移/原HTTP/一次GPU及全页CPU解析/硬预算）、score.py（离线数学评分）、write_report.py、sync_docs.py和finalize.py。actual-summary/cost-ledger、raw-http、model-calls、全页特征/解析与逐题排名受保护留存，原响应不公开。总墙钟764.86秒（含空库准备/服务加载/等待），小于10800秒；模型加载一次，网络尝试0，无失败重试/CPU回退，8项评分边界核对通过；评分器在任何页面/区域结果前冻结SHA，未后调阈值/分母。24题、28题页和32框分母全保留，九格均报。同一(q,page)输出复用Oracle和E2E，不冒作独立推理；本轮无应用套件/build/SDK或数值一致性重复实验，R33只作历史。
+
+开工HEAD c08f729、5项已有修改/空暂存；1925选定文件、23原集合全float32向量/payload和正式全表/schema摘要登记保护。正式只读仍0008/2文档13页；仅6333 Docker监听，3000/8000开工即未运行，不恢复。新空0013评价库/普通owner/上传/特征/候选/P′根及5个本轮索引代独占，未克隆旧库特征，未按gold生成候选。所有36页的原PNG SHA与R35冻结渲染一致；原始响应签名/凭据仅留本机runtime。
+
+不报完整Recall/nDCG、答案EM/F1、拒答或未见泛化；AllAnnotated覆盖全部官方框，含3题辅助语境，不等于答案证据最小必需。没有预设效果通过阈值，运行完成不等于效果达标。GPU模型审计包含cuda:0/meta参数对象、无缺键，未逐名解释meta；torch interop实际默认14。成本账本不是4-2B性能验收，OS缓存未控制。T01—T15原定义与历史矩阵保持，未把本轮效果表当完整产品测试通过。8项核对仅评分数学边界，不是新增功能单测或R33回归重跑。助手探索读取错路径/PowerShell不支持通配时无写入；pypdf原Xref校正及transformers加载提示保留日志，不改变冻结PDF。
+
+**本轮4-2A结束后停止。下一唯一任务：4-2B性能、资源与小规模负载，等待用户明确指定。** 4-2C/部署/恢复/预算方法/新产品功能不自动推进；正式库未迁移部署，许可缺口继续限制公开研究材料。
+
+
+## 2026-11-14｜R36 / 4-1B许可核查及AI辅助标签确认（无效果运行）
+
+[新检查](checks/stage4-1b-followup-verification.json)、[许可](stage4-1b-rights-review.md)、[逐题意见](stage4-1b-label-review.md)、[AI记录](evaluation/4-1b-v2/review-decisions.ai.json)、[用户完成记录](evaluation/4-1b-v2/human-confirmation.completed.json)、[准入](evaluation/4-1b-v2/admission.json)。全部24题/28题页/32框逐一对照原/系统PNG裁图，核物理页、算术与跨页第二页；无模型预测参与。AI没有发现原答/页/映射冲突；3题含辅助框，AllAnnotated只覆盖全部官方标注，不称最小必要或答案生成正确。用户明确接受AI辅助意见，24题本人确认完成，不登记为独立双人标注/独立逐图阅读。
+
+许可网页本轮新读，27次取得HTTP状态（21个200、3个403、3个404），之前9次沙箱套接字错误回执保留。HF固定卡SHA相同且无许可字段；仓库固定commit README明确研究用途，不能写成通用许可证；匹配本地PDF实际版本v1/v2/v2/v5查得三CC、一arXiv非独占分发。用户没有额外依据并明确保留许可阻塞，v2准入BLOCKED_LICENSE_ONLY。没有论文CC覆盖数据集标注的推定，也未发作者消息。
+
+命令助手为runtime/verification/r36中的prepare.py、fetch_license.py（公开文本GET）、prepare_review.py（PIL/PyMuPDF读取/裁图/文本）、write_review.py、record_decisions.py、sync_docs.py和finalize.py。无torch/应用import、模型加载/forward、MinerU解析/评价/性能、单元测试/build/SDK、迁移/部署/启停。R35结构预检PASS按输入SHA复用为历史，本轮没有新做结构预检。正式只读事务前后0008/2文档13页逻辑摘要保持，不测业务HTTP/端口/完整向量。829选定文件保护含R35全目录，不是旧库/ignored整盘审计。
+
+首次zoneinfo缺tzdata在网络前失败，改当前日期明确+08时区，不安装；沙箱WinError10013按正常权限流程重查成功，GitHub API403及错误main分支404保留，按网页实际master固定commit，master/LICENSE404只限该路径。源代码/配置和旧报告/01—10/R35/11与12原字节前缀、5项既有Git改动/空暂存保持。T01—T15定义/历史矩阵不改，本次没有新产品T项通过。
+
+**标签准入通过采用AI意见解决，许可准入仍阻塞。下一唯一4-1B剩余材料使用依据（或另行指定替代方案）；完成本轮核查后停止，不进入4-2A。**
+
+R36收尾助手首次在读取Git UTF-8输出时被Windows默认GBK解码中断，尚未生成最终通过数。first-final-encoding保留原清单/占位报告/正式回执及诊断；改为字节捕获后明确UTF-8解码，保留真实退出码再核，不改产品或验收门槛。
+
+## 2026-11-14｜R35 / 4-1B材料与协议检查（准入阻塞；无效果/性能运行）
+
+新证据：[协议](stage4-evaluation-protocol.md)、[审核包说明](stage4-evaluation-review.md)、[候选manifest](evaluation/4-1b-v1/corpus.json)、[文件SHA](evaluation/4-1b-v1/artifact-manifest.json)、[收尾核查](checks/stage4-1b-verification.json)；助手/源清点/失败和原图在runtime/verification/r35。命令为prepare.py、build_data.py、write_protocol.py、sync_docs.py、finalize.py，PDF结构预检用ARS pdf_read_preflight.py的stdout接口，sidecar落独占目录。只import标准库/PyMuPDF/PIL/pypdf，不import应用/torch或加载模型，不启动服务/解析器。
+
+数据新核：1623题/80文档的本地官方JSONL、80个PDF归档成员和1828个图像归档文件；只对选中4份完整PDF做新结构预检，均PASS。所选36页均原点零/无旋转/等CropBox，144dpi RGB原图逐SHA；24题/28题页/32框的源PNG坐标范围与0—1000归一化校验通过，映射到同版系统PNG。并排审核页包含全部28题页，联系表仅24个首证据页；视觉概览不算人工语义通过。标签/映射/许可人工审核全部pending，不能写效果已验。
+
+协议固定k/m=1,3,5，IoU0.50；完整36页排名请求k=36再取前缀，精确并列score/page_id稳定；区域score/layout_id。Any/一对一All匹配、页面24题/条件区域28题页/32框候选覆盖/端到端24题分母分别固定。所有超时/失败/漏检及预算未执行留分母；相关性不完备，不报完整Recall/nDCG；无答案题0，不报拒答。4份均已见，不称独立未见测试。
+
+用户批准本地审核包及原BF16 GPU+CPU串行3小时预算，但许可未明前明确阻塞效果运行/公开。人工复核未完成，4-2A未授权。新正式SQLite只读前后仍0008/2文档13页且逻辑摘要保持；未查端口/HTTP/完整向量。Git保留5项既有改动及空暂存；旧资料/源码/配置/历史受选定范围保护，不声称全ignored/旧库模型全盘审计。
+
+首次build_data预期路径少Images/前缀而失败，first-attempt完整保留，按实际归档名修正后成功；首次控制台GBK不能输出Unicode题文，改UTF-8，无题文改写。旧路径/PowerShell通配读取错误保留说明；PyMuPDF fitz弃用提示不影响渲染，未升级包。没有应用单测/构建/SDK/推理/评价/性能/迁移/部署/启停/下载/训练/暂存/提交/推送。T01—T15原定义及历史矩阵保持，本次不升级任何T项为新通过。
+
+**终态：协议及候选身份冻结，效果准入阻塞。下一唯一：4-1B补齐许可依据和人工标签复核，等用户明确指定。**
+
+R35首次收尾32/34通过；两项助手/文档问题为tuple对JSON list误判库变化，以及testing的阻塞提示超出首800字检查范围。序列化正式前后完全相等、全表摘要零变化；修比较表示并在标题明确准入阻塞，first-final-check保留原失败/清单/after/正式回执后重核，不修改产品、数据库或验收阈值。
+
+R35二次收尾33/34通过：补写说明时统一换行使11旧LF前缀SHA变化；已按开工SHA精确恢复7210字节原LF前缀，保留R35追加。second-final-check保留失败及诊断，未改历史文字/算法/数据库后重核。
+
+## 2026-11-09｜R34 / 4-1A只读盘点与范围冻结（非应用复跑）
+
+本批产物：[范围/版本](stage4-scope-freeze.md)、[逐T子项矩阵](stage4-acceptance-matrix.md)、[矩阵JSON](checks/stage4-1a-acceptance-matrix.json)、[身份清单](checks/stage4-1a-baseline.json)、[收尾结果](checks/stage4-1a-verification.json)。T01—T15原始定义保持，下列早期“PDF/管理待实现”等文字按其历史时点阅读；新矩阵逐项裁定当前首版适用性。
+
+实际命令仅为指定文档阅读、Git/CIM/端口读取及`.venv-web/Scripts/python.exe -B runtime/verification/r34/inspect_baseline.py`、`write_matrix.py`、`freeze_version.py`、`finalize.py`。助手不import应用；SQLite mode=ro/query_only/同事务读现存WAL，匿名GET首页/OpenAPI/health/代理health及Qdrant集合信息，资源仅流式SHA，三环境仅包元数据。没有新应用/模型测试、forward、浏览器、build/SDK生成、迁移/部署或启停。
+
+新结果：HEAD c08f729502c374279657a02d23e6cbb58811b912、开工干净/空暂存、669文件清单；正式0008_parsing/2文档13页/特征0、integrity ok/FK0；运行GET/search无/history及旧前端主题，源码0013/POST/history/74SDK。3000 PID3340/8000 PID59748/6333 PID49880连续，3001/8001空闲；Qdrant13点及配置新读，不声称完整13403向量本轮已核；41项本地资源SHA匹配、加载/推理0。未读既有进程环境，部署时须明确设置并核绑定。
+
+矩阵84子项分别登记历史适用证据、本轮新身份/静态核实、待验/不适用及计划批次/参与者：76项有历史、4待验、4不适用，不是功能覆盖率或新通过数。R33最终230后端229通过/1权限跳过、13CPU/115前端及E01—E09仍为历史，未复跑；旧symlink跳过、本人网页新密码未操作、完整BFCache/无障碍未验继续明确。无admin私有旁路/PDF GET/清库任意编辑/预算profile，外部公网部署不属首版。
+
+首次辅助清单将不在本轮源文件选择集的ignored tsbuildinfo误判缺失，initial-selection回执保留后按共同源文件比较纠正；无产品/构建变更。首次收尾39/40通过，唯一失败是助手strip误删Git首行有效前导空格，按固定列取路径出错；first-status-format原报告/after/DB/服务回执保留，只修rstrip换行后重核。OS本地化Caption输出编码不可用，最终只存数值版本/架构。探索读取不存在文件和PowerShell通配路径报错均无写入，随后改读实际路径。收尾检查仅验证文档/证据、修改范围、正式只读摘要和服务保持，不冒充应用回归。
+
+学习记录11/12的R34-S01—S06配对及AGENTS规则同步；01—10/旧报告/.gitignore保留。本轮到此停止，下一唯一4-1B须用户检查后明确指定；不提前评价批跑、性能测试、迁移部署或预算接入。
+
 ## 2026-11-09｜阶段4规划的文档检查（非应用验收）
 
 本次只读取R33手册/报告并更新路线图，不复跑R33、模型、单元测试、浏览器或构建，不迁移/部署/启停服务。检查仅包括R33报告结构与既有证据引用存在性、计划九小批/下一4-1A一致性、本轮修改范围、历史/学习前缀保护、Markdown链接与Git差异格式。见[文档检查](checks/stage4-planning-document-checks-20261109.json)。
